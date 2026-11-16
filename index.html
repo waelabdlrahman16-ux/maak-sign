@@ -510,6 +510,22 @@ async function sbRoom(){
       on:(t,f)=>{(H[t]=H[t]||[]).push(f)},presence:async p=>{await ch.track({p})},
       onPeers:f=>{PF.push(f)},peers:()=>peers,leave:async()=>{await sb.removeChannel(ch)}}}}}
 const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
+/* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */
+const AGENT_URL=SB_URL+'/functions/v1/maak-agent';
+const sampleP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null);
+const AGENT_SYS={
+  compose:'You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words) that the customer most likely means, for the bank teller to read. Use only meaning supported by the signs, the goal or the amount. Never invent numbers, names or requests. Reply with JSON only: {"text": "..."}',
+  match:'A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Reply with JSON only: {"index": n}'};
+function agentOk(task,v,payload){if(!v||typeof v!=='object')return null;
+  if(task==='compose'){const t=typeof v.text==='string'?v.text.trim():'';return t&&t.length<=160?{text:t}:null}
+  const i=Number(v.index);return Number.isInteger(i)&&i>=-1&&i<payload.phrases.length?{index:i}:null}
+async function agent(task,payload){
+  try{const s=await sampleP;if(s){const input=task==='match'?{text:payload.text,phrases:payload.phrases.map((t,i)=>i+': '+t)}:payload;
+    const v=await s.json(AGENT_SYS[task]+'\n\nINPUT:\n'+JSON.stringify(input),{modelTier:'quick'});const ok=agentOk(task,v,payload);if(ok)return ok}}catch(e){}
+  try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),7000);
+    const r=await fetch(AGENT_URL,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task,payload})});
+    clearTimeout(tm);if(r.ok){const j=await r.json();if(!j.fallback)return agentOk(task,j,payload)}}catch(e){}
+  return null}
 
 /* =========================================================
    Recognition (MediaPipe Holistic on this device)
@@ -707,6 +723,10 @@ function customer(){
   function sentenceFor(ws){let best=null;for(const [keys,txt] of RULES){if(keys.every(k=>ws.includes(k))&&(!best||keys.length>best[0].length))best=[keys,txt]}
     if(best&&best[0].length>=ws.filter(w=>!['salam','sabah','shokran','ana'].includes(w)).length-1){const pre=ws.filter(w=>['salam','sabah'].includes(w)).map(w=>AR[w]).join('، ');return (pre?pre+'، ':'')+best[1]}
     return ws.map(w=>AR[w]).join(' ')}
+  async function composeAgent(){const key=st.words.join(',');if(!st.words.length)return;
+    const it=INTENTS.find(i=>i.k===st.plan.intent);
+    const r=await agent('compose',{signs:st.words.map(w=>AR[w]),goal:it?it.want:null,amount:st.plan.intent==='card'?null:String(st.plan.amount)});
+    if(r&&st.words.join(',')===key&&cur==='c9'){st.composed={key,text:r.text};$('#c9text').textContent=r.text}}
   function renderChips(){
     $('#c8chips').innerHTML=st.words.length?st.words.map((w,i)=>`<span class="chip">${AR[w]}<button aria-label="امسح ${AR[w]}" data-i="${i}"><span class="ms">close</span></button></span>`).join(''):'<span class="body-m">الإشارات اللي فهمتها هتظهر هنا</span>';
     $('#c8chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{st.words.splice(+b.dataset.i,1);renderChips()});
@@ -725,7 +745,7 @@ function customer(){
   $('#c8send').onclick=()=>go('c9');
   /* ---------- C9 check ---------- */
   $('#c9yes').onclick=async()=>{
-    const text=sentenceFor(st.words);st.thread.push({who:'c',text});
+    const key=st.words.join(',');const text=st.composed&&st.composed.key===key?st.composed.text:sentenceFor(st.words);st.composed=null;st.thread.push({who:'c',text});
     if(st.room){try{await st.room.emit('say',{text,voice:!!SET.voice})}catch(e){snack('مقدرتش أبعت. اتأكد إن الموظف لسه متوصل.')}}
     else snack('مش متوصل بالموظف، ورّيله الشاشة');
     st.words=[];renderChips();hist.length=Math.max(0,hist.lastIndexOf('c8'));go('c8',false);
@@ -757,7 +777,7 @@ function customer(){
     c6(){$('#c6want').textContent=wantText();$('#c6amt').textContent=st.plan.intent==='card'?'':'المبلغ '+money(st.plan.amount)+' جنيه'},
     c7(){pair()},
     c8(){attach($('#c8v'),$('#c8c'),$('#c8pill'),$('#c8perf'),onTalk);renderChips();if(CAM.stream){$('#c8ph').hidden=true;startCam()}$('#c8end').hidden=!st.ended;$('#c8title').textContent=st.room?'عند الشباك · متوصل':'عند الشباك'},
-    c9(){$('#c9chips').innerHTML=st.words.map(w=>`<span class="chip">${AR[w]}</span>`).join('');$('#c9text').textContent=sentenceFor(st.words)},
+    c9(){$('#c9chips').innerHTML=st.words.map(w=>`<span class="chip">${AR[w]}</span>`).join('');$('#c9text').textContent=sentenceFor(st.words);composeAgent()},
     c10(){renderAlts();$('#c10v').hidden=true;$('#c10ph').hidden=false},
     c11(){stopCam();const v=store.get('maak_visits',[]);const it=st.ended?{want:wantText(),amount:st.plan.amount,items:st.thread,date:new Date().toISOString().slice(0,10)}:v[viewVisit];
       if(!it){$('#c11list').innerHTML='<p class="body-m pad">مفيش زيارات لسه</p>';return}
@@ -830,9 +850,10 @@ function teller(){
     mic.onclick=()=>{if(d.active()){d.stop().catch(()=>{})}else{d.start({language:'ar'}).catch(e=>{if(e&&e.code==='unavailable'){d.start().catch(()=>{})}})}};
   }catch(e){}})();
   // send → confirm
-  $('#t2send').onclick=()=>{
+  $('#t2send').onclick=async()=>{
     const text=$('#t2in').value.trim();if(!text){$('#t2in').focus();return}
-    const p=st.sel&&st.sel.t===text?st.sel:match(text);
+    let p=st.sel&&st.sel.t===text?st.sel:match(text);
+    if(!p){const btn=$('#t2send');btn.disabled=true;const r=await agent('match',{text,phrases:TELLER.map(x=>x.t)});btn.disabled=false;if(r&&r.index>=0)p=TELLER[r.index]}
     const clips=p?p.clips:[];const shown=p?p.t:text;
     const dlg=$('#confirm').content.cloneNode(true).firstElementChild;document.body.appendChild(dlg);
     dlg.querySelector('[data-text]').textContent=shown;
