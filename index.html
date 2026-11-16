@@ -792,6 +792,8 @@ function teller(){
   // connect
   const codeIn=$('#t1code');
   const hashCode=(location.hash.match(/teller-(\d{6})/)||[])[1];if(hashCode)codeIn.value=hashCode;
+  if(hashCode)queueMicrotask(()=>$('#t1go').click());
+  codeIn.addEventListener('focus',()=>codeIn.select());codeIn.addEventListener('input',()=>{const d=toLatin(codeIn.value).replace(/\D/g,'');if(d.length>6)codeIn.value=d.slice(-6)});
   $('#t1go').onclick=async()=>{
     const code=toLatin(codeIn.value).replace(/\D/g,'');
     if(code.length!==6){$('#t1st').className='status warn';$('#t1st').textContent='الرقم ٦ أرقام، زي اللي على موبايل العميل';return}
