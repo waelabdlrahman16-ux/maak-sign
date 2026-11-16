@@ -67,6 +67,7 @@ button,input{font:inherit;color:inherit}
 .headline-s{font-size:24px;line-height:32px;margin:0;font-weight:400}
 .headline-m{font-size:28px;line-height:36px;margin:0;font-weight:400}
 .body-l{font-size:16px;line-height:24px;color:var(--on-surface-variant);margin:0}
+.intro-en{font-size:13px;line-height:20px;color:var(--on-surface-variant);margin:12px 0 0;text-align:left}.intro-en a{color:var(--primary);font-weight:500;display:inline-block;padding:10px 0;margin:-10px 0}
 .body-m{font-size:14px;line-height:20px;color:var(--on-surface-variant);margin:0}
 .label-l{font-size:14px;line-height:20px;font-weight:500;color:var(--on-surface-variant)}
 .mute{color:var(--on-surface-variant)}
@@ -198,6 +199,7 @@ button,input{font:inherit;color:inherit}
   <div class="body">
     <p class="body-l">اتكلم بالإشارة، ومعاك يوصّل كلامك</p>
     <div class="media" style="height:420px"><video data-clip="salam" muted playsinline loop autoplay></video></div>
+    <p class="intro-en" lang="en" dir="ltr">Maak Sign helps deaf customers talk to bank tellers in Egyptian Sign Language. Bank teller? <a href="#teller">Open the teller screen</a></p>
   </div>
   <div class="actions">
     <button class="btn filled wide" data-go="c2"><span class="ms">sign_language</span>ابدأ</button>
@@ -526,6 +528,8 @@ function bootModel(){
   return booting;
 }
 let TEMPL=store.get('wasel_templates',{});const saveT=()=>store.set('wasel_templates',TEMPL);
+let BUILTIN={};fetch('templates.json').then(r=>r.ok?r.json():{}).then(j=>{BUILTIN=j&&typeof j==='object'?j:{}}).catch(()=>{});
+const allTemplates=()=>{const m={...BUILTIN};for(const [k,arr] of Object.entries(TEMPL))if(arr&&arr.length)m[k]=arr;return m};
 const POSW=0.6;
 function frameRaw(r,W,H){const asp=W/H;const P=r.poseLandmarks&&r.poseLandmarks[0];if(!P)return null;const sh=[P[11],P[12]];const mid=[(sh[0].x+sh[1].x)/2*asp,(sh[0].y+sh[1].y)/2];const w=Math.hypot((sh[0].x-sh[1].x)*asp,sh[0].y-sh[1].y)||1;const hand=h=>h&&h.length?h.map(p=>[(p.x*asp-mid[0])/w,(p.y-mid[1])/w]):null;return {L:hand(r.leftHandLandmarks&&r.leftHandLandmarks[0]),R:hand(r.rightHandLandmarks&&r.rightHandLandmarks[0]),hipY:P[23]?(P[23].y-mid[1])/w:2.5}}
 function shape(h){const o=h[0];let m=1e-6;const r=h.map(p=>[p[0]-o[0],p[1]-o[1]]);r.forEach(p=>m=Math.max(m,Math.hypot(p[0],p[1])));const f=[];for(let i=1;i<21;i++){f.push(r[i][0]/m,r[i][1]/m)}return f}
@@ -534,7 +538,7 @@ function motion(seq){const v=seq.filter(Boolean);if(v.length<2)return 0;let mx=0
 function resample(F,T){const out=[];for(let i=0;i<T;i++){const p=i*(F.length-1)/(T-1),lo=Math.floor(p),hi=Math.min(lo+1,F.length-1),w=p-lo;out.push(F[lo].map((x,k)=>x*(1-w)+F[hi][k]*w))}return out}
 function toFeatures(frames){const Ls=frames.map(f=>f.L),Rs=frames.map(f=>f.R);let D=Ls,N=Rs,mir=false;if(motion(Rs)>motion(Ls)){D=Rs;N=Ls;mir=true}const flip=h=>h&&mir?h.map(p=>[-p[0],p[1]]):h;D=fillGaps(D.map(flip));if(!D)return null;const nUp=frames.filter((f,i)=>N[i]&&N[i][0][1]<f.hipY-0.3).length/frames.length;const nMove=motion(N)-N.filter(Boolean).length/N.length;const Nf=(nUp>0.4||nMove>0.12)?fillGaps(N.map(flip)):null;const F=D.map((h,i)=>{let f=[h[0][0]*POSW,h[0][1]*POSW,...shape(h)];if(Nf)f.push(Nf[i][0][0]*0.5*POSW,Nf[i][0][1]*0.5*POSW,...shape(Nf[i]).map(x=>x*0.3));else f.push(0,0.9*0.5*POSW,...new Array(40).fill(0));return f});return resample(F,24)}
 function dtw(a,b,band=6){const n=a.length,INF=1e18;const D=Array.from({length:n+1},()=>new Float64Array(n+1).fill(INF));D[0][0]=0;for(let i=1;i<=n;i++)for(let j=Math.max(1,i-band);j<=Math.min(n,i+band);j++){let s=0;const x=a[i-1],y=b[j-1];for(let k=0;k<x.length;k++){const d=x[k]-y[k];s+=d*d}D[i][j]=Math.sqrt(s)+Math.min(D[i-1][j],D[i][j-1],D[i-1][j-1])}return D[n][n]}
-function classify(F){const best={};for(const [k,arr] of Object.entries(TEMPL))for(const t of arr){const d=dtw(F,t);if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
+function classify(F){const best={};for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){const d=dtw(F,t);if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
 
 /* camera + segmentation: a sign starts when a hand rises, ends when hands drop, stay still, or after 3.5 s */
 const CAM={stream:null,v:null,c:null,pill:null,perf:null,onSign:null,running:false,lastTs:-1};
