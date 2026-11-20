@@ -28,7 +28,7 @@ Right-to-left Arabic, icons and sign videos on every screen, a "explain this scr
 
 ## What is original and what is borrowed
 
-**Original to this project:** the product and interaction design, all screens and flows, the sign segmentation, feature normalisation and matching logic, the customer–teller protocol, and the banking sign vocabulary and phrases. The sign videos in `clips/` are prototype references and will be replaced by recordings from deaf volunteer signers.
+**Original to this project:** the product and interaction design, all screens and flows, the sign segmentation, feature normalisation and matching logic, the customer–teller protocol, and the banking sign vocabulary and phrases. Every sign video shown in the app is openly licensed (see below). Signs without an open-licence video yet show the word and an icon; recordings from deaf volunteer signers will fill those gaps.
 
 **Open data used:** sign examples and the `clips/kg_*.mp4` videos (need, help, where, sorry, fine, how are you, what is your name, thanks) come from the Kaggle dataset *Arabic Sign Language (ArSL) for Words* by Eslam Ezzat, released under CC0 (public domain), recorded by Egyptian signers. On signers held out from the examples, the matcher picks the right sign 81% of the time across these 8 words.
 

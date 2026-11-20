@@ -204,7 +204,7 @@ button,input{font:inherit;color:inherit}
   <div class="appbar"><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
   <div class="body">
     <p class="body-l">اتكلم بالإشارة، ومعاك يوصّل كلامك</p>
-    <div class="media" style="height:420px"><video data-clip="salam" muted playsinline loop autoplay></video></div>
+    <div class="media" style="height:420px"><video data-clip="kg_3amel_eh" muted playsinline loop autoplay></video></div>
     <p class="intro-en" lang="en" dir="ltr">Maak Sign helps deaf customers talk to bank tellers in Egyptian Sign Language. Bank teller? <a href="#teller">Open the teller screen</a></p>
   </div>
   <div class="actions">
@@ -341,7 +341,7 @@ button,input{font:inherit;color:inherit}
 <section class="screen" id="c11" hidden>
   <div class="appbar"><button class="ib lead" data-go="c4" aria-label="قفل"><span class="ms">close</span></button><h1>ملخص الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
   <div class="body flush">
-    <div class="pad" style="padding-bottom:8px"><div class="media" style="height:240px"><video data-clip="tmam" muted playsinline loop autoplay></video></div></div>
+    <div class="pad" style="padding-bottom:8px"><div class="media" style="height:240px"><video data-clip="kg_kwayes" muted playsinline loop autoplay></video></div></div>
     <div id="c11list"></div>
   </div>
   <div class="actions"><button class="btn filled wide" data-go="c4"><span class="ms">home</span>رجوع للرئيسية</button></div>
@@ -442,11 +442,14 @@ const SIGNS=[
  {k:'3waz',ar:'عايز'},{k:'ashab',ar:'أسحب'},{k:'awda3',ar:'أودع'},{k:'flos',ar:'فلوس',clip:'flos'},
  {k:'bta2a',ar:'البطاقة'},{k:'gedid',ar:'جديدة',clip:'gedid'},{k:'msh_shaghal',ar:'مش شغالة'},{k:'kam',ar:'كام',clip:'kam'},
  {k:'hesab',ar:'الحساب',clip:'hesab'},{k:'emta',ar:'إمتى',clip:'emta'},{k:'aywa',ar:'أيوه',clip:'aywa'},{k:'la',ar:'لأ',clip:'la'},
- {k:'tmam',ar:'تمام',clip:'tmam'},{k:'tany',ar:'تاني',clip:'tany'},{k:'shokran',ar:'شكراً',clip:'shokran'},{k:'salam',ar:'السلام عليكم',clip:'salam'},
+ {k:'tmam',ar:'تمام',clip:'tmam'},{k:'tany',ar:'تاني',clip:'tany'},{k:'shokran',ar:'شكراً',clip:'kg_shokran'},{k:'salam',ar:'السلام عليكم',clip:'salam'},
  {k:'sabah',ar:'صباح الخير',clip:'sabah'},{k:'ana',ar:'أنا',clip:'ana'},
  {k:'mo7tag',ar:'محتاج',clip:'kg_mo7tag'},{k:'mosa3da',ar:'مساعدة',clip:'kg_mosa3da'},{k:'fein',ar:'فين',clip:'kg_fein'},
  {k:'asef',ar:'آسف',clip:'kg_asef'},{k:'kwayes',ar:'كويس',clip:'kg_kwayes'},{k:'3amel_eh',ar:'عامل إيه',clip:'kg_3amel_eh'},
 ];
+/* Only openly licensed (CC0) sign videos are shown. Other reference clips are training data only. */
+const okClip=c=>typeof c==='string'&&/^kg_/.test(c);
+SIGNS.forEach(s=>{if(!okClip(s.clip))delete s.clip});
 const AR=Object.fromEntries(SIGNS.map(s=>[s.k,s.ar])), CLIP=Object.fromEntries(SIGNS.map(s=>[s.k,s.clip]));
 const RULES=[
  [['3waz','ashab','flos'],'عايز أسحب فلوس'],[['3waz','awda3','flos'],'عايز أودع فلوس'],
@@ -475,9 +478,10 @@ const TELLER=[
  {t:'تمام، خلصنا',kw:['تمام','خلاص','خلصنا','اتعمل'],clips:['tmam']},
  {t:'أيوه',kw:['ايوه','نعم'],clips:['aywa']},
  {t:'لأ',kw:['لا','مفيش'],clips:['la']},
- {t:'شكراً',kw:['شكرا','متشكر'],clips:['shokran']},
+ {t:'شكراً',kw:['شكرا','متشكر'],clips:['kg_shokran']},
  {t:'ممكن تعيد تاني؟',kw:['تاني','تعيد'],clips:['tany']},
 ];
+TELLER.forEach(p=>{p.clips=p.clips.filter(okClip)});
 const INTENTS=[
  {k:'ashab',icon:'payments',ar:'أسحب فلوس',want:'عايز أسحب فلوس',clip:'flos'},
  {k:'awda3',icon:'account_balance',ar:'أودع فلوس',want:'عايز أودع فلوس',clip:'flos'},
@@ -694,7 +698,7 @@ function customer(){
   function renderPlan(){
     $('#c5opts').innerHTML=INTENTS.map(i=>`<button class="li ${st.plan.intent===i.k?'sel':''}" data-intent="${i.k}" aria-pressed="${st.plan.intent===i.k}"><span class="ms lead">${i.icon}</span><span class="txt"><b>${i.ar}</b></span></button>`).join('');
     $('#c5opts').querySelectorAll('[data-intent]').forEach(b=>b.onclick=()=>{st.plan.intent=b.dataset.intent;savePlan();renderPlan()});
-    const it=INTENTS.find(i=>i.k===st.plan.intent);const v=$('#c5vid');const want='clips/'+it.clip+'.mp4';if(!v.src.endsWith(want)){v.src=want;v.play().catch(()=>{})}
+    const it=INTENTS.find(i=>i.k===st.plan.intent);const v=$('#c5vid');v.parentElement.hidden=!okClip(it.clip);if(okClip(it.clip)){const want='clips/'+it.clip+'.mp4';if(!v.src.endsWith(want)){v.src=want;v.play().catch(()=>{})}}else v.removeAttribute('src')
     $('#c5amtrow').hidden=st.plan.intent==='card';$('#c5amt').textContent=money(st.plan.amount)+' جنيه';
   }
   $('#c5edit').onclick=()=>{$('#c5field').hidden=false;$('#c5in').value=arDigits(st.plan.amount);$('#c5in').focus()};
