@@ -446,6 +446,7 @@ const SIGNS=[
  {k:'sabah',ar:'صباح الخير',clip:'sabah'},{k:'ana',ar:'أنا',clip:'ana'},
  {k:'mo7tag',ar:'محتاج',clip:'kg_mo7tag'},{k:'mosa3da',ar:'مساعدة',clip:'kg_mosa3da'},{k:'fein',ar:'فين',clip:'kg_fein'},
  {k:'asef',ar:'آسف',clip:'kg_asef'},{k:'kwayes',ar:'كويس',clip:'kg_kwayes'},{k:'3amel_eh',ar:'عامل إيه',clip:'kg_3amel_eh'},
+ {k:'bdal_fa2ed',ar:'بدل فاقد'},{k:'bdal_talef',ar:'بدل تالف'},{k:'raqam_serri',ar:'الرقم السري'},
 ];
 /* Only openly licensed (CC0) sign videos are shown. Other reference clips are training data only. */
 const okClip=c=>typeof c==='string'&&/^kg_/.test(c);
@@ -454,7 +455,9 @@ const AR=Object.fromEntries(SIGNS.map(s=>[s.k,s.ar])), CLIP=Object.fromEntries(S
 const RULES=[
  [['3waz','ashab','flos'],'عايز أسحب فلوس'],[['3waz','awda3','flos'],'عايز أودع فلوس'],
  [['ashab','flos'],'عايز أسحب فلوس'],[['awda3','flos'],'عايز أودع فلوس'],
- [['bta2a','msh_shaghal'],'البطاقة بتاعتي مش شغالة'],[['3waz','bta2a','gedid'],'عايز بطاقة جديدة'],[['bta2a','gedid'],'عايز بطاقة جديدة'],
+ [['bta2a','msh_shaghal'],'البطاقة بتاعتي مش شغالة'],
+ [['bta2a','bdal_fa2ed'],'عايز بطاقة بدل فاقد'],[['bdal_fa2ed'],'عايز بطاقة بدل فاقد'],[['bta2a','bdal_talef'],'عايز بطاقة بدل تالف'],[['bdal_talef'],'عايز بطاقة بدل تالف'],
+ [['raqam_serri','msh_shaghal'],'الرقم السري مش شغال'],[['3waz','raqam_serri','gedid'],'عايز رقم سري جديد'],[['raqam_serri'],'عندي مشكلة في الرقم السري'],[['msh_shaghal'],'مش شغالة'],[['3waz','bta2a','gedid'],'عايز بطاقة جديدة'],[['bta2a','gedid'],'عايز بطاقة جديدة'],
  [['bta2a','gedid','emta'],'البطاقة الجديدة هتوصل إمتى؟'],[['flos','kam'],'كام فلوس في حسابي؟'],[['hesab','flos','kam'],'كام فلوس في حسابي؟'],
  [['3waz','hesab'],'عايز أعرف عن حسابي'],
  [['ana','mo7tag','mosa3da'],'محتاج مساعدة لو سمحت'],[['mo7tag','mosa3da'],'محتاج مساعدة لو سمحت'],[['3waz','mosa3da'],'محتاج مساعدة لو سمحت'],[['mosa3da'],'ممكن مساعدة؟'],

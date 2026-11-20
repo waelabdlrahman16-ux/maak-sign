@@ -11,7 +11,7 @@ Entry for the Dubai Create AI Agents Championship, category **Best Societal AI A
 ## How it works
 
 1. **Sign recognition on the phone.** The camera feed is processed on the device. Hand, arm and body landmarks are extracted per frame, normalised for position, scale and handedness, and segmented into individual signs by timing (hand raised, held, lowered).
-2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for 23 of its 24 signs (62 examples from many signers), and each user can teach it their own way of signing, which then takes priority.
+2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for all 27 of its signs (70 examples from many signers), and each user can teach it their own way of signing, which then takes priority.
 3. **Sentence and confirmation.** Recognised signs become a short Arabic request (e.g. *I want to withdraw 2,000 EGP*). The customer confirms before anything is sent. If a sign is unclear, the customer picks the word from a picture list instead of the agent guessing.
 4. **Teller pairing.** The customer's phone shows a six-digit code; the teller types it (or opens a link) and both screens connect. No install and no account for the teller.
 5. **Reply in sign.** The teller taps a reply; the customer sees it as a sign-language video with the text underneath.
