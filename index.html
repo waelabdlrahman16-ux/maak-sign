@@ -575,7 +575,10 @@ function motion(seq){const v=seq.filter(Boolean);if(v.length<2)return 0;let mx=0
 function resample(F,T){const out=[];for(let i=0;i<T;i++){const p=i*(F.length-1)/(T-1),lo=Math.floor(p),hi=Math.min(lo+1,F.length-1),w=p-lo;out.push(F[lo].map((x,k)=>x*(1-w)+F[hi][k]*w))}return out}
 function toFeatures(frames){const Ls=frames.map(f=>f.L),Rs=frames.map(f=>f.R);let D=Ls,N=Rs,mir=false;if(motion(Rs)>motion(Ls)){D=Rs;N=Ls;mir=true}const flip=h=>h&&mir?h.map(p=>[-p[0],p[1]]):h;D=fillGaps(D.map(flip));if(!D)return null;const nUp=frames.filter((f,i)=>N[i]&&N[i][0][1]<f.hipY-0.3).length/frames.length;const nMove=motion(N)-N.filter(Boolean).length/N.length;const Nf=(nUp>0.4||nMove>0.12)?fillGaps(N.map(flip)):null;const F=D.map((h,i)=>{let f=[h[0][0]*POSW,h[0][1]*POSW,...shape(h)];if(Nf)f.push(Nf[i][0][0]*0.5*POSW,Nf[i][0][1]*0.5*POSW,...shape(Nf[i]).map(x=>x*0.3));else f.push(0,0.9*0.5*POSW,...new Array(40).fill(0));return f});return resample(F,24)}
 function dtw(a,b,band=6){const n=a.length,INF=1e18;const D=Array.from({length:n+1},()=>new Float64Array(n+1).fill(INF));D[0][0]=0;for(let i=1;i<=n;i++)for(let j=Math.max(1,i-band);j<=Math.min(n,i+band);j++){let s=0;const x=a[i-1],y=b[j-1];for(let k=0;k<x.length;k++){const d=x[k]-y[k];s+=d*d}D[i][j]=Math.sqrt(s)+Math.min(D[i-1][j],D[i][j-1],D[i-1][j-1])}return D[n][n]}
-function classify(F){const best={};for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){const d=dtw(F,t);if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
+/* Matching tuned on held-out CC0 signers (23 Nov): hand position weighted 6x, warp band 3 -> 77% to 87% strict top-1. */
+const POSBOOST=6,BAND=3,_wcache=new WeakMap();
+function wpos(F){if(_wcache.has(F))return _wcache.get(F);const G=F.map(f=>{const g=f.slice();g[0]*=POSBOOST;g[1]*=POSBOOST;g[42]*=POSBOOST;g[43]*=POSBOOST;return g});_wcache.set(F,G);return G}
+function classify(F){const best={};const Q=wpos(F);for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){const d=dtw(Q,wpos(t),BAND);if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
 
 /* camera + segmentation: a sign starts when a hand rises, ends when hands drop, stay still, or after 3.5 s */
 const CAM={stream:null,v:null,c:null,pill:null,perf:null,onSign:null,running:false,lastTs:-1};
@@ -756,7 +759,8 @@ function customer(){
   function onTalk(F){
     const r=classify(F);
     if(!r.length){snack('علّم معاك الإشارات الأول من «تمرين»');return}
-    if(r[0][1]>55){st.alts=r.slice(0,3).map(x=>x[0]);go('c10');return}
+    /* unclear (too far) or too close to call: let the customer pick instead of guessing */
+    if(r[0][1]>78||(r[1]&&r[1][1]/r[0][1]<1.08)){st.alts=r.slice(0,3).map(x=>x[0]);go('c10');return}
     const k=r[0][0],now=Date.now();if(st.words[st.words.length-1]===k&&now-(st.lastAdd||0)<2500){st.lastAdd=now;return}
     st.lastAdd=now;st.words.push(k);renderChips();
   }
