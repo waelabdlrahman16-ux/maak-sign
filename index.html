@@ -78,6 +78,7 @@ button,input{font:inherit;color:inherit}
 .btn .ms{font-size:20px}
 .btn.wide{width:100%}
 .btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
 .btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
 .btn.outline{background:none;border:1px solid var(--outline-variant);color:var(--on-surface-variant)}
 .btn.text{background:none;color:var(--primary);padding-inline:12px}
@@ -223,6 +224,37 @@ button,input{font:inherit;color:inherit}
     <div class="setrow"><span class="txt"><b>أشارك إشاراتي علشان معاك يتحسن</b><small>اختياري، تقدر تقفله في أي وقت</small></span><button class="sw" role="switch" aria-checked="false" data-setting="share" aria-label="أشارك إشاراتي"></button></div>
   </div>
   <div class="actions"><button class="btn filled wide" id="c2ok"><span class="ms">check_circle</span>موافق</button></div>
+</section>
+
+<section class="screen" id="rv" hidden>
+  <div class="appbar"><span></span><h1>ساعد معاك يفهم الإشارة</h1><span></span></div>
+  <div class="body flush">
+    <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">هتعمل ١٥ إشارة بنك، كل إشارة ٣ مرات. حوالي ١٠ دقايق.</p></div>
+    <div class="li static"><span class="ms lead">front_hand</span><span class="txt"><b>بنسجّل نقط حركة الإيد بس</b><small>من غير فيديو ومن غير وشّك</small></span></div>
+    <div class="li static"><span class="ms lead">school</span><span class="txt"><b>علشان معاك يفهم ناس أكتر</b><small>مش هتتنشر ومش هتتباع</small></span></div>
+    <div class="li static"><span class="ms lead">delete</span><span class="txt"><b>تقدر تطلب مسحها في أي وقت</b><small>بالكود اللي هيظهرلك في الآخر</small></span></div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:8px;padding-block:8px">
+      <p class="label-l">إيدك الأساسية</p>
+      <div class="chips" data-rvpick="hand"><button class="btn tonal" data-v="R" aria-pressed="false">يمين</button><button class="btn tonal" data-v="L" aria-pressed="false">شمال</button></div>
+      <p class="label-l">علاقتك بلغة الإشارة</p>
+      <div class="chips" data-rvpick="rel"><button class="btn tonal" data-v="deaf" aria-pressed="false">أصم / ضعيف سمع</button><button class="btn tonal" data-v="interp" aria-pressed="false">مترجم إشارة</button><button class="btn tonal" data-v="family" aria-pressed="false">أهل أو صديق لأصم</button><button class="btn tonal" data-v="learner" aria-pressed="false">بتعلّم الإشارة</button></div>
+    </div>
+    <div class="setrow"><span class="txt"><b>عندي ١٨ سنة أو أكتر</b></span><button class="sw" role="switch" aria-checked="false" data-rv="adult" aria-label="عندي ١٨ سنة أو أكتر"></button></div>
+    <div class="setrow"><span class="txt"><b>موافق إن نقط حركة إيدي تتسجل لتحسين معاك</b></span><button class="sw" role="switch" aria-checked="false" data-rv="agree" aria-label="موافق على التسجيل"></button></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="rvstart" disabled><span class="ms">videocam</span>ابدأ</button></div>
+</section>
+
+<section class="screen" id="rvdone" hidden>
+  <div class="appbar"><span></span><h1>شكرًا ليك</h1><span></span></div>
+  <div class="body">
+    <div class="media" style="height:200px"><div class="ph"><span class="ms lg">volunteer_activism</span><b>إشاراتك هتساعد الصم في مصر</b></div></div>
+    <p class="title-l" style="text-align:center" id="rvmsg"></p>
+    <p class="status">الكود بتاعك</p>
+    <p class="title-l num" style="text-align:center;letter-spacing:.2em" id="rvcode"></p>
+    <p class="status" id="rvpending"></p>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="rvretry" hidden><span class="ms">cloud_upload</span>ابعت الباقي</button></div>
 </section>
 
 <section class="screen" id="c3" hidden>
@@ -697,16 +729,33 @@ function customer(){
   function showTeach(){
     const s=curSign();$('#c3count').textContent=T.list.length>1?`إشارة ${arDigits(T.i+1)} من ${arDigits(T.list.length)}`:'تمرين';$('#c3word').textContent=s.ar;$('#c3word2').textContent=s.ar;
     const r=$('#c3ref');if(s.clip){r.hidden=false;$('#c3noref').hidden=true;r.src='clips/'+s.clip+'.mp4';r.play().catch(()=>{})}else{r.hidden=true;r.removeAttribute('src');$('#c3noref').hidden=false}
-    const n=(TEMPL[s.k]||[]).length;$('#c3st').textContent=n?`اتسجلت ${arDigits(n)} مرة ✔ ${n<2?'— اعملها مرة كمان':''}`:'اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة';
+    if(RECMODE){const n=REC.reps[s.k]||0;$('#c3st').textContent=n?`اتسجلت ${arDigits(Math.min(n,REC_REPS))} من ${arDigits(REC_REPS)} ✔`:`اعمل الإشارة ${arDigits(REC_REPS)} مرات، ونزّل إيدك بين كل مرة`}else{const n=(TEMPL[s.k]||[]).length;$('#c3st').textContent=n?`اتسجلت ${arDigits(n)} مرة ✔ ${n<2?'— اعملها مرة كمان':''}`:'اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة'}
     $('#c3next').lastChild.textContent=T.i<T.list.length-1?'التالي':'خلّصت';
-    $('#c3skip').hidden=T.list.length===1;
+    $('#c3skip').hidden=T.list.length===1||RECMODE;
   }
-  const finishTeach=()=>{store.set('maak_onboarded',true);hist.length=0;go(T.ret,false)};
-  function onTeach(F){const s=curSign();(TEMPL[s.k]=TEMPL[s.k]||[]).push(F);if(TEMPL[s.k].length>4)TEMPL[s.k].shift();saveT();showTeach();if(TEMPL[s.k].length>=2)setTimeout(()=>{if(cur==='c3'&&T.i<T.list.length-1){T.i++;showTeach()}},900)}
+  const finishTeach=()=>{if(!RECMODE)store.set('maak_onboarded',true);hist.length=0;go(T.ret,false)};
+  function onTeach(F){if(RECMODE){recTeach(F);return}const s=curSign();(TEMPL[s.k]=TEMPL[s.k]||[]).push(F);if(TEMPL[s.k].length>4)TEMPL[s.k].shift();saveT();showTeach();if(TEMPL[s.k].length>=2)setTimeout(()=>{if(cur==='c3'&&T.i<T.list.length-1){T.i++;showTeach()}},900)}
   $('#c3cam').onclick=()=>camButton($('#c3ph'),$('#c3pill'));
   $('#c3file').onchange=()=>fileButton($('#c3file'),$('#c3ph'));
   $('#c3next').onclick=()=>{if(T.i<T.list.length-1){T.i++;showTeach()}else finishTeach()};
   $('#c3skip').onclick=finishTeach;
+  /* ---------- volunteer recorder (?rec): hand-point features only, sent to the Maak-only Supabase project ---------- */
+  const RECMODE=(()=>{try{return new URLSearchParams(location.search).has('rec')}catch(e){return false}})();
+  const REC_LIST=['ana','asam','3waz','bta2a','msh_shaghal','bdal_fa2ed','bdal_talef','raqam_serri','gedid','estelam','tawqee3','meeza','hesab','emta','tmam'],REC_REPS=3;
+  const REC_URL='https://lkvdivexgzhavuijydsb.supabase.co/rest/v1/recordings',REC_KEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
+  const REC=store.get('maak_rec',null)||{session:Math.random().toString(36).slice(2,8).toUpperCase(),meta:{},reps:{},sent:0};
+  const recSave=()=>store.set('maak_rec',REC);
+  async function recSend(it){try{const r=await fetch(REC_URL,{method:'POST',headers:{apikey:REC_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(it)});return r.ok}catch(e){return false}}
+  let recBusy=false;
+  async function recFlush(){if(recBusy)return store.get('maak_rec_q',[]).length;recBusy=true;const q=store.get('maak_rec_q',[]);const left=[];for(const it of q){if(await recSend(it))REC.sent++;else left.push(it)}store.set('maak_rec_q',left);recSave();recBusy=false;return left.length}
+  function recTeach(F){const s=curSign();const n=(REC.reps[s.k]||0)+1;REC.reps[s.k]=n;recSave();
+    const q=store.get('maak_rec_q',[]);q.push({session:REC.session,sign:s.k,rep:Math.min(n,10),features:F.map(r=>r.map(v=>Math.round(v*1e3)/1e3)),meta:REC.meta});store.set('maak_rec_q',q);recFlush();
+    showTeach();if(n>=REC_REPS)setTimeout(()=>{if(cur!=='c3')return;if(T.i<T.list.length-1){T.i++;showTeach()}else finishTeach()},900)}
+  const rvReady=()=>{const ok=REC.meta.hand&&REC.meta.rel&&document.querySelector('[data-rv="adult"]').getAttribute('aria-checked')==='true'&&document.querySelector('[data-rv="agree"]').getAttribute('aria-checked')==='true';$('#rvstart').disabled=!ok};
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>{b.setAttribute('aria-checked',b.getAttribute('aria-checked')!=='true');rvReady()});
+  document.querySelectorAll('[data-rvpick]').forEach(g=>g.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{g.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b));REC.meta[g.dataset.rvpick]=b.dataset.v;rvReady()}));
+  $('#rvstart').onclick=()=>{REC.meta.adult=true;REC.meta.consent=new Date().toISOString();REC.meta.v=1;recSave();T.list=REC_LIST;T.i=0;T.ret='rvdone';go('c3')};
+  $('#rvretry').onclick=async()=>{$('#rvretry').disabled=true;await recFlush();$('#rvretry').disabled=false;enter.rvdone()};
   /* ---------- word picker (fallback when signing is not understood) ---------- */
   function openPicker(){
     const frag=$('#picker').content.cloneNode(true);const scrim=frag.querySelector('[data-scrim]'),sheet=frag.querySelector('.sheet');document.body.append(scrim,sheet);
@@ -834,10 +883,12 @@ function customer(){
       $('#c12list').querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{viewVisit=+b.dataset.visit;st.ended=false;go('c11')})},
     c13(){stopCam();$('#c13list').innerHTML=SIGNS.map((s,i)=>{const n=(TEMPL[s.k]||[]).length;return `<button class="li two" data-t="${i}"><span class="ms lead">play_circle</span><span class="txt"><b>${s.ar}</b><small>${n?'اتعلمتها':'لسه'}</small></span>${n?'<span class="ms trail">check_circle</span>':''}</button>`}).join('');
       $('#c13list').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{T.list=[SIGNS[+b.dataset.t].k];T.i=0;T.ret='c13';go('c3')})},
+    async rvdone(){stopCam();const done=REC_LIST.filter(k=>(REC.reps[k]||0)>=REC_REPS).length;$('#rvmsg').textContent=`سجّلت ${arDigits(done)} من ${arDigits(REC_LIST.length)} إشارة`;$('#rvcode').textContent=REC.session;const left=await recFlush();$('#rvpending').textContent=left?`فاضل ${arDigits(left)} تسجيل لسه ما اتبعتش. اتأكد من النت ودوس «ابعت الباقي».`:'كل التسجيلات اتبعتت ✔';$('#rvretry').hidden=!left},
     c14(){stopCam();$('#c14n').textContent=`معاك اتعلم ${arDigits(trainedCount())} إشارة على الموبايل ده`},
   };
   $('#c14reset').onclick=()=>{TEMPL={};saveT();enter.c14();snack('اتمسحت الإشارات')};
-  go(store.get('maak_onboarded',false)?'c4':'c1',false);
+  if(RECMODE){const idx=REC_LIST.findIndex(k=>(REC.reps[k]||0)<REC_REPS);if(!Object.keys(REC.reps).length)go('rv',false);else if(idx<0)go('rvdone',false);else{T.list=REC_LIST;T.i=idx;T.ret='rvdone';go('c3',false)}}
+  else go(store.get('maak_onboarded',false)?'c4':'c1',false);
   bootModel().catch(()=>{});
 }
 
