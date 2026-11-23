@@ -599,23 +599,36 @@ async function startCam(){
 async function useFile(file){
   await bootModel();
   if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}
-  const v=CAM.v,onSign=CAM.onSign;v.srcObject=null;v.muted=true;v.loop=false;v.style.transform='none';CAM.c.style.transform='none';
-  v.src=URL.createObjectURL(file);v.pause();
+  const v=CAM.v,onSign=CAM.onSign;v.srcObject=null;v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.loop=false;v.style.transform='none';CAM.c.style.transform='none';
+  v.src=URL.createObjectURL(file);
   await new Promise((res,rej)=>{if(v.readyState>=1)return res();v.onloadedmetadata=()=>res();v.onerror=()=>rej(new Error('bad video'))});
   const dur=isFinite(v.duration)?v.duration:0;if(!dur)throw new Error('no duration');
-  buf=[];signing=false;upSince=0;cool=0;prevW=null;emitted=0;const all=[];const step=1/12;
+  /* iPhone Safari only shows frames of a video that has played once: play it silently for a moment, then pause */
+  try{await v.play()}catch(e){}v.pause();
+  /* copy each frame into a canvas and track that: reliable on Safari, same pixels everywhere */
+  const W=v.videoWidth,H=v.videoHeight,fc=document.createElement('canvas');fc.width=W;fc.height=H;const fg=fc.getContext('2d');
+  const tc=document.createElement('canvas');tc.width=tc.height=16;const tg=tc.getContext('2d',{willReadFrequently:true});
+  buf=[];signing=false;upSince=0;cool=0;prevW=null;emitted=0;const all=[];const step=1/12;let n=0,blank=0;
   for(let t=0;t<dur;t+=step){
     if(CAM.onSign!==onSign)return;
-    v.currentTime=t;await new Promise(r=>{const h=()=>{v.removeEventListener('seeked',h);r()};v.addEventListener('seeked',h);setTimeout(h,1500)});
-    const r=holistic.detectForVideo(v,nextTs(performance.now()));draw(r);
-    const f=frameRaw(r,v.videoWidth,v.videoHeight);if(f){if(f.L||f.R)all.push(f);segment(f,t*1000)}
+    await seekFrame(v,t);
+    fg.drawImage(v,0,0,W,H);n++;
+    tg.drawImage(fc,0,0,16,16);const px=tg.getImageData(0,0,16,16).data;let mx=0;for(let k=0;k<px.length;k+=4)mx=Math.max(mx,px[k],px[k+1],px[k+2]);if(mx<12)blank++;
+    const r=holistic.detectForVideo(fc,nextTs(performance.now()));draw(r);
+    const f=frameRaw(r,W,H);if(f){if(f.L||f.R)all.push(f);segment(f,t*1000)}
     CAM.pill.textContent='بحلل الفيديو… '+arDigits(Math.min(100,Math.round(t/dur*100)))+'٪';
   }
   if(signing)endSign(dur*1000,'cap');
   if(!emitted&&all.length>=4&&onSign){const F=toFeatures(all);if(F)onSign(F)}
-  else if(!emitted&&onSign)snack('مش شايف إيد واضحة في الفيديو. صوّر تاني والإيد قدام الكاميرا.');
+  else if(!emitted&&onSign)snack(n&&blank>n*0.8?'الموبايل ده مقدرش يقرا الفيديو. استخدم الكاميرا المباشرة.':'مش شايف إيد واضحة في الفيديو. صوّر تاني والإيد قدام الكاميرا.');
   CAM.pill.classList.remove('rec');CAM.pill.textContent='خلص التحليل';
 }
+/* jump to time t and wait until that frame is actually on screen (requestVideoFrameCallback where available) */
+function seekFrame(v,t){return new Promise(res=>{let sk=false,fr=!v.requestVideoFrameCallback,done=false;
+  const fin=()=>{if(!done&&sk&&fr){done=true;res()}};
+  if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>{fr=true;fin()});
+  const h=()=>{v.removeEventListener('seeked',h);sk=true;fin();setTimeout(()=>{fr=true;fin()},120)};v.addEventListener('seeked',h);
+  setTimeout(()=>{v.removeEventListener('seeked',h);sk=fr=true;fin()},1500);v.currentTime=t})}
 function stopCam(){if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}CAM.onSign=null}
 function raised(f){const up=h=>h&&h[0][1]<f.hipY-0.3;return up(f.L)||up(f.R)}
 function wrist(f){const h=f.R||f.L;return h?h[0]:null}
