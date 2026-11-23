@@ -304,6 +304,7 @@ button,input{font:inherit;color:inherit}
     <span class="label-l">الموظف</span>
     <div class="media" style="height:200px" id="c8tbox"><video id="c8tv" muted playsinline></video><div class="ph" id="c8tph"><span class="ms lg">play_circle</span>رد الموظف هيظهر هنا بالإشارة</div></div>
     <div class="teller-msg"><p id="c8ttext" class="mute">لسه مفيش رد</p><button class="ib tonal" id="c8replay" aria-label="أعيد إشارة الموظف"><span class="ms">replay</span></button></div>
+    <div class="chips" id="c8twords" hidden></div>
     <span class="label-l" style="margin-top:8px">إنت</span>
     <div class="media cam" style="height:300px"><video id="c8v" muted playsinline></video><canvas id="c8c"></canvas><span class="pill" id="c8pill">الكاميرا</span><span class="perf" id="c8perf" hidden></span>
       <div class="ph" id="c8ph"><span class="ms lg">videocam</span>اعمل الإشارة<button class="btn tonal" id="c8cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c8file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c8file" accept="video/*" capture="user" hidden></div>
@@ -496,7 +497,7 @@ const AD='٠١٢٣٤٥٦٧٨٩';
 const arDigits=n=>String(n).replace(/\d/g,d=>AD[d]);
 const toLatin=s=>s.replace(/[٠-٩]/g,d=>AD.indexOf(d));
 const money=n=>arDigits(Number(n).toLocaleString('en-US').replace(/,/g,'٬'));
-const norm=t=>t.replace(/[؟?!.,،"]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
+const norm=t=>t.replace(/[\u064B-\u0652\u0640]/g,'').replace(/[؟?!.,،"]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function snack(t){const d=document.createElement('div');d.className='snack';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),3200)}
@@ -536,9 +537,11 @@ const AGENT_URL=SB_URL+'/functions/v1/maak-agent';
 const sampleP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null);
 const AGENT_SYS={
   compose:'You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words) that the customer most likely means, for the bank teller to read. The signs come first: use the goal and amount only when the signs are about money, the card, the account or the visit goal. A greeting, thanks, apology, \"how are you\", \"where\" question or request for help stays exactly that, with no goal or amount added. Never invent numbers, names or requests. Reply with JSON only: {"text": "..."}',
-  match:'A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Reply with JSON only: {"index": n}'};
+  match:'A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Reply with JSON only: {"index": n}',
+  simplify:'A bank teller typed a reply for a deaf Egyptian customer who may not read well. Rewrite it as ONE very short, simple Egyptian Arabic sentence (at most 8 words) with the same meaning. Then pick up to 5 signs from the vocabulary list, in order, that together carry that meaning. Use only keys from the list and never add meaning that is not in the reply. Reply with JSON only: {"text": "...", "words": ["key", ...]}'};
 function agentOk(task,v,payload){if(!v||typeof v!=='object')return null;
   if(task==='compose'){const t=typeof v.text==='string'?v.text.trim():'';return t&&t.length<=160?{text:t}:null}
+  if(task==='simplify'){const t=typeof v.text==='string'?v.text.trim():'';const ks=new Set(payload.vocab.map(x=>x.k));const w=Array.isArray(v.words)?v.words.filter(k=>ks.has(k)).slice(0,5):[];return t&&t.length<=120?{text:t,words:w}:null}
   const i=Number(v.index);return Number.isInteger(i)&&i>=-1&&i<payload.phrases.length?{index:i}:null}
 async function agent(task,payload){
   try{const s=await sampleP;if(s){const input=task==='match'?{text:payload.text,phrases:payload.phrases.map((t,i)=>i+': '+t)}:payload;
@@ -738,7 +741,10 @@ function customer(){
     $('#c8ttext').textContent=d.t||'';$('#c8ttext').classList.remove('mute');
     st.lastClips=(d.clips||[]).filter(c=>/^[a-z0-9_]+$/.test(c));
     playClips($('#c8tv'),st.lastClips,$('#c8tph'));
-    if(!st.lastClips.length){$('#c8tph').innerHTML='<span class="ms lg">text_snippet</span>الرد ده لسه ملوش فيديو إشارة، اقراه تحت'}
+    const ws=(Array.isArray(d.words)?d.words:[]).filter(k=>AR[k]).slice(0,5);const wb=$('#c8twords');wb.hidden=!ws.length;
+    wb.innerHTML=ws.map(k=>`<button class="chip" data-k="${k}"><span class="ms">sign_language</span>${AR[k]}</button>`).join('');
+    wb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k];if(c)playClips($('#c8tv'),[c],$('#c8tph'))});
+    if(!st.lastClips.length){$('#c8tph').innerHTML=ws.length?'<span class="ms lg">sign_language</span>الكلمات الأساسية تحت':'<span class="ms lg">text_snippet</span>الرد ده لسه ملوش فيديو إشارة، اقراه تحت'}
     if(cur!=='c8'&&cur!=='c9'&&cur!=='c10') go('c8');
   }
   $('#c8replay').onclick=()=>playClips($('#c8tv'),st.lastClips||[],$('#c8tph'));
@@ -831,6 +837,8 @@ function teller(){
   const show=id=>document.querySelectorAll('.web .screen').forEach(s=>s.hidden=s.id!==id);
   document.querySelector('[data-customer]').onclick=()=>{location.hash='';};
   const stem=w=>w.replace(/^(و|ف|ب)(?=..)/,'').replace(/^ال(?=..)/,'');
+  const sstem=w=>{w=w.replace(/^و(?=...)/,'').replace(/^ف(?=ال)/,'').replace(/^(بال|لل|ال)(?=..)/,'');return w.length>4?w.replace(/(كم|نا|ها|ك|ي)$/,''):w};
+  function signWordsIn(text){const tw=norm(text).split(/\s+/).map(sstem);const hits=[];for(const sg of SIGNS){const sw=norm(sg.ar).split(/\s+/).map(sstem);for(let i=0;i+sw.length<=tw.length;i++){if(sw.every((x,j)=>tw[i+j]===x)){hits.push([i,sg.k]);break}}}return hits.sort((a,b)=>a[0]-b[0]).map(h=>h[1]).filter((k,i,a)=>a.indexOf(k)===i).slice(0,5)}
   function match(text){const words=norm(text).split(/\s+/).map(stem);let best=null,bs=0,second=0;
     for(const p of TELLER){let s=0;for(const k of p.kw){const kw=norm(k).split(/\s+/).map(stem);for(let i=0;i+kw.length<=words.length;i++){if(kw.every((x,j)=>words[i+j]===x)){s=Math.max(s,kw.join('').length);break}}}if(s>bs){second=bs;bs=s;best=p}else if(s>second)second=s}
     if(!best||second===bs)return null;return best}
@@ -879,16 +887,20 @@ function teller(){
     const text=$('#t2in').value.trim();if(!text){$('#t2in').focus();return}
     let p=st.sel&&st.sel.t===text?st.sel:match(text);
     if(!p){const btn=$('#t2send');btn.disabled=true;const r=await agent('match',{text,phrases:TELLER.map(x=>x.t)});btn.disabled=false;if(r&&r.index>=0)p=TELLER[r.index]}
-    const clips=p?p.clips:[];const shown=p?p.t:text;
+    let words=[];
+    if(!p){const btn=$('#t2send');btn.disabled=true;const s=await agent('simplify',{text,vocab:SIGNS.map(x=>({k:x.k,ar:x.ar}))});btn.disabled=false;
+      p={t:(s&&s.text)||text,clips:[]};words=(s&&s.words&&s.words.length)?s.words:signWordsIn(text)}
+    const clips=p.clips.length?p.clips:words.map(k=>CLIP[k]).filter(Boolean);const shown=p.t;
     const dlg=$('#confirm').content.cloneNode(true).firstElementChild;document.body.appendChild(dlg);
     dlg.querySelector('[data-text]').textContent=shown;
-    dlg.querySelector('[data-title]').textContent=clips.length?'هيتبعت للعميل بالإشارة':'هيتبعت للعميل كتابة';
+    dlg.querySelector('[data-title]').textContent=clips.length?'هيتبعت للعميل بالإشارة':words.length?'هيتبعت للعميل بالكلمات الأساسية':'هيتبعت للعميل كتابة';
+    if(words.length){const w=document.createElement('p');w.className='body-m';w.textContent='الكلمات: '+words.map(k=>AR[k]).join(' · ');dlg.querySelector('[data-text]').after(w)}
     dlg.querySelector('[data-phtext]').textContent=clips.length?'معاينة الإشارة':'مفيش فيديو إشارة للجملة دي لسه';
     playClips(dlg.querySelector('[data-v]'),clips,dlg.querySelector('[data-ph]'));
     dlg.querySelector('[data-no]').onclick=()=>{dlg.remove();$('#t2in').focus()};
     dlg.querySelector('[data-yes]').onclick=async()=>{
       dlg.remove();
-      try{await st.room.emit('reply',{t:shown,clips})}catch(e){snack('مقدرتش أبعت، العميل ممكن يكون فصل');return}
+      try{await st.room.emit('reply',{t:shown,clips,words})}catch(e){snack('مقدرتش أبعت، العميل ممكن يكون فصل');return}
       addMsg('t',shown,clips.length?'اتبعت للعميل بالإشارة':'اتبعت للعميل كتابة');$('#t2in').value='';st.sel=null;
     };
     dlg.querySelector('[data-yes]').focus();
