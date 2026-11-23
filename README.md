@@ -11,7 +11,7 @@ Entry for the Dubai Create AI Agents Championship, category **Best Societal AI A
 ## How it works
 
 1. **Sign recognition on the phone.** The camera feed is processed on the device. Hand, arm and body landmarks are extracted per frame, normalised for position, scale and handedness, and segmented into individual signs by timing (hand raised, held, lowered).
-2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for all 39 of its signs (174 examples from many signers), and each user can teach it their own way of signing, which then takes priority.
+2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for all 39 of its signs (174 examples: the 8 public-domain words come from 15 signers; the other 31 signs come from one signer each and are not yet tested on new signers), and each user can teach it their own way of signing, which then takes priority.
 3. **Sentence and confirmation.** Recognised signs become a short Arabic request (e.g. *I want to withdraw 2,000 EGP*). The customer confirms before anything is sent. If a sign is unclear, the customer picks the word from a picture list instead of the agent guessing.
 4. **Teller pairing.** The customer's phone shows a six-digit code; the teller types it (or opens a link) and both screens connect. No install and no account for the teller.
 5. **Reply in sign.** The teller taps a reply; the customer sees it as a sign-language video with the text underneath.
@@ -30,7 +30,7 @@ Right-to-left Arabic, icons and sign videos on every screen, a "explain this scr
 
 **Original to this project:** the product and interaction design, all screens and flows, the sign segmentation, feature normalisation and matching logic, the customer–teller protocol, and the banking sign vocabulary and phrases. Every sign video shown in the app is openly licensed (see below). Signs without an open-licence video yet show the word and an icon; recordings from deaf volunteer signers will fill those gaps.
 
-**Open data used:** sign examples and the `clips/kg_*.mp4` videos (need, help, where, sorry, fine, how are you, what is your name, thanks) come from the Kaggle dataset *Arabic Sign Language (ArSL) for Words* by Eslam Ezzat, released under CC0 (public domain), recorded by Egyptian signers. On signers held out from the examples, the app picks the right sign 87% of the time for these 8 words while choosing among all 39 signs. When two signs are too close to call, it asks the customer to pick, and the right word ends up in the sentence 91% of the time.
+**Open data used:** sign examples and the `clips/kg_*.mp4` videos (need, help, where, sorry, fine, how are you, what is your name, thanks) come from the Kaggle dataset *Arabic Sign Language (ArSL) for Words* by Eslam Ezzat, released under CC0 (public domain), recorded by Egyptian signers. Tested by leaving out one signer at a time (15 signers, 231 clips of these 8 words), the app picks the right sign 82% of the time while choosing among all 39 signs (95% range: 77–87%). About 1 time in 4 it is unsure and asks the customer to pick from its top 3; the right sign is in that top 3 94% of the time, so when the customer picks correctly the right word ends up in the sentence 92% of the time, and a wrong word slips through 5% of the time. Weakest word: "how are you" (43%). The matching settings were chosen on these same clips, so new signers may score lower.
 
 **Open-source tools used:**
 
