@@ -181,11 +181,9 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 <div class="load" id="load" hidden><div><span class="spin"></span><span>معاك بيفكّر…</span></div></div>
 
 <script>
-/* Agent server: the Maak-only project first; the older shared project is the backup until the
-   Maak project has its own AI key (it answers {fallback:true,reason:"no_key"} until then). */
+/* Agent server on the Maak-only Supabase project. A list, so a backup server can be added later. */
 const SERVERS=[
- {url:'https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-agent',key:'sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0'},
- {url:'https://pqpnwxyevrsipklzmwex.supabase.co/functions/v1/maak-agent',key:'sb_publishable_CjB_aiAM0sXs6GdqiWGZZA_Z1k_TDmF'}];
+ {url:'https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-agent',key:'sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0'}];
 let srvSkip=0;
 async function post(task,payload,signal){
   let last=null;

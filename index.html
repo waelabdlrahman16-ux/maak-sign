@@ -549,7 +549,7 @@ async function speak(text){
   try{const t=await window.claude?.use?.('tts');if(t){await t.speak(text,{language:'ar'});return}}catch(e){}
   try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-EG';speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
 }
-const SB_URL='https://pqpnwxyevrsipklzmwex.supabase.co',SB_KEY='sb_publishable_CjB_aiAM0sXs6GdqiWGZZA_Z1k_TDmF';
+const SB_URL='https://lkvdivexgzhavuijydsb.supabase.co',SB_KEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
 const loadJs=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
 async function sbRoom(){
   await loadJs('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
@@ -569,8 +569,8 @@ try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent
 try{if(new URLSearchParams(location.search).has('notext'))document.documentElement.classList.add('notext')}catch(e){}
 const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
 /* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */
-/* Maak-only project first; the older shared project is the backup until the Maak project has its own AI key. */
-const AGENT_SERVERS=[['https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-agent','sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0'],[SB_URL+'/functions/v1/maak-agent',SB_KEY]];
+/* Agent server on the Maak-only Supabase project (same project as the teller relay and the recordings). */
+const AGENT_SERVERS=[[SB_URL+'/functions/v1/maak-agent',SB_KEY]];
 let agentSkip=0;
 const sampleP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null);
 const AGENT_SYS={
