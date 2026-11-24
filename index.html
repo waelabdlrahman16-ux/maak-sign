@@ -261,7 +261,8 @@ button,input{font:inherit;color:inherit}
   <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>علّم معاك إشاراتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
   <div class="body">
     <span class="label-l" id="c3count">إشارة ١ من ١٨</span>
-    <div class="media" style="height:180px"><video id="c3ref" muted playsinline loop></video><div class="ph" id="c3noref" hidden><span class="ms lg">sign_language</span><b id="c3word2"></b>اعملها زي ما بتعملها عادي</div></div>
+    <div class="media" style="height:180px"><video id="c3ref" muted playsinline loop></video><iframe id="c3yt" hidden title="الإشارة على يوتيوب" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe><div class="ph" id="c3noref" hidden><span class="ms lg">sign_language</span><b id="c3word2"></b>اعملها زي ما بتعملها عادي</div></div>
+    <p class="status" id="c3ytsrc" hidden></p>
     <p class="title-l" id="c3word" style="text-align:center"></p>
     <div class="media cam" style="height:240px"><video id="c3v" muted playsinline></video><canvas id="c3c"></canvas><span class="pill" id="c3pill">الكاميرا</span><span class="perf" id="c3perf" hidden></span>
       <div class="ph" id="c3ph"><span class="ms lg">videocam</span>ارفع إيدك واعمل الإشارة<button class="btn tonal" id="c3cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c3file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c3file" accept="video/*" capture="user" hidden></div>
@@ -729,6 +730,7 @@ function customer(){
   function showTeach(){
     const s=curSign();$('#c3count').textContent=T.list.length>1?`إشارة ${arDigits(T.i+1)} من ${arDigits(T.list.length)}`:'تمرين';$('#c3word').textContent=s.ar;$('#c3word2').textContent=s.ar;
     const r=$('#c3ref');if(s.clip){r.hidden=false;$('#c3noref').hidden=true;r.src='clips/'+s.clip+'.mp4';r.play().catch(()=>{})}else{r.hidden=true;r.removeAttribute('src');$('#c3noref').hidden=false}
+    {const yt=RECMODE&&REC_YT[s.k],yf=$('#c3yt');if(yt){r.hidden=true;$('#c3noref').hidden=true;const u='https://www.youtube-nocookie.com/embed/'+yt[0]+'?rel=0&playsinline=1'+(yt[1]!=null?'&start='+yt[1]+'&end='+yt[2]:'');if(yf.getAttribute('src')!==u)yf.src=u;yf.hidden=false;$('#c3ytsrc').hidden=false;$('#c3ytsrc').textContent='شوف الإشارة · من يوتيوب: '+yt[3]}else{yf.hidden=true;if(yf.getAttribute('src'))yf.removeAttribute('src');$('#c3ytsrc').hidden=true}}
     if(RECMODE){const n=REC.reps[s.k]||0;$('#c3st').textContent=n?`اتسجلت ${arDigits(Math.min(n,REC_REPS))} من ${arDigits(REC_REPS)} ✔`:`اعمل الإشارة ${arDigits(REC_REPS)} مرات، ونزّل إيدك بين كل مرة`}else{const n=(TEMPL[s.k]||[]).length;$('#c3st').textContent=n?`اتسجلت ${arDigits(n)} مرة ✔ ${n<2?'— اعملها مرة كمان':''}`:'اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة'}
     $('#c3next').lastChild.textContent=T.i<T.list.length-1?'التالي':'خلّصت';
     $('#c3skip').hidden=T.list.length===1||RECMODE;
@@ -742,6 +744,7 @@ function customer(){
   /* ---------- volunteer recorder (?rec): hand-point features only, sent to the Maak-only Supabase project ---------- */
   const RECMODE=(()=>{try{return new URLSearchParams(location.search).has('rec')}catch(e){return false}})();
   const REC_LIST=['ana','asam','3waz','bta2a','msh_shaghal','bdal_fa2ed','bdal_talef','raqam_serri','gedid','estelam','tawqee3','meeza','hesab','emta','tmam'],REC_REPS=3;
+  const REC_YT={asam:['OqW23uvL988',null,null,'رسالة مصر الجديدة'],meeza:['aC_eUBtx2tQ',0,20,'NBK Egypt'],msh_shaghal:['bkted-RRmcs',null,null,'رسالة مصر الجديدة'],bdal_fa2ed:['_dqib3zB-L8',null,null,'منصة إشارتي'],bdal_talef:['WqZYQBFQHFU',null,null,'منصة إشارتي'],raqam_serri:['TV8a1gLTr_0',null,null,'منصة إشارتي'],estelam:['sztPowyPYBs',180,188,'إشارتي هي لغتي – أيمن عباس'],tawqee3:['aC_eUBtx2tQ',311,325,'NBK Egypt'],tmam:['r7NQIIu3GQ8',null,null,'رسالة مصر الجديدة']};
   const REC_URL='https://lkvdivexgzhavuijydsb.supabase.co/rest/v1/recordings',REC_KEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
   const REC=store.get('maak_rec',null)||{session:Math.random().toString(36).slice(2,8).toUpperCase(),meta:{},reps:{},sent:0};
   const recSave=()=>store.set('maak_rec',REC);
