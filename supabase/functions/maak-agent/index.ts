@@ -11,6 +11,8 @@ const ALLOWED = ["https://waelabdlrahman16-ux.github.io", "http://localhost:8790
 const FAST = "claude-haiku-5-5";
 const SMART = "claude-sonnet-5-5";
 const AGENT_TASKS = ["plan", "next", "read", "summary"];
+// plan and read use the smart model; the counter loop (next) and summary use the fast one so each turn is quick.
+const SMART_TASKS = ["plan", "read"];
 
 const STYLE =
   "Write for a deaf Egyptian adult who may read little and is in a hurry: Egyptian Arabic, very short, everyday words, no formal Arabic, numbers as digits. " +
@@ -29,7 +31,7 @@ const PROMPTS: Record<string, string> = {
   plan:
     "You are Maak, an agent that helps a deaf Egyptian person get a task done at a service counter (bank, civil registry, social unit, hospital). Given the goal and the place, plan the visit: 2 to 5 short steps in order (each at most 6 words), and for each step the exact polite question Maak will show the staff on the customer's behalf (at most 18 words, Egyptian Arabic, addressed to the staff), or an empty string if no question is needed. List what to bring (each at most 5 words), and the fee: if a KNOWLEDGE fact gives the fee for this goal, put it (e.g. \"100 جنيه\") with that fact id, else empty text. In words, pick the sign keys that carry the goal (e.g. card, lost, new). For every step, item and the fee, set from to the id of the KNOWLEDGE fact it comes from (e.g. \"f1\"), or an empty string if it comes from no fact. Items with no fact are fine but must not contain numbers. If a step can only be done by phone and the customer is deaf, say Maak will ask the staff to do it. Add one warning only if it really matters (at most 12 words), else empty. " + STYLE,
   next:
-    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: which steps are now done (ids) based only on what the staff said; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); and finished=true only when every step is done or the staff said there is nothing more. Never repeat a question Maak already asked unless the staff did not answer it. " + STYLE,
+    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
   read:
     "You are Maak. A deaf Egyptian person photographed a paper or a phone screen at a service counter. Say what it is (kind), a short title (at most 8 words), up to 5 key facts copied EXACTLY as printed (amounts, dates, reference numbers, names of places or documents) with a short label each, and the one next step the person should take (at most 14 words). If the photo is blurry, cut off or unreadable, set unclear=true and say so in next instead of guessing. Do not read out or repeat full card numbers, national ID numbers or account numbers: show only the last 4 digits. " + STYLE,
   summary:
@@ -148,7 +150,10 @@ const SCHEMAS: Record<string, any> = {
   next: {
     type: "object",
     properties: {
-      done: { type: "array", items: { type: "string" } },
+      progress: {
+        type: "array",
+        items: { type: "object", properties: { id: { type: "string" }, state: { type: "string", enum: ["done", "customer_todo", "open"] } }, required: ["id", "state"] },
+      },
       facts: { type: "array", maxItems: 4, items: factItem },
       ask_staff: { type: "string" },
       tell_customer: { type: "string" },
@@ -156,7 +161,7 @@ const SCHEMAS: Record<string, any> = {
       replies: { type: "array", items: { type: "string" }, maxItems: 3 },
       finished: { type: "boolean" },
     },
-    required: ["done", "facts", "ask_staff", "tell_customer", "words", "replies", "finished"],
+    required: ["progress", "facts", "ask_staff", "tell_customer", "words", "replies", "finished"],
   },
   read: {
     type: "object",
@@ -186,14 +191,14 @@ const SCHEMAS: Record<string, any> = {
 async function ask(key: string, task: string, content: unknown, signal: AbortSignal, strict = false) {
   // strict = the fast model with a forced tool call (always returns the full schema); used as the
   // agent tasks' backup when the smart model's answer comes back incomplete.
-  const agent = AGENT_TASKS.includes(task) && !strict;
+  const agent = SMART_TASKS.includes(task) && !strict;
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     signal,
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
       model: agent ? SMART : FAST,
-      max_tokens: agent ? 1200 : 400,
+      max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
       system: PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : ""),
@@ -290,7 +295,8 @@ function shape(task: string, out: any, p: any): any | null {
       .filter((f: any) => f.label && f.value && supported(f.value, evidence));
     const tell = clip(out.tell_customer, 120);
     return {
-      done: (Array.isArray(out.done) ? out.done : []).filter((d: unknown) => typeof d === "string" && ids.has(d)),
+      done: (Array.isArray(out.progress) ? out.progress : []).filter((x: any) => x && x.state === "done" && ids.has(x.id)).map((x: any) => x.id),
+      todo: (Array.isArray(out.progress) ? out.progress : []).filter((x: any) => x && x.state === "customer_todo" && ids.has(x.id)).map((x: any) => x.id),
       facts,
       ask_staff: supported(clip(out.ask_staff, 180), kText + " " + evidence) ? clip(out.ask_staff, 180) : "",
       tell_customer: supported(tell, kText + " " + evidence) ? tell : "",
