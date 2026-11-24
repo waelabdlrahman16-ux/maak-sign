@@ -1,6 +1,6 @@
 // Maak knowledge pack. Only facts with a source. level "official" = the provider's own page;
 // level "news" = a news report — the agent must present it as "usually" and ask staff to confirm.
-// Checked 24 Nov 2026.
+// Checked 24 Nov 2026. Social Solidarity facts: Ministry of Social Solidarity FAQ (official).
 
 export type Fact = { text: string; level: "official" | "news"; source: string };
 
@@ -28,9 +28,13 @@ export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
   social_solidarity: {
     name: "الوحدة الاجتماعية (التضامن)",
     facts: [
-      { text: "Takaful and Karama applications are made at the social unit that serves your home address.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
-      { text: "Bring copies of valid national ID cards for adults, the marriage or divorce certificate, computerised birth certificates for children under 18, the ration card if any, and school enrolment papers for children 6 to 18.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
-      { text: "After applying, a social researcher visits the home to check eligibility.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
+      { text: "Takaful and Karama applications are made all year round at the nearest social unit that serves your home address.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "Karama is for people aged 65 or older and for persons with a disability rate of 50% or more; Takaful is for families below the poverty line whose children attend school.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "Documents: valid national ID cards of both spouses, the marriage, divorce, death or desertion document, the children's birth certificates and school enrolment, and a computerised family register; for Karama also the medical commission form number or the integrated services card if you have one.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "A lost Takaful or Karama card is replaced through the hotline 19680 or 19681 (a voice call), so a deaf person should ask the social unit staff to do it; a fee of 25 EGP may apply.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "The integrated services card is for all persons with disabilities, including hearing disabilities. You register on the Ministry of Health portal pod.mohp.gov.eg to book a medical committee exam, and the card is issued about 45 to 60 days after the local rehabilitation office finishes.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "Assistive devices such as hearing aids and cochlear implant repair are free, for any age, and do not need the integrated services card.", level: "official", source: "https://www.moss.gov.eg/%D8%A7%D9%84%D8%A7%D8%B3%D8%A6%D9%84%D8%A9-%D8%A7%D9%84%D8%B4%D8%A7%D8%A6%D8%B9%D8%A9/" },
+      { text: "After a Takaful and Karama application, a social researcher visits the home to check eligibility.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
     ],
   },
   hospital: { name: "المستشفى", facts: [] },
