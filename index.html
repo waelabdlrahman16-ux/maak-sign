@@ -569,7 +569,9 @@ try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent
 try{if(new URLSearchParams(location.search).has('notext'))document.documentElement.classList.add('notext')}catch(e){}
 const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
 /* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */
-const AGENT_URL=SB_URL+'/functions/v1/maak-agent';
+/* Maak-only project first; the older shared project is the backup until the Maak project has its own AI key. */
+const AGENT_SERVERS=[['https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-agent','sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0'],[SB_URL+'/functions/v1/maak-agent',SB_KEY]];
+let agentSkip=0;
 const sampleP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null);
 const AGENT_SYS={
   compose:'You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words) that the customer most likely means, for the bank teller to read. The signs come first: use the goal and amount only when the signs are about money, the card, the account or the visit goal. A greeting, thanks, apology, \"how are you\", \"where\" question or request for help stays exactly that, with no goal or amount added. Never invent numbers, names or requests. Reply with JSON only: {"text": "..."}',
@@ -582,9 +584,12 @@ function agentOk(task,v,payload){if(!v||typeof v!=='object')return null;
 async function agent(task,payload){
   try{const s=await sampleP;if(s){const input=task==='match'?{text:payload.text,phrases:payload.phrases.map((t,i)=>i+': '+t)}:payload;
     const v=await s.json(AGENT_SYS[task]+'\n\nINPUT:\n'+JSON.stringify(input),{modelTier:'quick'});const ok=agentOk(task,v,payload);if(ok)return ok}}catch(e){}
-  try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),7000);
-    const r=await fetch(AGENT_URL,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task,payload})});
-    clearTimeout(tm);if(r.ok){const j=await r.json();if(!j.fallback)return agentOk(task,j,payload)}}catch(e){}
+  const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),7000);
+  try{for(let i=agentSkip;i<AGENT_SERVERS.length;i++){const [url,key]=AGENT_SERVERS[i];
+    try{const r=await fetch(url,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:key,authorization:'Bearer '+key},body:JSON.stringify({task,payload})});
+      const j=await r.json();if(j&&j.fallback&&j.reason==='no_key'){agentSkip=i+1;continue}
+      if(r.ok&&!j.fallback)return agentOk(task,j,payload);return null}catch(e){if(e.name==='AbortError')return null}}}
+  finally{clearTimeout(tm)}
   return null}
 
 /* =========================================================

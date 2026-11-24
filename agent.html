@@ -181,8 +181,26 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 <div class="load" id="load" hidden><div><span class="spin"></span><span>معاك بيفكّر…</span></div></div>
 
 <script>
-const URL_AGENT='https://pqpnwxyevrsipklzmwex.supabase.co/functions/v1/maak-agent';
-const SB_KEY='sb_publishable_CjB_aiAM0sXs6GdqiWGZZA_Z1k_TDmF';
+/* Agent server: the Maak-only project first; the older shared project is the backup until the
+   Maak project has its own AI key (it answers {fallback:true,reason:"no_key"} until then). */
+const SERVERS=[
+ {url:'https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-agent',key:'sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0'},
+ {url:'https://pqpnwxyevrsipklzmwex.supabase.co/functions/v1/maak-agent',key:'sb_publishable_CjB_aiAM0sXs6GdqiWGZZA_Z1k_TDmF'}];
+let srvSkip=0;
+async function post(task,payload,signal){
+  let last=null;
+  for(let i=srvSkip;i<SERVERS.length;i++){
+    const s=SERVERS[i];
+    try{
+      const r=await fetch(s.url,{method:'POST',signal,headers:{'content-type':'application/json',apikey:s.key,authorization:'Bearer '+s.key},body:JSON.stringify({task,payload})});
+      const j=await r.json();
+      if(j&&j.fallback&&j.reason==='no_key'&&i<SERVERS.length-1){srvSkip=i+1;last=j;continue}
+      return {ok:r.ok,j};
+    }catch(e){if(e.name==='AbortError')throw e;last=null}
+  }
+  if(last)return {ok:true,j:last};
+  throw new Error('net');
+}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const AD='٠١٢٣٤٥٦٧٨٩',ar=n=>String(n).replace(/\d/g,d=>AD[d]);
@@ -217,9 +235,9 @@ async function call(task,payload){
   $('#load').hidden=false;
   try{
     const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
-    const r=await fetch(URL_AGENT,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task,payload})});
-    clearTimeout(tm);const j=await r.json();
-    if(!r.ok||j.fallback||j.error)throw new Error(j.reason||j.error||'fail');
+    const {ok,j}=await post(task,payload,ctl.signal);
+    clearTimeout(tm);
+    if(!ok||j.fallback||j.error)throw new Error(j.reason||j.error||'fail');
     return j;
   }catch(e){snack('مش قادر أوصل للمساعد دلوقتي. جرّب تاني.');return null}
   finally{$('#load').hidden=true}
@@ -383,8 +401,8 @@ $('#sgSend').onclick=async()=>{
   let text=words.join(' ');
   $('#load').hidden=false;
   try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),12000);
-    const r=await fetch(URL_AGENT,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task:'compose',payload:{signs:words,goal:(S.goal||'').slice(0,80)}})});
-    clearTimeout(tm);const j=await r.json();if(j&&j.text)text=j.text}catch(e){}
+    const {j}=await post('compose',{signs:words,goal:(S.goal||'').slice(0,80)},ctl.signal);
+    clearTimeout(tm);if(j&&j.text)text=j.text}catch(e){}
   finally{$('#load').hidden=true}
   stopCam();addTurn('customer',text);S.said=text;SG=[];save();go('sStaff');
 };
