@@ -62,6 +62,12 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 .snack{position:fixed;inset-inline:16px;bottom:24px;max-width:398px;margin:auto;background:#282a2f;color:#eeedf4;border-radius:12px;padding:14px 16px;z-index:10}
 .note{font-size:12px;color:var(--var);display:flex;gap:6px;align-items:center}
 .note .ms{font-size:16px}
+.media{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:4/3;max-width:100%}
+.media video,.media canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.media .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;background:#1a1b21}
+.pill{position:absolute;inset-inline:12px;bottom:12px;margin:auto;width:max-content;max-width:calc(100% - 24px);background:rgba(0,0,0,.6);color:#fff;border-radius:16px;padding:4px 12px;font-size:14px}
+.pill.rec{background:#b3261e}
+.sign-chip{background:var(--pc);color:var(--on-pc);border:0}
 :focus-visible{outline:3px solid var(--primary);outline-offset:2px}
 </style>
 </head>
@@ -127,10 +133,24 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
     <div><span class="sub">قول بلمسة</span><div class="chips" id="cuReplies" style="margin-top:6px"></div></div>
   </div>
   <div class="foot">
-    <button class="btn" id="cuShow"><span class="ms">screen_rotation</span>ورّي الموظف</button>
+    <div class="row"><button class="btn" id="cuShow" style="flex:1"><span class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="cuSign" style="flex:none;padding:0 18px"><span class="ms">sign_language</span>إشارة</button></div>
     <div class="row"><button class="btn tonal" id="cuPhoto" style="flex:1"><span class="ms">document_scanner</span>صوّر ورقة</button><button class="btn tonal" id="cuDone" style="flex:1"><span class="ms">task_alt</span>خلصت</button></div>
     <input type="file" id="cuFile" accept="image/*" capture="environment" hidden>
   </div>
+</section>
+
+<!-- 4b Sign to the staff (sign reader runs on this phone; video never leaves it) -->
+<section class="screen" id="sSign" hidden>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>قول بالإشارة</h1></div>
+  <div class="body">
+    <div class="media"><video id="sgV" playsinline muted></video><canvas id="sgC"></canvas>
+      <div class="ph" id="sgPh"><span class="ms" style="font-size:48px">videocam</span><button class="btn" id="sgStart"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" style="color:#d9e2ff">أو صوّر فيديو<input type="file" id="sgFile" accept="video/*" capture="user" hidden></label></div>
+      <span class="pill" id="sgPill">ارفع إيدك وابدأ الإشارة</span><span id="sgPerf" hidden></span></div>
+    <p class="note"><span class="ms">lock</span><span>الفيديو مش بيخرج من الموبايل. بنقرا حركة الإيد بس.</span></p>
+    <div class="card" id="sgAlts" hidden><b>قصدك أنهي؟</b><div class="chips" id="sgAltList"></div></div>
+    <div><span class="sub">اللي قلته</span><div class="chips" id="sgWords" style="margin-top:6px"><span class="sub">لسه مفيش</span></div></div>
+  </div>
+  <div class="foot"><div class="row"><button class="btn tonal" id="sgClear" style="flex:none;padding:0 18px"><span class="ms">backspace</span>امسح</button><button class="btn" id="sgSend" style="flex:1" disabled><span class="ms">send</span>ابعت للموظف</button></div></div>
 </section>
 
 <!-- 5 Paper -->
@@ -218,7 +238,8 @@ function wordChips(el,words){
   el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k],v=$('#cuVid');if(c&&v){v.hidden=false;v.src='clips/'+c+'.mp4';v.play().catch(()=>{})}else snack('الإشارة دي لسه مش متسجّلة بالفيديو')});
 }
 const factHtml=f=>`<div class="fact"><span class="ms">${esc(f.icon||'info')}</span><div><span>${esc(f.label)}</span><b>${esc(f.value)}</b></div></div>`;
-function stepsHtml(){return S.steps.map((s,i)=>`<div class="row"><span class="num ${s.status==='done'?'done':''}">${s.status==='done'?'<span class="ms">check</span>':ar(i+1)}</span><span style="${s.status==='done'?'color:var(--var)':''}">${esc(s.text)}</span></div>`).join('')}
+function stepsHtml(){return S.steps.map((s,i)=>`<div class="row"><span class="num ${s.status==='done'?'done':''}">${s.status==='done'?'<span class="ms">check</span>':ar(i+1)}</span><span style="${s.status==='done'?'color:var(--var)':''}">${esc(s.text)}</span>${s.status==='todo'?'<span class="tag ask" style="margin-inline-start:auto">عليك</span>':''}</div>`).join('')}
+const stepsForServer=()=>S.steps.map(s=>({id:s.id,text:s.text,status:s.status==='done'?'done':'open'}));
 function mergeFacts(nf){for(const f of nf||[]){const i=S.facts.findIndex(x=>x.label===f.label);const v={icon:f.icon,label:String(f.label).slice(0,40),value:String(f.value).slice(0,80)};if(i>=0)S.facts[i]=v;else S.facts.push(v)}S.facts=S.facts.slice(-12)}
 const addTurn=(who,text)=>{if(!text)return;S.turns.push({who,text:String(text).slice(0,300)});S.turns=S.turns.slice(-30)};
 
@@ -273,9 +294,9 @@ $('#staffBack').onclick=()=>go('sCust',false);
 $('#stSend').onclick=async()=>{
   const t=$('#stIn').value.trim();if(!t){snack('اكتب الرد الأول');return}
   addTurn('staff',t);S.said='';save();
-  const n=await call('next',{goal:S.goal,place:S.place,vocab:VOCAB,steps:S.steps.map(s=>({id:s.id,text:s.text,status:s.status})),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value}))});
+  const n=await call('next',{goal:S.goal,place:S.place,vocab:VOCAB,steps:stepsForServer(),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value}))});
   if(!n){S.turns.pop();save();return}
-  S.steps.forEach(s=>{if(n.done.includes(s.id))s.status='done'});
+  S.steps.forEach(s=>{if(n.done.includes(s.id))s.status='done';else if((n.todo||[]).includes(s.id))s.status='todo'});
   mergeFacts(n.facts);S.tell=n.tell_customer||t;S.words=n.words||[];S.replies=n.replies||[];S.ask=n.ask_staff||'';S.finished=!!n.finished;
   save();go('sCust');
 };
@@ -297,7 +318,7 @@ $('#cuDone').onclick=()=>finish();
 async function finish(){
   if(!S.turns.some(t=>t.who==='staff')){snack('لسه الموظف مردّش');return}
   const d=new Date();const today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const m=await call('summary',{goal:S.goal,place:S.place,vocab:VOCAB,steps:S.steps.map(s=>({id:s.id,text:s.text,status:s.status})),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value})),today});
+  const m=await call('summary',{goal:S.goal,place:S.place,vocab:VOCAB,steps:stepsForServer(),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value})),today});
   if(!m)return;S.summary=m;save();go('sSum');
 }
 
@@ -332,7 +353,44 @@ $('#smCal').onclick=()=>{
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.download='maak-reminder.ics';document.body.appendChild(a);a.click();a.remove();
 };
 
-go(S.screen||'sGoal',false);
+/* ---------- signing (recog.js) ---------- */
+const arDigits=ar;const SET={perf:false};
+const RAR={'3waz':'عايز',ashab:'أسحب',awda3:'أودع',flos:'فلوس',bta2a:'البطاقة',gedid:'جديدة',msh_shaghal:'مش شغالة',kam:'كام',hesab:'الحساب',emta:'إمتى',aywa:'أيوه',la:'لأ',tmam:'تمام',tany:'تاني',shokran:'شكراً',salam:'السلام عليكم',sabah:'صباح الخير',ana:'أنا',mo7tag:'محتاج',mosa3da:'مساعدة',fein:'فين',asef:'آسف',kwayes:'كويس','3amel_eh':'عامل إيه',bdal_fa2ed:'بدل فاقد',bdal_talef:'بدل تالف',raqam_serri:'الرقم السري',bank:'البنك',tawqee3:'توقيع',telefon:'تليفون',asam:'أصم',estelam:'استلام',meeza:'بطاقة ميزة',sora:'صورة',besor3a:'بسرعة',ba3d:'بعدين',akid:'أكيد','7ader':'حاضر',ahlan:'أهلاً'};
+let SG=[];
+function sgShow(){
+  $('#sgWords').innerHTML=SG.length?SG.map(k=>`<span class="chip sign-chip">${esc(RAR[k]||k)}</span>`).join(''):'<span class="sub">لسه مفيش</span>';
+  $('#sgSend').disabled=!SG.length;
+}
+function sgOnSign(F){
+  const r=classify(F);if(!r.length)return;
+  /* same ask step as the main app: unsure when far from every example or the top two are close */
+  if(r[0][1]>78||(r[1]&&r[1][1]/r[0][1]<1.08)){
+    $('#sgAlts').hidden=false;
+    $('#sgAltList').innerHTML=r.slice(0,3).map(x=>`<button class="chip" data-k="${x[0]}">${esc(RAR[x[0]]||x[0])}</button>`).join('')+'<button class="chip" data-k="">ولا واحدة</button>';
+    $('#sgAltList').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('#sgAlts').hidden=true;if(b.dataset.k){SG.push(b.dataset.k);sgShow()}});
+    return;
+  }
+  $('#sgAlts').hidden=true;SG.push(r[0][0]);sgShow();
+}
+render.sSign=()=>{SG=[];sgShow();$('#sgAlts').hidden=true;$('#sgPh').hidden=false;attach($('#sgV'),$('#sgC'),$('#sgPill'),$('#sgPerf'),sgOnSign)};
+$('#cuSign').onclick=()=>go('sSign');
+$('#sgStart').onclick=()=>camButton($('#sgPh'),$('#sgPill'));
+$('#sgFile').onchange=()=>fileButton($('#sgFile'),$('#sgPh'));
+$('#sgClear').onclick=()=>{SG.pop();sgShow()};
+$('#sgSend').onclick=async()=>{
+  if(!SG.length)return;const words=SG.filter((k,i)=>k!==SG[i-1]).map(k=>RAR[k]||k);
+  let text=words.join(' ');
+  $('#load').hidden=false;
+  try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),12000);
+    const r=await fetch(URL_AGENT,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task:'compose',payload:{signs:words,goal:(S.goal||'').slice(0,80)}})});
+    clearTimeout(tm);const j=await r.json();if(j&&j.text)text=j.text}catch(e){}
+  finally{$('#load').hidden=true}
+  stopCam();addTurn('customer',text);S.said=text;SG=[];save();go('sStaff');
+};
+document.addEventListener('click',e=>{if(e.target.closest('#sSign [data-back]'))stopCam()},true);
+
+go(S.screen==='sSign'?'sCust':(S.screen||'sGoal'),false);
 </script>
+<script src="recog.js"></script>
 </body>
 </html>
