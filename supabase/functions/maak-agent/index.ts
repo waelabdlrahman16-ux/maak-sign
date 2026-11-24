@@ -1,13 +1,23 @@
-// Maak Sign agent brain. Turns recognised signs into a natural Egyptian Arabic request,
-// matches a teller's free-typed reply to a known phrase by meaning, and simplifies any other
-// reply into a short sentence plus the known signs that carry its meaning.
-// Only text reaches this function; video never leaves the customer's phone.
-// The Anthropic key lives in the ANTHROPIC_API_KEY secret. Without it the function
-// answers {fallback:true} and the app keeps using its built-in rules.
+// Maak Sign agent brain.
+// Translator tasks (v7): compose, match, simplify.
+// Agent tasks (v8): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// Only text and, for "read", one photo reach this function; the photo is used once and never stored.
+// Video never leaves the customer's phone. The Anthropic key lives in the ANTHROPIC_API_KEY secret;
+// without it the function answers {fallback:true} and the app keeps using its built-in rules.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { ICONS, KNOWLEDGE } from "./knowledge.ts";
 
 const ALLOWED = ["https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
-const MODEL = "claude-haiku-5-5";
+const FAST = "claude-haiku-5-5";
+const SMART = "claude-sonnet-5-5";
+const AGENT_TASKS = ["plan", "next", "read", "summary"];
+
+const STYLE =
+  "Write for a deaf Egyptian adult who may read little and is in a hurry: Egyptian Arabic, very short, everyday words, no formal Arabic, numbers as digits. " +
+  "Honesty rules: state a fee, document, date, time or number ONLY if it appears in the KNOWLEDGE facts or in what the staff said. " +
+  "A fact marked level \"news\" is not confirmed: present it as usual practice and turn it into a question for the staff to confirm. " +
+  "Anything you do not know becomes a question for the staff, never a guess. Never give medical, legal or financial advice. " +
+  "Sign keys: pick only keys from the vocabulary list (the part before the colon). Icons: pick only from the icon list.";
 
 const PROMPTS: Record<string, string> = {
   compose:
@@ -16,6 +26,14 @@ const PROMPTS: Record<string, string> = {
     "A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Give the number in index.",
   simplify:
     "A bank teller typed a reply for a deaf Egyptian customer who may not read well. Rewrite it as very short, simple Egyptian Arabic (one or two short sentences, at most 14 words) with the same meaning. Keep every fact the customer needs: what will happen, what they must do, when, and any number, time or amount. Drop only politeness and filler. Then pick up to 5 signs from the vocabulary list, in order, that together carry that meaning. The vocabulary is given as \"key: Arabic word\"; put only the keys (the part before the colon, in Latin letters) in words. Never add meaning that is not in the reply. Give the sentence in text and the keys in words.",
+  plan:
+    "You are Maak, an agent that helps a deaf Egyptian person get a task done at a service counter (bank, civil registry, social unit, hospital). Given the goal and the place, plan the visit: 2 to 5 short steps in order (each at most 6 words), and for each step the exact polite question Maak will show the staff on the customer's behalf (at most 18 words, Egyptian Arabic, addressed to the staff), or an empty string if no question is needed. List what to bring (each at most 5 words), and the fee: if a KNOWLEDGE fact gives the fee for this goal, put it (e.g. \"100 جنيه\") with that fact id, else empty text. In words, pick the sign keys that carry the goal (e.g. card, lost, new). For every step, item and the fee, set from to the id of the KNOWLEDGE fact it comes from (e.g. \"f1\"), or an empty string if it comes from no fact. Items with no fact are fine but must not contain numbers. If a step can only be done by phone and the customer is deaf, say Maak will ask the staff to do it. Add one warning only if it really matters (at most 12 words), else empty. " + STYLE,
+  next:
+    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: which steps are now done (ids) based only on what the staff said; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); and finished=true only when every step is done or the staff said there is nothing more. Never repeat a question Maak already asked unless the staff did not answer it. " + STYLE,
+  read:
+    "You are Maak. A deaf Egyptian person photographed a paper or a phone screen at a service counter. Say what it is (kind), a short title (at most 8 words), up to 5 key facts copied EXACTLY as printed (amounts, dates, reference numbers, names of places or documents) with a short label each, and the one next step the person should take (at most 14 words). If the photo is blurry, cut off or unreadable, set unclear=true and say so in next instead of guessing. Do not read out or repeat full card numbers, national ID numbers or account numbers: show only the last 4 digits. " + STYLE,
+  summary:
+    "You are Maak. Summarise a finished visit for a deaf Egyptian customer: a title (at most 5 words), up to 5 lines (each at most 8 words) covering what was done, the fee paid, and what happens next, using only what the staff said and the facts collected during the visit; never claim something was paid or done unless the staff said so. If the staff gave a pickup or follow-up date, set remind.date as YYYY-MM-DD (today's date is given; resolve phrases like \"after 3 days\") and remind.text (at most 8 words); otherwise leave remind.date empty. " + STYLE,
 };
 
 function cors(origin: string | null) {
@@ -32,6 +50,18 @@ function json(body: unknown, status: number, h: Record<string, string>) {
   return new Response(JSON.stringify(body), { status, headers: { ...h, "Content-Type": "application/json" } });
 }
 
+const str = (v: unknown, max: number, min = 0) => typeof v === "string" && v.length >= min && v.length <= max;
+const vocabOk = (v: unknown) =>
+  v == null || (Array.isArray(v) && v.length <= 80 && v.every((x: any) => x && str(x.k, 30) && str(x.ar, 40)));
+const stepsOk = (v: unknown) =>
+  Array.isArray(v) && v.length >= 1 && v.length <= 8 &&
+  v.every((s: any) => s && str(s.id, 10, 1) && str(s.text, 80, 1) && ["open", "done"].includes(s.status));
+const turnsOk = (v: unknown) =>
+  Array.isArray(v) && v.length <= 30 &&
+  v.every((t: any) => t && ["staff", "customer", "maak"].includes(t.who) && str(t.text, 300, 1));
+const factsOk = (v: unknown) =>
+  v == null || (Array.isArray(v) && v.length <= 12 && v.every((f: any) => f && str(f.label, 40) && str(f.value, 80)));
+
 function validate(task: string, p: any): string | null {
   if (task === "compose") {
     if (!Array.isArray(p?.signs) || p.signs.length < 1 || p.signs.length > 12) return "signs";
@@ -41,18 +71,32 @@ function validate(task: string, p: any): string | null {
     return null;
   }
   if (task === "match") {
-    if (typeof p?.text !== "string" || p.text.length < 1 || p.text.length > 300) return "text";
+    if (!str(p?.text, 300, 1)) return "text";
     if (!Array.isArray(p?.phrases) || p.phrases.length < 1 || p.phrases.length > 60) return "phrases";
     if (!p.phrases.every((s: unknown) => typeof s === "string" && s.length <= 120)) return "phrases";
     return null;
   }
   if (task === "simplify") {
-    if (typeof p?.text !== "string" || p.text.length < 1 || p.text.length > 300) return "text";
-    if (!Array.isArray(p?.vocab) || p.vocab.length < 1 || p.vocab.length > 80) return "vocab";
-    if (!p.vocab.every((v: any) => v && typeof v.k === "string" && v.k.length <= 30 && typeof v.ar === "string" && v.ar.length <= 40)) return "vocab";
+    if (!str(p?.text, 300, 1)) return "text";
+    if (!Array.isArray(p?.vocab) || p.vocab.length < 1 || !vocabOk(p.vocab)) return "vocab";
     return null;
   }
-  return "task";
+  if (!AGENT_TASKS.includes(task)) return "task";
+  if (task === "read" ? !(p?.goal == null || str(p.goal, 120)) : !str(p?.goal, 120, 1)) return "goal";
+  if (p?.place != null && !(str(p.place, 40) && p.place in KNOWLEDGE)) return "place";
+  if (!vocabOk(p?.vocab)) return "vocab";
+  if (task === "next" || task === "summary") {
+    if (!stepsOk(p?.steps)) return "steps";
+    if (!turnsOk(p?.turns)) return "turns";
+    if (!factsOk(p?.facts)) return "facts";
+  }
+  if (task === "summary" && !/^\d{4}-\d{2}-\d{2}$/.test(String(p?.today || ""))) return "today";
+  if (task === "read") {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(p?.media_type)) return "media_type";
+    if (typeof p?.image !== "string" || p.image.length < 100 || p.image.length > 3_000_000) return "image";
+    if (!/^[A-Za-z0-9+/=]+$/.test(p.image.slice(0, 200))) return "image";
+  }
+  return null;
 }
 
 // Pull the first balanced JSON object out of the model's text (tolerates code fences or extra prose).
@@ -71,37 +115,216 @@ function firstObject(text: string): any | null {
   return null;
 }
 
+const icon = { type: "string", enum: ICONS };
+const keys = { type: "array", items: { type: "string" }, maxItems: 5 };
+const factItem = { type: "object", properties: { icon, label: { type: "string" }, value: { type: "string" } }, required: ["icon", "label", "value"] };
+
 const SCHEMAS: Record<string, any> = {
   compose: { type: "object", properties: { text: { type: "string" } }, required: ["text"] },
   match: { type: "object", properties: { index: { type: "integer" } }, required: ["index"] },
   simplify: {
     type: "object",
-    properties: { text: { type: "string" }, words: { type: "array", items: { type: "string" }, maxItems: 5 } },
+    properties: { text: { type: "string" }, words: keys },
     required: ["text", "words"],
+  },
+  plan: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      steps: {
+        type: "array", minItems: 2, maxItems: 5,
+        items: { type: "object", properties: { text: { type: "string" }, icon, ask: { type: "string" }, from: { type: "string" } }, required: ["text", "icon", "ask", "from"] },
+      },
+      bring: {
+        type: "array", maxItems: 5,
+        items: { type: "object", properties: { text: { type: "string" }, icon, from: { type: "string" } }, required: ["text", "icon", "from"] },
+      },
+      fee: { type: "object", properties: { text: { type: "string" }, from: { type: "string" } }, required: ["text", "from"] },
+      warn: { type: "string" },
+      words: keys,
+    },
+    required: ["title", "steps", "bring", "fee", "warn", "words"],
+  },
+  next: {
+    type: "object",
+    properties: {
+      done: { type: "array", items: { type: "string" } },
+      facts: { type: "array", maxItems: 4, items: factItem },
+      ask_staff: { type: "string" },
+      tell_customer: { type: "string" },
+      words: keys,
+      replies: { type: "array", items: { type: "string" }, maxItems: 3 },
+      finished: { type: "boolean" },
+    },
+    required: ["done", "facts", "ask_staff", "tell_customer", "words", "replies", "finished"],
+  },
+  read: {
+    type: "object",
+    properties: {
+      kind: { type: "string", enum: ["receipt", "form", "letter", "prescription", "bill", "card", "screen", "other"] },
+      title: { type: "string" },
+      facts: { type: "array", maxItems: 5, items: factItem },
+      next: { type: "string" },
+      words: keys,
+      unclear: { type: "boolean" },
+    },
+    required: ["kind", "title", "facts", "next", "words", "unclear"],
+  },
+  summary: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      lines: { type: "array", maxItems: 5, items: { type: "object", properties: { icon, text: { type: "string" } }, required: ["icon", "text"] } },
+      remind: { type: "object", properties: { date: { type: "string" }, text: { type: "string" } }, required: ["date", "text"] },
+      words: keys,
+    },
+    required: ["title", "lines", "remind", "words"],
   },
 };
 
 // Forced tool call: the model can only answer with the fields in SCHEMAS[task].
-async function ask(key: string, task: string, input: unknown, signal: AbortSignal) {
+async function ask(key: string, task: string, content: unknown, signal: AbortSignal, strict = false) {
+  // strict = the fast model with a forced tool call (always returns the full schema); used as the
+  // agent tasks' backup when the smart model's answer comes back incomplete.
+  const agent = AGENT_TASKS.includes(task) && !strict;
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     signal,
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 400,
-      system: PROMPTS[task],
+      model: agent ? SMART : FAST,
+      max_tokens: agent ? 1200 : 400,
+      // The agent model does not accept a forced tool choice, so it is told to call the tool and
+      // a plain-JSON reply is still parsed by firstObject.
+      system: PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : ""),
       tools: [{ name: "answer", description: "Return the answer.", input_schema: SCHEMAS[task] }],
-      tool_choice: { type: "tool", name: "answer" },
-      messages: [{ role: "user", content: JSON.stringify(input) }],
+      tool_choice: agent ? { type: "auto" } : { type: "tool", name: "answer" },
+      messages: [{ role: "user", content }],
     }),
   });
-  if (!r.ok) return { status: r.status, out: null, stop: "" };
+  if (!r.ok) {
+    let msg = "";
+    try { msg = String((await r.json())?.error?.message || "").slice(0, 200); } catch { /* no body */ }
+    return { status: r.status, out: null, stop: msg };
+  }
   const data = await r.json();
   const blocks: any[] = data?.content || [];
   const tool = blocks.find((c) => c?.type === "tool_use" && c?.input && typeof c.input === "object");
   const out = tool ? tool.input : firstObject(blocks.map((c) => c?.type === "text" ? c.text || "" : "").join(""));
   return { status: 200, out, stop: String(data?.stop_reason || "") };
+}
+
+// ---------- honesty guard: every number the agent states must exist in its evidence ----------
+const AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const latin = (s: string) => s.replace(/[٠-٩]/g, (d) => String(AR_DIGITS.indexOf(d)));
+const numbers = (s: string) => (latin(s).match(/\d+/g) || []).map((n) => String(Number(n)));
+function supported(text: string, evidence: string): boolean {
+  const have = new Set(numbers(evidence));
+  return numbers(text).every((n) => have.has(n));
+}
+const clip = (s: unknown, n: number) => (typeof s === "string" ? s.trim().slice(0, n) : "");
+const okIcon = (s: unknown) => (typeof s === "string" && ICONS.includes(s) ? s : "help");
+function signKeys(words: unknown, vocab: any[] | undefined): string[] {
+  if (!Array.isArray(words) || !vocab) return [];
+  const byKey = new Map(vocab.map((v: any) => [v.k, v.k]));
+  const byAr = new Map(vocab.map((v: any) => [v.ar, v.k]));
+  return [...new Set(words.map((w) => (typeof w === "string" ? byKey.get(w.trim()) ?? byAr.get(w.trim()) : undefined)).filter(Boolean))].slice(0, 5) as string[];
+}
+
+function knowledgeFor(place: string | undefined) {
+  const k = place ? KNOWLEDGE[place] : undefined;
+  return k ? { place: k.name, facts: k.facts.map((f, i) => ({ id: "f" + (i + 1), fact: f.text, level: f.level })) } : { place: null, facts: [] };
+}
+
+function buildInput(task: string, p: any): unknown {
+  if (task === "match") return JSON.stringify({ text: p.text, phrases: p.phrases.map((t: string, i: number) => `${i}: ${t}`) });
+  if (task === "simplify") return JSON.stringify({ reply: p.text, vocabulary: p.vocab.map((v: any) => `${v.k}: ${v.ar}`) });
+  if (task === "compose") return JSON.stringify({ signs: p.signs, goal: p.goal ?? null, amount: p.amount ?? null });
+  const base: any = {
+    goal: p.goal ?? null,
+    KNOWLEDGE: knowledgeFor(p.place),
+    vocabulary: (p.vocab || []).map((v: any) => `${v.k}: ${v.ar}`),
+    icons: ICONS,
+  };
+  if (task === "next" || task === "summary") Object.assign(base, { steps: p.steps, conversation: p.turns, facts_so_far: p.facts || [] });
+  if (task === "summary") base.today = p.today;
+  if (task !== "read") return JSON.stringify(base);
+  return [
+    { type: "image", source: { type: "base64", media_type: p.media_type, data: p.image } },
+    { type: "text", text: JSON.stringify(base) },
+  ];
+}
+
+function shape(task: string, out: any, p: any): any | null {
+  const kText = knowledgeFor(p.place).facts.map((f) => f.fact).join(" ");
+  const staff = (p.turns || []).filter((t: any) => t.who === "staff").map((t: any) => t.text).join(" ");
+  const factsSoFar = (p.facts || []).map((f: any) => f.value).join(" ");
+
+  if (task === "plan") {
+    const kf = p.place ? KNOWLEDGE[p.place]?.facts || [] : [];
+    const fact = (id: unknown) => (typeof id === "string" && /^f\d+$/.test(id) ? kf[Number(id.slice(1)) - 1] : undefined);
+    // text may carry numbers only if its own cited fact carries them; "sure" only for an official cited fact
+    const backed = (text: string, id: unknown) => supported(text, fact(id)?.text || "");
+    const sure = (id: unknown) => fact(id)?.level === "official";
+    if (!Array.isArray(out.steps) || out.steps.length < 1) return null;
+    const steps = out.steps.slice(0, 5)
+      .map((s: any) => ({ text: clip(s.text, 60), icon: okIcon(s.icon), ask: clip(s.ask, 160), from: s.from }))
+      .filter((s: any) => s.text && backed(s.text, s.from))
+      .map((s: any, i: number) => ({ id: "s" + (i + 1), text: s.text, icon: s.icon, ask: backed(s.ask, s.from) ? s.ask : "", sure: sure(s.from), status: "open" }));
+    const bring = (Array.isArray(out.bring) ? out.bring : []).slice(0, 5)
+      .map((b: any) => ({ text: clip(b.text, 50), icon: okIcon(b.icon), sure: sure(b.from), ok: backed(clip(b.text, 50), b.from) }))
+      .filter((b: any) => b.text && b.ok).map(({ ok: _ok, ...b }: any) => b);
+    const feeText = clip(out.fee?.text, 60);
+    const fee = feeText && numbers(feeText).length && backed(feeText, out.fee?.from)
+      ? { text: feeText, sure: sure(out.fee?.from) }
+      : { text: "", sure: false };
+    if (!steps.length) return null;
+    return { title: clip(out.title, 50), steps, bring, fee, warn: supported(clip(out.warn, 100), kText) ? clip(out.warn, 100) : "", words: signKeys(out.words, p.vocab) };
+  }
+
+  if (task === "next") {
+    const ids = new Set(p.steps.map((s: any) => s.id));
+    const evidence = staff + " " + factsSoFar;
+    const facts = (Array.isArray(out.facts) ? out.facts : []).slice(0, 4)
+      .map((f: any) => ({ icon: okIcon(f.icon), label: clip(f.label, 30), value: clip(f.value, 60) }))
+      .filter((f: any) => f.label && f.value && supported(f.value, evidence));
+    const tell = clip(out.tell_customer, 120);
+    return {
+      done: (Array.isArray(out.done) ? out.done : []).filter((d: unknown) => typeof d === "string" && ids.has(d)),
+      facts,
+      ask_staff: supported(clip(out.ask_staff, 180), kText + " " + evidence) ? clip(out.ask_staff, 180) : "",
+      tell_customer: supported(tell, kText + " " + evidence) ? tell : "",
+      words: signKeys(out.words, p.vocab),
+      replies: (Array.isArray(out.replies) ? out.replies : []).map((r: unknown) => clip(r, 30)).filter(Boolean).slice(0, 3),
+      finished: out.finished === true,
+    };
+  }
+
+  if (task === "read") {
+    const facts = (Array.isArray(out.facts) ? out.facts : []).slice(0, 5)
+      .map((f: any) => ({ icon: okIcon(f.icon), label: clip(f.label, 30), value: clip(f.value, 60) }))
+      // never show more than the last 4 digits of a long number (card, ID, account)
+      .map((f: any) => ({ ...f, value: f.value.replace(/[\d٠-٩][\d٠-٩ -]{8,}[\d٠-٩]/g, (m: string) => "•••• " + latin(m).replace(/\D/g, "").slice(-4)) }))
+      .filter((f: any) => f.label && f.value);
+    return {
+      kind: typeof out.kind === "string" ? out.kind : "other",
+      title: clip(out.title, 60),
+      facts,
+      next: clip(out.next, 120),
+      words: signKeys(out.words, p.vocab),
+      unclear: out.unclear === true,
+    };
+  }
+
+  if (task === "summary") {
+    const evidence = staff + " " + factsSoFar;
+    const lines = (Array.isArray(out.lines) ? out.lines : []).slice(0, 5)
+      .map((l: any) => ({ icon: okIcon(l.icon), text: clip(l.text, 70) }))
+      .filter((l: any) => l.text && supported(l.text, evidence));
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(String(out.remind?.date || "")) && staff ? String(out.remind.date) : "";
+    return { title: clip(out.title, 40), lines, remind: { date, text: date ? clip(out.remind?.text, 60) : "" }, words: signKeys(out.words, p.vocab) };
+  }
+  return null;
 }
 
 Deno.serve(async (req) => {
@@ -121,34 +344,44 @@ Deno.serve(async (req) => {
   if (!key) return json({ fallback: true, reason: "no_key" }, 200, h);
 
   const p = body.payload;
-  const input = task === "match"
-    ? { text: p.text, phrases: p.phrases.map((t: string, i: number) => `${i}: ${t}`) }
-    : task === "simplify"
-    ? { reply: p.text, vocabulary: p.vocab.map((v: any) => `${v.k}: ${v.ar}`) }
-    : { signs: p.signs, goal: p.goal ?? null, amount: p.amount ?? null };
+  const content = buildInput(task, p);
+  const agent = AGENT_TASKS.includes(task);
 
   try {
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 9000);
-    let res = await ask(key, task, input, ctl.signal);
-    if (res.status === 200 && !res.out) res = await ask(key, task, input, ctl.signal); // one retry on unparsable output
+    const timer = setTimeout(() => ctl.abort(), agent ? 25000 : 9000);
+    let res = await ask(key, task, content, ctl.signal);
+    if (res.status === 200 && !res.out) res = await ask(key, task, content, ctl.signal); // one retry on unparsable output
     clearTimeout(timer);
-    if (res.status !== 200) return json({ fallback: true, reason: "upstream_" + res.status }, 200, h);
+    if (res.status !== 200) return json({ fallback: true, reason: "upstream_" + res.status, detail: res.stop }, 200, h);
     const out = res.out;
     if (!out) return json({ fallback: true, reason: "parse", stop: res.stop }, 200, h);
+
+    if (agent) {
+      // some replies carry nested arrays/objects as JSON strings; parse them back
+      for (const k of Object.keys(out)) {
+        if (typeof out[k] === "string" && /^\s*[\[{]/.test(out[k])) { try { out[k] = JSON.parse(out[k]); } catch { /* keep */ } }
+      }
+      let shaped = shape(task, out, p);
+      if (!shaped) {
+        const ctl2 = new AbortController();
+        const t2 = setTimeout(() => ctl2.abort(), 15000);
+        const res2 = await ask(key, task, content, ctl2.signal, true);
+        clearTimeout(t2);
+        if (res2.status === 200 && res2.out) shaped = shape(task, res2.out, p);
+        if (shaped) return json({ ...shaped, backup: true }, 200, h);
+      }
+      if (shaped) return json(shaped, 200, h);
+      return json({ fallback: true, reason: "shape", ...(p.debug === true ? { raw: out } : {}) }, 200, h);
+    }
     if (task === "compose") {
       if (typeof out.text !== "string" || !out.text.trim() || out.text.length > 160) return json({ fallback: true, reason: "shape" }, 200, h);
       return json({ text: out.text.trim() }, 200, h);
     }
     if (task === "simplify") {
-      const byKey = new Map(p.vocab.map((v: any) => [v.k, v.k]));
-      const byAr = new Map(p.vocab.map((v: any) => [v.ar, v.k]));
       const t = typeof out.text === "string" ? out.text.trim() : "";
-      const words = Array.isArray(out.words)
-        ? [...new Set(out.words.map((w: unknown) => typeof w === "string" ? (byKey.get(w.trim()) ?? byAr.get(w.trim())) : undefined).filter(Boolean))].slice(0, 5)
-        : [];
       if (!t || t.length > 120) return json({ fallback: true, reason: "shape" }, 200, h);
-      return json({ text: t, words }, 200, h);
+      return json({ text: t, words: signKeys(out.words, p.vocab) }, 200, h);
     }
     const i = Number(out.index);
     if (!Number.isInteger(i) || i < -1 || i >= p.phrases.length) return json({ fallback: true, reason: "shape" }, 200, h);

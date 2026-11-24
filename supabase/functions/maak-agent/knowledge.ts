@@ -1,0 +1,44 @@
+// Maak knowledge pack. Only facts with a source. level "official" = the provider's own page;
+// level "news" = a news report — the agent must present it as "usually" and ask staff to confirm.
+// Checked 24 Nov 2026.
+
+export type Fact = { text: string; level: "official" | "news"; source: string };
+
+export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
+  bank_misr: {
+    name: "بنك مصر",
+    facts: [
+      { text: "Replacing a lost or damaged debit card costs 100 EGP.", level: "official", source: "https://www.banquemisr.com/en/Home/SMEs/Retail-Banking/Pages/Cards/Debit-Cards-Pages/VISA-and-MasterCard-Debit-Cards" },
+      { text: "Issuing a new debit card costs 150 EGP.", level: "official", source: "https://www.banquemisr.com/en/Home/SMEs/Retail-Banking/Pages/Cards/Debit-Cards-Pages/VISA-and-MasterCard-Debit-Cards" },
+      { text: "Setting or resetting a card PIN costs 15 EGP.", level: "official", source: "https://www.banquemisr.com/en/Home/SMEs/Retail-Banking/Pages/Cards/Debit-Cards-Pages/VISA-and-MasterCard-Debit-Cards" },
+      { text: "Stopping a lost or stolen card is done through the call center 19888, open day and night (a voice call), so a deaf customer should ask the branch staff to stop it.", level: "official", source: "https://www.banquemisr.com/en/Home/CONTACT-US/Call-Center" },
+      { text: "The 19888 call center also creates a PIN and cancels wrong-PIN attempts.", level: "official", source: "https://www.banquemisr.com/en/Home/CONTACT-US/Call-Center" },
+      { text: "The BM Online app can pause a card temporarily, set a PIN, unblock a PIN after wrong attempts, and request a new card.", level: "official", source: "https://www.banquemisr.com/ar-EG/Home/Pages/BM-Online---Internet-and-Mobile-banking" },
+    ],
+  },
+  civil_registry: {
+    name: "السجل المدني",
+    facts: [
+      { text: "For a lost national ID card, first file a police report at the nearest police station.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
+      { text: "At the civil registry office bring a recent personal photo and a copy of the police report.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
+      { text: "The office tells you the fee after you submit the papers, and you pay it at the same office.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
+      { text: "A replacement can also be requested on the Digital Egypt portal and is delivered to your address within a few days.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
+    ],
+  },
+  social_solidarity: {
+    name: "الوحدة الاجتماعية (التضامن)",
+    facts: [
+      { text: "Takaful and Karama applications are made at the social unit that serves your home address.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
+      { text: "Bring copies of valid national ID cards for adults, the marriage or divorce certificate, computerised birth certificates for children under 18, the ration card if any, and school enrolment papers for children 6 to 18.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
+      { text: "After applying, a social researcher visits the home to check eligibility.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
+    ],
+  },
+  hospital: { name: "المستشفى", facts: [] },
+};
+
+export const ICONS = [
+  "credit_card", "credit_card_off", "block", "payments", "event", "schedule", "badge", "description",
+  "local_police", "photo_camera", "call", "location_on", "receipt_long", "medication", "local_hospital",
+  "account_balance", "family_restroom", "task_alt", "help", "edit_document", "person", "home", "school",
+  "password", "inventory_2", "warning",
+];
