@@ -7,7 +7,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { ICONS, KNOWLEDGE } from "./knowledge.ts";
 
-const ALLOWED = ["https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
+const ALLOWED = ["https://maaksign.com", "https://www.maaksign.com", "https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
 const FAST = "claude-haiku-5-5";
 const SMART = "claude-sonnet-5-5";
 const AGENT_TASKS = ["plan", "next", "read", "summary"];
