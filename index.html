@@ -38,6 +38,11 @@ button,input{font:inherit;color:inherit}
 .ms.fill{font-variation-settings:"FILL" 1}
 /* ---------- shells ---------- */
 .phone{max-width:430px;overflow-x:hidden;margin:0 auto;height:100%;background:var(--surface);display:flex;flex-direction:column;position:relative}
+.door{flex:1 1 0;max-height:300px;min-height:180px;border:0;border-radius:28px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:start;text-decoration:none;cursor:pointer;font:inherit;position:relative;overflow:hidden}
+.door::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s}.door:hover::before{opacity:.08}.door:active::before{opacity:.12}
+.door .ms{font-size:64px;position:relative}.door-t{display:flex;flex-direction:column;gap:6px;position:relative}
+.door b{font-size:30px;line-height:42px;font-weight:700}.door small{font-size:17px;line-height:26px}
+.door-main{background:var(--primary);color:var(--on-primary)}.door-alt{background:var(--secondary-container);color:var(--on-secondary-container)}.door-alt .ms{color:var(--primary)}
 .web{min-height:100%;overflow-x:hidden;background:var(--surface);display:flex;flex-direction:column}
 .screen{display:flex;flex-direction:column;flex:1;min-height:0}
 .web .screen{min-height:100%}
@@ -202,8 +207,18 @@ button,input{font:inherit;color:inherit}
 <template id="customer">
 <div class="phone">
 
-<section class="screen" id="c1">
-  <div class="appbar"><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+<section class="screen" id="c0" hidden>
+  <div class="appbar"><h1 style="color:var(--primary);font-weight:700">معاك</h1><button class="btn tonal" data-help style="height:48px;margin-inline-end:8px"><span class="ms">play_circle</span>بالإشارة</button></div>
+  <div class="body" style="gap:16px;padding-top:12px">
+    <a class="door door-main" href="agent.html"><span class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
+    <button class="door door-alt" id="c0talk"><span class="ms" aria-hidden="true">sign_language</span><span class="door-t"><b>أكلّم الموظف</b><small>أنا عند الشباك دلوقتي</small></span></button>
+    <button class="li" data-teller style="padding-inline:4px"><span class="ms lead" style="color:var(--primary)">desktop_windows</span><span class="txt"><b style="font-weight:600">أنا موظف</b></span><span class="ms trail">chevron_left</span></button>
+    <p class="intro-en" lang="en" dir="ltr" style="margin-top:auto">Maak Sign is an AI agent that helps deaf Egyptians get counter errands done. <a href="https://github.com/waelabdlrahman16-ux/maak-sign#readme" target="_blank" rel="noopener" style="padding:12px 0;margin:-12px 0">About Maak</a></p>
+  </div>
+</section>
+
+<section class="screen" id="c1" hidden>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
   <div class="body">
     <p class="body-l">اتكلم بالإشارة، ومعاك يوصّل كلامك</p>
     <div class="media" style="height:420px"><video data-clip="kg_3amel_eh" muted playsinline loop autoplay></video></div>
@@ -277,7 +292,7 @@ button,input{font:inherit;color:inherit}
 </section>
 
 <section class="screen" id="c4" hidden>
-  <div class="appbar"><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-go="c14" aria-label="الإعدادات"><span class="ms">settings</span></button></div>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-go="c14" aria-label="الإعدادات"><span class="ms">settings</span></button></div>
   <div class="body flush">
     <button class="li two" data-go="c5"><span class="ms lead">account_balance</span><span class="txt"><b>بنك</b><small>سحب · إيداع · كارت</small></span><span class="ms trail">chevron_left</span></button>
     <div class="li two" aria-disabled="true"><span class="ms lead">local_hospital</span><span class="txt"><b>مستشفى</b><small>قريبًا</small></span></div>
@@ -908,7 +923,8 @@ function customer(){
   };
   $('#c14reset').onclick=()=>{TEMPL={};saveT();enter.c14();snack('اتمسحت الإشارات')};
   if(RECMODE){const idx=REC_LIST.findIndex(k=>(REC.reps[k]||0)<REC_REPS&&!(REC.skip||{})[k]);if(!Object.keys(REC.reps).length)go('rv',false);else if(idx<0)go('rvdone',false);else{T.list=REC_LIST;T.i=idx;T.ret='rvdone';go('c3',false)}}
-  else go(store.get('maak_onboarded',false)?'c4':'c1',false);
+  else go('c0',false);
+  $('#c0talk').onclick=()=>go(store.get('maak_onboarded',false)?'c4':'c1');
   bootModel().catch(()=>{});
 }
 
