@@ -564,6 +564,7 @@ async function sbRoom(){
     return {emit:async(t,d)=>{const r=await ch.send({type:'broadcast',event:t,payload:d});if(r!=='ok')throw new Error(r)},
       on:(t,f)=>{(H[t]=H[t]||[]).push(f)},presence:async p=>{await ch.track({p})},
       onPeers:f=>{PF.push(f)},peers:()=>peers,leave:async()=>{await sb.removeChannel(ch)}}}}}
+try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent.html')}catch(e){}
 try{if(new URLSearchParams(location.search).has('notext'))document.documentElement.classList.add('notext')}catch(e){}
 const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
 /* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maak Agent</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+<style>
+:root{--primary:#485e92;--on-primary:#fff;--pc:#dbe2ff;--on-pc:#324574;--sc:#d9dff6;--on-sc:#404659;
+  --surface:#faf8ff;--low:#f4f3fa;--high:#e8e7ef;--card:#fff;--on:#1a1b21;--var:#44464f;--outline:#c6c8d2;
+  --good:#1d5b2c;--good-c:#d7f0dd;--warn:#7a4b00;--warn-c:#ffe0b2;--err:#b3261e;color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--primary:#b0c6ff;--on-primary:#152e60;--pc:#2e4578;--on-pc:#d9e2ff;--sc:#404659;--on-sc:#dce2f9;
+  --surface:#121318;--low:#1a1b21;--high:#282a2f;--card:#1e1f25;--on:#e2e2e9;--var:#c5c6d0;--outline:#44464f;--good:#9ee2b0;--good-c:#1f4a2b;--warn:#ffcf8a;--warn-c:#4d3300;--err:#f2b8b5;color-scheme:dark}}
+:root[data-theme="dark"]{--primary:#b0c6ff;--on-primary:#152e60;--pc:#2e4578;--on-pc:#d9e2ff;--sc:#404659;--on-sc:#dce2f9;
+  --surface:#121318;--low:#1a1b21;--high:#282a2f;--card:#1e1f25;--on:#e2e2e9;--var:#c5c6d0;--outline:#44464f;--good:#9ee2b0;--good-c:#1f4a2b;--warn:#ffcf8a;--warn-c:#4d3300;--err:#f2b8b5;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%;margin:0}[hidden]{display:none!important}
+body{background:var(--low);color:var(--on);font-family:"Noto Sans Arabic",system-ui,sans-serif;font-size:16px;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;display:inline-block;direction:ltr;width:1em;overflow:hidden;flex:none;-webkit-font-feature-settings:"liga";font-feature-settings:"liga"}
+.phone{max-width:430px;margin:0 auto;min-height:100%;background:var(--surface);display:flex;flex-direction:column}
+.screen{display:flex;flex-direction:column;flex:1;min-height:100vh}
+.bar{height:64px;display:flex;align-items:center;gap:8px;padding:0 8px;flex:none}
+.bar h1{flex:1;margin:0;font-size:22px;font-weight:500}
+.ib{width:48px;height:48px;border:0;border-radius:24px;background:none;display:grid;place-items:center;cursor:pointer;color:var(--on)}
+.body{flex:1;display:flex;flex-direction:column;gap:12px;padding:4px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.foot{display:flex;flex-direction:column;gap:8px;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));position:sticky;bottom:0;background:var(--surface)}
+.btn{min-height:56px;border:0;border-radius:28px;background:var(--primary);color:var(--on-primary);font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;cursor:pointer}
+.btn.tonal{background:var(--sc);color:var(--on-sc)}.btn.text{background:none;color:var(--primary);min-height:48px;font-weight:500}
+.btn:disabled{opacity:.5}
+h2{margin:0;font-size:26px;line-height:34px;font-weight:600;text-wrap:balance}
+.sub{margin:0;color:var(--var);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{min-height:112px;border:1px solid var(--outline);border-radius:16px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:500;cursor:pointer;padding:12px;text-align:center}
+.tile .ms{font-size:36px;color:var(--primary)}.tile small{font-size:12px;color:var(--var);font-weight:400}
+.card{background:var(--card);border:1px solid var(--outline);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:12px}
+.num{width:36px;height:36px;border-radius:18px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:600;flex:none}
+.num.done{background:var(--good-c);color:var(--good)}
+.big{font-size:22px;line-height:32px;font-weight:600;margin:0}
+.fee{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--pc);color:var(--on-pc)}
+.fee b{font-size:28px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:13px;border-radius:8px;padding:2px 8px}
+.tag.ok{background:var(--good-c);color:var(--good)}.tag.ask{background:var(--warn-c);color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--outline);background:var(--card);display:inline-flex;align-items:center;gap:6px;font-size:15px;cursor:pointer}
+.chip .ms{font-size:20px;color:var(--primary)}
+.reply{height:48px;padding:0 18px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font-size:16px;cursor:pointer}
+.fact{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--pc);color:var(--on-pc)}
+.fact .ms{font-size:28px}.fact span{display:block;font-size:13px}.fact b{font-size:19px}
+.staff{background:var(--on);color:var(--surface)}
+.staff .bar,.staff .foot{background:var(--on);color:var(--surface)}.staff .ib{color:var(--surface)}
+.staff .card{background:#ffffff;color:#1a1b21;border:0}
+.staff textarea{width:100%;min-height:110px;border-radius:14px;border:2px solid #c6c8d2;padding:12px;font-size:18px;background:#fff;color:#1a1b21;resize:vertical}
+.staff .btn.tonal{background:#d9dff6;color:#404659}
+.said{border-inline-start:4px solid var(--primary);padding:4px 12px;color:#44464f;font-size:16px}
+video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object-fit:contain}
+.load{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:9}
+.load div{background:var(--surface);border-radius:24px;padding:24px 28px;display:flex;align-items:center;gap:16px;font-size:18px}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--pc);border-top-color:var(--primary);animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(1turn)}}
+.snack{position:fixed;inset-inline:16px;bottom:24px;max-width:398px;margin:auto;background:#282a2f;color:#eeedf4;border-radius:12px;padding:14px 16px;z-index:10}
+.note{font-size:12px;color:var(--var);display:flex;gap:6px;align-items:center}
+.note .ms{font-size:16px}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="phone" id="app">
+
+<!-- 1 Goal -->
+<section class="screen" id="sGoal">
+  <div class="bar"><h1 style="padding-inline-start:8px">معاك</h1><a class="ib" href="./" aria-label="المترجم"><span class="ms">sign_language</span></a></div>
+  <div class="body">
+    <h2>عايز تعمل إيه؟</h2>
+    <p class="sub">اختار صورة. معاك يجهّز الزيارة ويكلّم الموظف بدالك.</p>
+    <div class="grid" id="goals"></div>
+    <div class="card" id="otherBox" hidden>
+      <label for="otherIn" class="sub">اكتب أو خلّي حد يكتب المطلوب</label>
+      <input id="otherIn" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card)" maxlength="110">
+      <div class="grid" id="places"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 Plan -->
+<section class="screen" id="sPlan" hidden>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>خطة الزيارة</h1></div>
+  <div class="body">
+    <div class="chips" id="planHead"></div>
+    <div class="fee" id="planFee" hidden><span class="ms" style="font-size:32px">payments</span><div><b id="planFeeTx"></b><div id="planFeeTag"></div></div></div>
+    <div class="card" id="planSteps"></div>
+    <div class="card" id="planBring" hidden><b>هات معاك</b><div class="chips" id="planBringList"></div></div>
+    <p class="note" id="planWarn" hidden><span class="ms">warning</span><span></span></p>
+    <p class="note"><span class="ms">verified</span><span>✓ = من موقع الجهة الرسمي · ؟ = معاك هيسأل الموظف</span></p>
+  </div>
+  <div class="foot"><button class="btn" id="toCounter"><span class="ms">storefront</span>أنا عند الشباك</button></div>
+</section>
+
+<!-- 3 Staff view (phone turned to the staff) -->
+<section class="screen staff" id="sStaff" hidden>
+  <div class="bar"><button class="ib" id="staffBack" aria-label="رجوع للعميل"><span class="ms">arrow_forward</span></button><h1>للموظف</h1></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><span class="ms" style="font-size:32px;color:#485e92">sign_language</span><b>العميل أصم. أنا «معاك»، مساعد بالذكاء الاصطناعي بساعده.</b></div>
+      <p class="sub" style="color:#44464f;margin:0">العميل جاي عشان: <b id="stGoal"></b></p>
+      <p class="said" id="stSaid" hidden></p>
+      <p class="big" id="stAsk"></p>
+    </div>
+    <label for="stIn" style="font-size:15px">اكتب ردّك هنا، أو دوس الميكروفون واتكلم</label>
+    <textarea id="stIn" maxlength="280"></textarea>
+    <p class="note" style="color:#c6c8d2"><span class="ms">lock</span><span>الكلام بيروح للمساعد عشان يبسّطه، ومش بيتحفظ.</span></p>
+  </div>
+  <div class="foot">
+    <div class="row"><button class="btn tonal" id="stMic" style="flex:none;width:56px;padding:0" aria-label="اتكلم"><span class="ms">mic</span></button><button class="btn" id="stSend" style="flex:1"><span class="ms">send</span>ابعت للعميل</button></div>
+  </div>
+</section>
+
+<!-- 4 Customer view -->
+<section class="screen" id="sCust" hidden>
+  <div class="bar"><button class="ib" data-home aria-label="إنهاء"><span class="ms">close</span></button><h1>مع الموظف</h1><span class="tag ok" id="cuProg"></span></div>
+  <div class="body">
+    <div class="card"><span class="note" style="font-size:13px"><span class="ms">support_agent</span>الموظف قال</span><p class="big" id="cuTell"></p><div class="chips" id="cuWords"></div><video class="sign" id="cuVid" playsinline muted hidden></video></div>
+    <div id="cuFacts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="card" id="cuAskBox" hidden><span class="note"><span class="ms">help</span>معاك هيسأل الموظف بدالك</span><b id="cuAsk"></b></div>
+    <div class="card"><b>الزيارة</b><div id="cuSteps" style="display:flex;flex-direction:column;gap:8px"></div></div>
+    <div><span class="sub">قول بلمسة</span><div class="chips" id="cuReplies" style="margin-top:6px"></div></div>
+  </div>
+  <div class="foot">
+    <button class="btn" id="cuShow"><span class="ms">screen_rotation</span>ورّي الموظف</button>
+    <div class="row"><button class="btn tonal" id="cuPhoto" style="flex:1"><span class="ms">document_scanner</span>صوّر ورقة</button><button class="btn tonal" id="cuDone" style="flex:1"><span class="ms">task_alt</span>خلصت</button></div>
+    <input type="file" id="cuFile" accept="image/*" capture="environment" hidden>
+  </div>
+</section>
+
+<!-- 5 Paper -->
+<section class="screen" id="sRead" hidden>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الورقة دي فيها إيه؟</h1></div>
+  <div class="body">
+    <img id="rdImg" alt="الصورة اللي اتصورت" style="border-radius:16px;max-height:200px;object-fit:contain;background:var(--high)">
+    <p class="note"><span class="ms">lock</span><span>الصورة بتروح للمساعد يقراها مرة واحدة، ومش بتتحفظ. الأرقام الطويلة بتظهر آخر ٤ أرقام بس.</span></p>
+    <div class="card"><p class="big" id="rdTitle"></p><div id="rdFacts" style="display:flex;flex-direction:column;gap:8px"></div><div class="row"><span class="ms" style="color:var(--primary)">arrow_back</span><b id="rdNext"></b></div><div class="chips" id="rdWords"></div></div>
+  </div>
+  <div class="foot"><button class="btn" data-back><span class="ms">check</span>فهمت</button></div>
+</section>
+
+<!-- 6 Summary -->
+<section class="screen" id="sSum" hidden>
+  <div class="bar"><button class="ib" data-home aria-label="قفل"><span class="ms">close</span></button><h1>ملخص الزيارة</h1></div>
+  <div class="body">
+    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px"><span style="width:72px;height:72px;border-radius:36px;background:var(--good-c);color:var(--good);display:grid;place-items:center"><span class="ms" style="font-size:40px">task_alt</span></span><h2 id="smTitle"></h2></div>
+    <div class="card" id="smLines"></div>
+    <div class="fee" id="smRem" hidden><span class="ms">notifications_active</span><div><b style="font-size:18px" id="smRemDate"></b><div id="smRemTx"></div></div></div>
+    <div class="chips" id="smWords"></div>
+  </div>
+  <div class="foot"><button class="btn" id="smCal" hidden><span class="ms">event_available</span>ضيف للتقويم</button><button class="btn text" data-home>زيارة جديدة</button></div>
+</section>
+
+</div>
+<div class="load" id="load" hidden><div><span class="spin"></span><span>معاك بيفكّر…</span></div></div>
+
+<script>
+const URL_AGENT='https://pqpnwxyevrsipklzmwex.supabase.co/functions/v1/maak-agent';
+const SB_KEY='sb_publishable_CjB_aiAM0sXs6GdqiWGZZA_Z1k_TDmF';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const AD='٠١٢٣٤٥٦٧٨٩',ar=n=>String(n).replace(/\d/g,d=>AD[d]);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function snack(t){const d=document.createElement('div');d.className='snack';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}
+
+/* Signs the app knows. Only openly licensed (CC0) clips are shown as video; the rest show as words. */
+const VOCAB=[['bta2a','بطاقة'],['bdal_fa2ed','بدل فاقد'],['bdal_talef','بدل تالف'],['gedid','جديد'],['raqam_serri','رقم سري'],['flos','فلوس'],['hesab','حساب'],['emta','إمتى'],['kam','كام'],['estelam','استلام'],['tmam','تمام'],['aywa','أيوه'],['la','لأ'],['tany','تاني'],['shokran','شكراً'],['fein','فين'],['mo7tag','محتاج'],['mosa3da','مساعدة'],['asef','آسف'],['ana','أنا'],['asam','أصم'],['tawqee3','توقيع'],['sora','صورة'],['bokra','بكرة'],['ba3d','بعدين'],['bank','البنك'],['telefon','تليفون'],['msh_shaghal','مش شغالة']].map(([k,a])=>({k,ar:a}));
+const AR=Object.fromEntries(VOCAB.map(v=>[v.k,v.ar]));
+const CLIP={shokran:'kg_shokran',fein:'kg_fein',mo7tag:'kg_mo7tag',mosa3da:'kg_mosa3da',asef:'kg_asef'};
+
+const PLACES={bank_misr:{ar:'بنك مصر',icon:'account_balance'},civil_registry:{ar:'السجل المدني',icon:'badge'},social_solidarity:{ar:'الوحدة الاجتماعية',icon:'family_restroom'},hospital:{ar:'المستشفى',icon:'local_hospital'}};
+const GOALS=[
+ {icon:'credit_card_off',ar:'بطاقة البنك ضاعت',goal:'بطاقة البنك ضاعت وعايز أوقفها وآخد بدل فاقد',place:'bank_misr'},
+ {icon:'build',ar:'بطاقة البنك باظت',goal:'بطاقة البنك باظت وعايز بدل تالف',place:'bank_misr'},
+ {icon:'password',ar:'نسيت الرقم السري',goal:'نسيت الرقم السري لبطاقة البنك',place:'bank_misr'},
+ {icon:'badge',ar:'البطاقة الشخصية ضاعت',goal:'البطاقة الشخصية (الرقم القومي) ضاعت وعايز بدل فاقد',place:'civil_registry'},
+ {icon:'family_restroom',ar:'معاش تكافل وكرامة',goal:'عايز أقدّم على معاش تكافل وكرامة',place:'social_solidarity'},
+ {icon:'local_hospital',ar:'كشف عند دكتور',goal:'عايز أكشف عند دكتور في المستشفى',place:'hospital'},
+ {icon:'medication',ar:'أصرف علاج',goal:'عايز أصرف علاج من صيدلية المستشفى',place:'hospital'},
+ {icon:'edit',ar:'حاجة تانية',other:true},
+];
+
+/* ---------- state ---------- */
+let S=store.get('maak_agent',null);
+const save=()=>store.set('maak_agent',S);
+const fresh=()=>({goal:'',place:'',plan:null,steps:[],turns:[],facts:[],ask:'',said:'',tell:'',words:[],replies:[],finished:false,summary:null,screen:'sGoal'});
+if(!S||!S.screen)S=fresh();
+
+/* ---------- server ---------- */
+async function call(task,payload){
+  $('#load').hidden=false;
+  try{
+    const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
+    const r=await fetch(URL_AGENT,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:SB_KEY,authorization:'Bearer '+SB_KEY},body:JSON.stringify({task,payload})});
+    clearTimeout(tm);const j=await r.json();
+    if(!r.ok||j.fallback||j.error)throw new Error(j.reason||j.error||'fail');
+    return j;
+  }catch(e){snack('مش قادر أوصل للمساعد دلوقتي. جرّب تاني.');return null}
+  finally{$('#load').hidden=true}
+}
+
+/* ---------- navigation ---------- */
+const hist=[];
+function go(id,push=true){if(push&&S.screen!==id)hist.push(S.screen);document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!==id);S.screen=id;save();window.scrollTo(0,0);render[id]&&render[id]()}
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-back]')){go(hist.pop()||'sCust',false)}
+  if(e.target.closest('[data-home]')){if(S.screen!=='sSum'&&S.turns.length&&!confirm('تنهي الزيارة؟'))return;S=fresh();hist.length=0;go('sGoal',false)}
+});
+
+/* ---------- pieces ---------- */
+function wordChips(el,words){
+  el.innerHTML=(words||[]).filter(k=>AR[k]).map(k=>`<button class="chip" data-k="${k}"><span class="ms">sign_language</span>${esc(AR[k])}</button>`).join('');
+  el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k],v=$('#cuVid');if(c&&v){v.hidden=false;v.src='clips/'+c+'.mp4';v.play().catch(()=>{})}else snack('الإشارة دي لسه مش متسجّلة بالفيديو')});
+}
+const factHtml=f=>`<div class="fact"><span class="ms">${esc(f.icon||'info')}</span><div><span>${esc(f.label)}</span><b>${esc(f.value)}</b></div></div>`;
+function stepsHtml(){return S.steps.map((s,i)=>`<div class="row"><span class="num ${s.status==='done'?'done':''}">${s.status==='done'?'<span class="ms">check</span>':ar(i+1)}</span><span style="${s.status==='done'?'color:var(--var)':''}">${esc(s.text)}</span></div>`).join('')}
+function mergeFacts(nf){for(const f of nf||[]){const i=S.facts.findIndex(x=>x.label===f.label);const v={icon:f.icon,label:String(f.label).slice(0,40),value:String(f.value).slice(0,80)};if(i>=0)S.facts[i]=v;else S.facts.push(v)}S.facts=S.facts.slice(-12)}
+const addTurn=(who,text)=>{if(!text)return;S.turns.push({who,text:String(text).slice(0,300)});S.turns=S.turns.slice(-30)};
+
+/* ---------- screens ---------- */
+const render={};
+render.sGoal=()=>{
+  $('#goals').innerHTML=GOALS.map((g,i)=>`<button class="tile" data-i="${i}"><span class="ms">${g.icon}</span>${esc(g.ar)}${g.place?`<small>${esc(PLACES[g.place].ar)}</small>`:''}</button>`).join('');
+  $('#goals').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const g=GOALS[b.dataset.i];if(g.other){$('#otherBox').hidden=false;$('#otherIn').focus();return}startPlan(g.goal,g.place)});
+  $('#places').innerHTML=Object.entries(PLACES).map(([k,p])=>`<button class="tile" data-p="${k}" style="min-height:80px"><span class="ms">${p.icon}</span>${esc(p.ar)}</button>`).join('');
+  $('#places').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const t=$('#otherIn').value.trim();if(!t){snack('اكتب المطلوب الأول');return}startPlan(t,b.dataset.p)});
+};
+async function startPlan(goal,place){
+  S=fresh();S.goal=goal;S.place=place;save();
+  const p=await call('plan',{goal,place,vocab:VOCAB});
+  if(!p){go('sGoal',false);return}
+  S.plan=p;S.steps=p.steps.map(s=>({id:s.id,text:s.text,status:'open',ask:s.ask}));S.words=p.words||[];
+  S.ask=(p.steps.find(s=>s.ask)||{}).ask||'';
+  go('sPlan');
+}
+render.sPlan=()=>{
+  const p=S.plan;if(!p)return go('sGoal',false);
+  $('#planHead').innerHTML=`<span class="chip"><span class="ms">${PLACES[S.place]?.icon||'help'}</span>${esc(PLACES[S.place]?.ar||'')}</span><span class="chip" style="background:var(--pc);color:var(--on-pc);border:0">${esc(p.title)}</span>`;
+  $('#planFee').hidden=!p.fee.text;$('#planFeeTx').textContent=p.fee.text;
+  $('#planFeeTag').innerHTML=p.fee.sure?'<span class="tag ok"><span class="ms" style="font-size:16px">verified</span>الرسوم من موقع البنك</span>':'<span class="tag ask">؟ نتأكد من الموظف</span>';
+  $('#planSteps').innerHTML='<b>معاك جهّزلك الخطوات</b>'+p.steps.map((s,i)=>`<div class="row" style="align-items:flex-start"><span class="num">${ar(i+1)}</span><div><b>${esc(s.text)}</b>${s.ask?`<div class="sub" style="font-size:14px">معاك هيسأل: «${esc(s.ask)}»</div>`:''}</div><span class="tag ${s.sure?'ok':'ask'}" style="margin-inline-start:auto">${s.sure?'✓':'؟'}</span></div>`).join('');
+  $('#planBring').hidden=!p.bring.length;
+  $('#planBringList').innerHTML=p.bring.map(b=>`<span class="chip"><span class="ms">${esc(b.icon)}</span>${esc(b.text)} <span class="tag ${b.sure?'ok':'ask'}">${b.sure?'✓':'؟'}</span></span>`).join('');
+  $('#planWarn').hidden=!p.warn;$('#planWarn span:last-child').textContent=p.warn;
+};
+$('#toCounter').onclick=()=>go('sStaff');
+
+/* staff side */
+let rec=null;
+render.sStaff=()=>{
+  $('#stGoal').textContent=S.goal;
+  $('#stSaid').hidden=!S.said;$('#stSaid').textContent=S.said?'العميل بيقول: «'+S.said+'»':'';
+  $('#stAsk').textContent=S.ask||'اتفضل، اكتب الرد أو الخطوة الجاية للعميل.';
+  if(S.ask&&!(S.turns.length&&S.turns[S.turns.length-1].who==='maak'&&S.turns[S.turns.length-1].text===S.ask)){addTurn('maak',S.ask);save()}
+  $('#stIn').value='';
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;$('#stMic').hidden=!SR;
+};
+$('#stMic').onclick=()=>{
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  if(rec){rec.stop();return}
+  rec=new SR();rec.lang='ar-EG';rec.interimResults=true;rec.continuous=false;
+  const base=$('#stIn').value;$('#stMic').style.background='#ffb4ab';
+  rec.onresult=e=>{let t='';for(const r of e.results)t+=r[0].transcript;$('#stIn').value=(base?base+' ':'')+t};
+  rec.onend=()=>{rec=null;$('#stMic').style.background=''};rec.onerror=()=>snack('الميكروفون مش شغال، اكتب الرد');
+  rec.start();
+};
+$('#staffBack').onclick=()=>go('sCust',false);
+$('#stSend').onclick=async()=>{
+  const t=$('#stIn').value.trim();if(!t){snack('اكتب الرد الأول');return}
+  addTurn('staff',t);S.said='';save();
+  const n=await call('next',{goal:S.goal,place:S.place,vocab:VOCAB,steps:S.steps.map(s=>({id:s.id,text:s.text,status:s.status})),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value}))});
+  if(!n){S.turns.pop();save();return}
+  S.steps.forEach(s=>{if(n.done.includes(s.id))s.status='done'});
+  mergeFacts(n.facts);S.tell=n.tell_customer||t;S.words=n.words||[];S.replies=n.replies||[];S.ask=n.ask_staff||'';S.finished=!!n.finished;
+  save();go('sCust');
+};
+
+/* customer side */
+render.sCust=()=>{
+  const done=S.steps.filter(s=>s.status==='done').length;$('#cuProg').textContent=ar(done)+' من '+ar(S.steps.length);
+  $('#cuTell').textContent=S.tell;$('#cuVid').hidden=true;wordChips($('#cuWords'),S.words);
+  $('#cuFacts').innerHTML=S.facts.map(factHtml).join('');
+  $('#cuAskBox').hidden=!S.ask;$('#cuAsk').textContent=S.ask;
+  $('#cuSteps').innerHTML=stepsHtml();
+  const reps=[...new Set([...(S.replies||[]),'مش فاهم، ممكن تكتبها أبسط؟'])];
+  $('#cuReplies').innerHTML=reps.map(r=>`<button class="reply">${esc(r)}</button>`).join('');
+  $('#cuReplies').querySelectorAll('.reply').forEach(b=>b.onclick=()=>{addTurn('customer',b.textContent);S.said=b.textContent;save();go('sStaff')});
+  $('#cuShow').innerHTML=S.finished?'<span class="ms">task_alt</span>الملخص':'<span class="ms">screen_rotation</span>ورّي الموظف';
+};
+$('#cuShow').onclick=()=>S.finished?finish():go('sStaff');
+$('#cuDone').onclick=()=>finish();
+async function finish(){
+  if(!S.turns.some(t=>t.who==='staff')){snack('لسه الموظف مردّش');return}
+  const d=new Date();const today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const m=await call('summary',{goal:S.goal,place:S.place,vocab:VOCAB,steps:S.steps.map(s=>({id:s.id,text:s.text,status:s.status})),turns:S.turns,facts:S.facts.map(f=>({label:f.label,value:f.value})),today});
+  if(!m)return;S.summary=m;save();go('sSum');
+}
+
+/* paper */
+$('#cuPhoto').onclick=()=>$('#cuFile').click();
+$('#cuFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(f)}).catch(()=>null);
+  if(!img){snack('الصورة مش واضحة، صوّر تاني');return}
+  const k=Math.min(1,1280/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);const data=c.toDataURL('image/jpeg',0.8);
+  const r=await call('read',{goal:S.goal||null,place:S.place||null,vocab:VOCAB,media_type:'image/jpeg',image:data.split(',')[1]});
+  if(!r)return;
+  $('#rdImg').src=data;$('#rdTitle').textContent=r.unclear?'الصورة مش واضحة':r.title;
+  $('#rdFacts').innerHTML=r.facts.map(factHtml).join('');$('#rdNext').textContent=r.next;wordChips($('#rdWords'),r.words);
+  mergeFacts(r.facts.map(x=>({...x,label:'من الورقة: '+x.label})));save();
+  go('sRead');
+};
+
+/* summary */
+render.sSum=()=>{
+  const m=S.summary;if(!m)return go('sGoal',false);
+  $('#smTitle').textContent=m.title||'الزيارة خلصت';
+  $('#smLines').innerHTML=m.lines.map(l=>`<div class="row"><span class="ms" style="color:var(--primary)">${esc(l.icon)}</span><span style="font-size:17px">${esc(l.text)}</span></div>`).join('')||'<span class="sub">مفيش تفاصيل كفاية</span>';
+  const has=!!m.remind.date;$('#smRem').hidden=!has;$('#smCal').hidden=!has;
+  if(has){const [y,mo,da]=m.remind.date.split('-');$('#smRemDate').textContent='هفكّرك يوم '+ar(+da)+'/'+ar(+mo)+'/'+ar(y);$('#smRemTx').textContent=m.remind.text}
+  wordChips($('#smWords'),m.words);
+};
+$('#smCal').onclick=()=>{
+  const m=S.summary;if(!m?.remind.date)return;const d=m.remind.date.replace(/-/g,'');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Maak//Agent//AR','BEGIN:VEVENT','UID:'+Date.now()+'@maak','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART;VALUE=DATE:'+d,'SUMMARY:'+(m.remind.text||'معاك: متابعة الزيارة'),'DESCRIPTION:'+S.goal,'BEGIN:VALARM','TRIGGER:-PT12H','ACTION:DISPLAY','DESCRIPTION:معاك','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.download='maak-reminder.ics';document.body.appendChild(a);a.click();a.remove();
+};
+
+go(S.screen||'sGoal',false);
+</script>
+</body>
+</html>
