@@ -5,8 +5,8 @@ The customer signs to their phone; the agent turns the signs into a clear Arabic
 
 Entry for the Dubai Create AI Agents Championship, category **Best Societal AI Agent**.
 
-**Live prototype:** https://waelabdlrahman16-ux.github.io/maak-sign/
-**Agent (new):** https://waelabdlrahman16-ux.github.io/maak-sign/agent/
+**Live prototype:** https://maaksign.com/
+**Agent (new):** https://maaksign.com/agent/
 
 ## The agent
 
