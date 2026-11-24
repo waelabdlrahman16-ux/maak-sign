@@ -6,12 +6,25 @@ The customer signs to their phone; the agent turns the signs into a clear Arabic
 Entry for the Dubai Create AI Agents Championship, category **Best Societal AI Agent**.
 
 **Live prototype:** https://waelabdlrahman16-ux.github.io/maak-sign/
+**Agent (new):** https://waelabdlrahman16-ux.github.io/maak-sign/agent/
+
+## The agent
+
+Maak also gets a task done for a deaf person at any service counter: a bank, the civil registry, a Social Solidarity office or a hospital.
+
+1. **Goal.** The person taps a picture (lost bank card, lost national ID, Takaful and Karama, integrated services card, a doctor visit).
+2. **Plan.** Claude plans the visit from a small knowledge pack of facts with sources: steps, the question to ask the staff at each step, what to bring, and the fee. Facts from the provider's own website are marked ✓; anything else becomes a question for the staff. Phone-only services (for example a card stop through Banque Misr's 19888 line) become a request for the staff to do it.
+3. **At the counter.** The phone shows the staff Maak's question; the staff types or speaks the answer. Claude ticks off steps, records the facts the staff gave, marks what the customer still has to do, asks the next question, and tells the customer in short words with signs. The customer answers with a tap or by signing (the sign reader runs on the phone).
+4. **Papers.** The person photographs a receipt or form; Claude reads it and explains it in simple words. The photo is used once and not stored; long card, ID and account numbers show only their last 4 digits.
+5. **Summary.** What was done, the fee, the pickup date and a calendar reminder.
+
+**Honesty rule, enforced in code:** every number the agent shows must appear in a cited official fact or in what the staff said; anything else is removed before it reaches the screen.
 **Teller screen:** https://waelabdlrahman16-ux.github.io/maak-sign/#teller
 
 ## How it works
 
 1. **Sign recognition on the phone.** The camera feed is processed on the device. Hand, arm and body landmarks are extracted per frame, normalised for position, scale and handedness, and segmented into individual signs by timing (hand raised, held, lowered).
-2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for all 39 of its signs (384 examples: the 7 public-domain customer signs have 45 examples each, drawn from all 15 signers; the other 32 signs come from one signer each and are not yet tested on new signers), and each user can teach it their own way of signing, which then takes priority.
+2. **Matching.** Each sign is compared with known examples using dynamic time warping. The app ships with built-in examples for all 39 of its signs (380 examples: the 7 public-domain customer signs have 45 examples each, drawn from all 15 signers; the other 32 signs come from one signer each and are not yet tested on new signers), and each user can teach it their own way of signing, which then takes priority.
 3. **Sentence and confirmation.** Recognised signs become a short Arabic request (e.g. *I want to withdraw 2,000 EGP*). The customer confirms before anything is sent. If a sign is unclear, the customer picks the word from a picture list instead of the agent guessing.
 4. **Teller pairing.** The customer's phone shows a six-digit code; the teller types it (or opens a link) and both screens connect. No install and no account for the teller.
 5. **Reply in sign.** The teller taps a reply; the customer sees it as a sign-language video with the text underneath.
@@ -43,6 +56,6 @@ Right-to-left Arabic, icons and sign videos on every screen, a "explain this scr
 
 ## Status
 
-Working prototype. Next: recognition trained on many signers, a language agent that turns signs into natural sentences and matches teller replies by meaning, and testing with deaf customers.
+Working prototype with a live agent. Next: testing with deaf users, more official facts per place, and more signs from deaf signers.
 
 Designed and built by Wael Abdlrahman.
