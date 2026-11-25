@@ -772,7 +772,7 @@ function customer(){
   function showTeach(){
     const s=curSign();$('#c3count').textContent=T.list.length>1?`إشارة ${arDigits(T.i+1)} من ${arDigits(T.list.length)}`:'تمرين';$('#c3word').textContent=s.ar;$('#c3word2').textContent=s.ar;
     const r=$('#c3ref');if(s.clip){r.hidden=false;$('#c3noref').hidden=true;r.src='clips/'+s.clip+'.mp4';r.play().catch(()=>{})}else{r.hidden=true;r.removeAttribute('src');$('#c3noref').hidden=false}
-    {const yt=RECMODE&&REC_YT[s.k],yf=$('#c3yt');if(yt){r.hidden=true;$('#c3noref').hidden=true;ytShow(yf,yt);yf.hidden=false;$('#c3ytsrc').hidden=false;$('#c3ytsrc').textContent='شوف الإشارة · من يوتيوب: '+yt[3]}else{yf.hidden=true;if(yf.getAttribute('src'))yf.removeAttribute('src');ytCur='';$('#c3ytsrc').hidden=true}}
+    {const yt=RECMODE&&REC_YT[s.k],yf=$('#c3yt');if(yt){r.hidden=true;$('#c3noref').hidden=true;ytShow(yf,yt);yf.hidden=false;$('#c3ytsrc').hidden=false;$('#c3ytsrc').textContent='شوف الإشارة · من يوتيوب: '+yt[3]}else{yf.hidden=true;{const pb=yf.parentElement.querySelector('.ytplay');if(pb)pb.style.display='none'}if(yf.getAttribute('src'))yf.removeAttribute('src');ytCur='';$('#c3ytsrc').hidden=true}}
     if(RECMODE){const n=REC.reps[s.k]||0;$('#c3st').textContent=n?`اتسجلت ${arDigits(Math.min(n,REC_REPS))} من ${arDigits(REC_REPS)} ✔`:`اعمل الإشارة ${arDigits(REC_REPS)} مرات، ونزّل إيدك بين كل مرة`}else{const n=(TEMPL[s.k]||[]).length;$('#c3st').textContent=n?`اتسجلت ${arDigits(n)} مرة ✔ ${n<2?'— اعملها مرة كمان':''}`:'اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة'}
     $('#c3next').lastChild.textContent=T.i<T.list.length-1?'التالي':'خلّصت';
     $('#c3skip').hidden=T.list.length===1&&!RECMODE;
@@ -783,9 +783,16 @@ function customer(){
   const loadYT=()=>ytApi||(ytApi=new Promise((ok,no)=>{if(window.YT&&YT.Player)return ok();window.onYouTubeIframeAPIReady=ok;const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=no;document.head.appendChild(sc);setTimeout(no,8000)}));
   function ytShow(f,yt){
     const [id,st,en]=yt;const s0=st||0;
-    const u='https://www.youtube-nocookie.com/embed/'+id+'?rel=0&playsinline=1&mute=1&autoplay=1&enablejsapi=1&origin='+encodeURIComponent(location.origin)+(st!=null?'&start='+st+'&end='+en:'');
-    if(ytCur===u)return;ytCur=u;f.src=u;
-    loadYT().then(()=>{if(ytCur!==u)return;new YT.Player(f.id,{events:{onReady:e=>{e.target.mute();e.target.playVideo()},onStateChange:e=>{if(e.data===0&&ytCur===u){e.target.seekTo(s0,true);e.target.playVideo()}}}})}).catch(()=>{});
+    /* minimal player: no controls or keyboard, our own play icon; YouTube's small logo stays (YouTube's terms) */
+    const u='https://www.youtube-nocookie.com/embed/'+id+'?rel=0&playsinline=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin='+encodeURIComponent(location.origin)+(st!=null?'&start='+st+'&end='+en:'');
+    let pb=f.parentElement.querySelector('.ytplay');
+    if(!pb){pb=document.createElement('button');pb.className='ytplay';pb.type='button';pb.setAttribute('aria-label','شغّل الإشارة');pb.innerHTML='<span class="ms">play_arrow</span>';
+      pb.style.cssText='position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer';
+      pb.querySelector('.ms').style.fontSize='40px';f.parentElement.appendChild(pb)}
+    pb.style.display='flex';
+    if(ytCur===u)return;ytCur=u;f.src=u;f.ytp=null;
+    pb.onclick=()=>{if(f.ytp&&f.ytp.playVideo){f.ytp.playVideo();pb.style.display='none'}};
+    loadYT().then(()=>{if(ytCur!==u)return;f.ytp=new YT.Player(f.id,{events:{onReady:e=>{e.target.mute()},onStateChange:e=>{if(ytCur!==u)return;if(e.data===1)pb.style.display='none';else if(e.data===2)pb.style.display='flex';if(e.data===0){e.target.seekTo(s0,true);e.target.playVideo()}}}})}).catch(()=>{});
   }
   const finishTeach=()=>{if(!RECMODE)store.set('maak_onboarded',true);hist.length=0;go(T.ret,false)};
   function onTeach(F){if(RECMODE){recTeach(F);return}const s=curSign();(TEMPL[s.k]=TEMPL[s.k]||[]).push(F);if(TEMPL[s.k].length>4)TEMPL[s.k].shift();saveT();showTeach();if(TEMPL[s.k].length>=2)setTimeout(()=>{if(cur==='c3'&&T.i<T.list.length-1){T.i++;showTeach()}},900)}
