@@ -636,7 +636,13 @@ function dtw(a,b,band=6){const n=a.length,INF=1e18;const D=Array.from({length:n+
 /* Matching settings (23 Nov): hand position weighted 6x, warp band 3. Leave-one-signer-out on 15 CC0 signers, 732 clips of 7 customer signs, 45 examples each: 91% top-1. */
 const POSBOOST=6,BAND=3,_wcache=new WeakMap();
 function wpos(F){if(_wcache.has(F))return _wcache.get(F);const G=F.map(f=>{const g=f.slice();g[0]*=POSBOOST;g[1]*=POSBOOST;g[42]*=POSBOOST;g[43]*=POSBOOST;return g});_wcache.set(F,G);return G}
-function classify(F){const best={};const Q=wpos(F);for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){const d=dtw(Q,wpos(t),BAND);if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
+/* One-hand signing (25 Nov): when the customer signs with one hand (e.g. holding the phone), a two-handed example is also compared
+   without its second hand, with a 10% penalty. Leave-one-signer-out: one-handed 73.5% -> 82.5% top-1, wrong slips 15.2% -> 8.2%;
+   normal two-handed signing unchanged (91.1% top-1, 95.5% with the ask step, 2.2% wrong slips). */
+const ONE_PEN=1.1,PH2=[0,0.9*0.5*POSW,...new Array(40).fill(0)],_scache=new WeakMap();
+const oneHanded=F=>F.every(f=>f[42]===0&&Math.abs(f[43]-PH2[1])<1e-3);
+function stripped(t){if(_scache.has(t))return _scache.get(t);const s=wpos(t.map(f=>[...f.slice(0,42),...PH2]));_scache.set(t,s);return s}
+function classify(F){const best={};const Q=wpos(F),one=oneHanded(F);for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){let d=dtw(Q,wpos(t),BAND);if(one&&!oneHanded(t)){const ds=dtw(Q,stripped(t),BAND)*ONE_PEN;if(ds<d)d=ds}if(best[k]===undefined||d<best[k])best[k]=d}return Object.entries(best).sort((a,b)=>a[1]-b[1])}
 
 /* camera + segmentation: a sign starts when a hand rises, ends when hands drop, stay still, or after 3.5 s */
 const CAM={stream:null,v:null,c:null,pill:null,perf:null,onSign:null,running:false,lastTs:-1};
