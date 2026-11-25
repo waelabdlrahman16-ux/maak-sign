@@ -4,7 +4,7 @@
   "description": "Maak Sign: an agent that helps deaf people get counter errands done in Egyptian Sign Language.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "/agent.html",
+  "start_url": "/agent/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#faf8ff",

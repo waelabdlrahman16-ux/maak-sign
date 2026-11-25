@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     for (const j of jobs || []) {
       try {
         const d = webpush.generateRequestDetails({ endpoint: j.endpoint, keys: { p256dh: j.p256dh, auth: j.auth } },
-          JSON.stringify({ title: "معاك", body: j.body, url: "https://maaksign.com/agent.html?case=" + j.case_ref }),
+          JSON.stringify({ title: "معاك", body: j.body, url: "https://maaksign.com/agent/?case=" + j.case_ref }),
           { TTL: 86400, urgency: "normal", vapidDetails: { subject: "mailto:waelabdlrahman16@gmail.com", publicKey: k.public_key, privateKey: k.private_key } });
         const r = await fetch(d.endpoint, { method: "POST", headers: d.headers as Record<string, string>, body: d.body as unknown as BodyInit });
         if (r.status === 404 || r.status === 410) { await db.from("push_jobs").delete().eq("id", j.id); gone++; continue; }

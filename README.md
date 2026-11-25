@@ -19,7 +19,18 @@ Maak also gets a task done for a deaf person at any service counter: a bank, the
 5. **Summary.** What was done, the fee, the pickup date and a calendar reminder.
 
 **Honesty rule, enforced in code:** every number the agent shows must appear in a cited official fact or in what the staff said; anything else is removed before it reaches the screen.
-**Teller screen:** https://waelabdlrahman16-ux.github.io/maak-sign/#teller
+**Agent page:** https://maaksign.com/agent/ · **Teller screen:** https://maaksign.com/staff
+
+### Agent actions
+
+| Action | What it does | Privacy |
+|---|---|---|
+| **Write the paper** | Drafts the paper the customer hands to the staff: a request to the branch or office, or (lost national ID) a statement for the police station. It says the customer is deaf and asks for written replies. Show on screen or print. | Only the goal, the staff's replies and the visit facts go to the agent. The customer's name is added on the phone and never sent. The national ID and card number lines stay blank to fill in by hand; long numbers are blocked by the server. The agent may not claim anything was paid or done unless the staff said so. |
+| **Find the place** | Opens Google Maps searching for the right kind of place (Banque Misr branch, civil registry, social unit, public hospital). | Nothing is sent by Maak; Maps uses the phone's own location. |
+| **Remember the case** | Unfinished visits and pending pickups show at the top of the agent page, with "got it" and "going to pick it up" (starts the next visit with the earlier facts). | Kept on the phone. "Save a copy" encrypts the cases on the phone (AES-GCM, key derived from a 10-character code with PBKDF2) and stores only the locked bytes; the server never sees the code or anything readable. Copies are deleted after 180 days. |
+| **Follow up by itself** | On the pickup date, a phone notification ("today is your date… did you get it?"); tapping it opens the case. | The server keeps only the browser's push address, the date, a random case id and a short generic text: no names, numbers or bank details. Sent jobs are deleted after 7 days. iPhone needs "Add to Home Screen". |
+
+**Server pieces** (Supabase project "Maak Sign"): edge functions `maak-agent` (plan, next, read, letter, summary, compose, match, simplify), `maak-case` (stores and returns locked case copies) and `maak-push` (signing key, push jobs, daily send). Tables `case_backups`, `push_keys` and `push_jobs` have row-level security on and no public access; only the functions read them. A daily database job (`maak-push-daily`, 08:47 Cairo) sends the due notifications.
 
 ## How it works
 

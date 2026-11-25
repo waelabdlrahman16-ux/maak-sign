@@ -1,6 +1,7 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v8): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v20: compose may not add requests the signs do not contain (prompt + server guard).
 // v19: letter — the paper the customer hands to the staff (request or police statement).
 // Only text and, for "read", one photo reach this function; the photo is used once and never stored.
 // Video never leaves the customer's phone. The Anthropic key lives in the ANTHROPIC_API_KEY secret;
@@ -14,6 +15,8 @@ const SMART = "claude-sonnet-5-5";
 const AGENT_TASKS = ["plan", "next", "read", "summary", "letter"];
 // plan and read use the smart model; the counter loop (next) and summary use the fast one so each turn is quick.
 const SMART_TASKS = ["plan", "read"];
+// compose guard: signs that are only identity/greeting words are shown exactly as signed
+const COMPOSE_PLAIN = ["أنا", "أصم", "أهلاً", "أهلا", "شكراً", "شكرا", "آسف", "تمام", "أيوه", "لأ"];
 
 const STYLE =
   "Write for a deaf Egyptian adult who may read little and is in a hurry: Egyptian Arabic, very short, everyday words, no formal Arabic, numbers as digits. " +
@@ -24,7 +27,7 @@ const STYLE =
 
 const PROMPTS: Record<string, string> = {
   compose:
-    "You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words), in the first person as the customer speaking, that the customer most likely means, for the bank teller to read. The signs come first: use the goal and amount only when the signs are about money, the card, the account or the visit goal. A greeting, thanks, apology, \"how are you\", \"where\" question or request for help stays exactly that, with no goal or amount added. Never invent numbers, names or requests. Give the sentence in text.",
+    "You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words), in the first person as the customer speaking, that the customer most likely means, for the bank teller to read. The signs come first: use the goal and amount only when the signs are about money, the card, the account or the visit goal. A greeting, thanks, apology, \"how are you\", \"where\" question or request for help stays exactly that, with no goal or amount added. The sentence may only express what the signs say: never add a request, question, reason or politeness clause the signs do not contain (e.g. أنا + أصم → \"أنا أصم.\", not a request to write). Never invent numbers, names or requests. Give the sentence in text.",
   match:
     "A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Give the number in index.",
   simplify:
@@ -417,7 +420,14 @@ Deno.serve(async (req) => {
     }
     if (task === "compose") {
       if (typeof out.text !== "string" || !out.text.trim() || out.text.length > 160) return json({ fallback: true, reason: "shape" }, 200, h);
-      return json({ text: out.text.trim() }, 200, h);
+      // guard: the sentence may not say more than the signs. Identity/greeting signs are returned as signed;
+      // a sentence far longer than the signs falls back to the signs themselves.
+      const signs = (p.signs as string[]).map((x) => x.trim()).filter(Boolean);
+      const plain = signs.join(" ") + ".";
+      if (signs.every((x) => COMPOSE_PLAIN.includes(x))) return json({ text: plain, guarded: true }, 200, h);
+      const t = out.text.trim();
+      if (t.split(/\s+/).length > signs.length * 5 + 6) return json({ text: plain, guarded: true }, 200, h);
+      return json({ text: t }, 200, h);
     }
     if (task === "simplify") {
       const t = typeof out.text === "string" ? out.text.trim() : "";

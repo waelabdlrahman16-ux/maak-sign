@@ -7,12 +7,12 @@ self.addEventListener('push', e => {
   e.waitUntil(self.registration.showNotification(d.title || 'معاك', {
     body: d.body || 'عندك متابعة النهارده',
     icon: 'icons/maak-192.png', badge: 'icons/maak-badge.png', dir: 'rtl', lang: 'ar',
-    data: { url: d.url || 'https://maaksign.com/agent.html' }
+    data: { url: d.url || 'https://maaksign.com/agent/' }
   }));
 });
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const url = (e.notification.data && e.notification.data.url) || 'https://maaksign.com/agent.html';
+  const url = (e.notification.data && e.notification.data.url) || 'https://maaksign.com/agent/';
   if (!/^https:\/\/(www\.)?maaksign\.com\//.test(url)) return;
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
     for (const c of list) if (c.url.includes('/agent') && 'focus' in c) { c.navigate(url); return c.focus(); }

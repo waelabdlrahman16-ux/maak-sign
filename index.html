@@ -210,7 +210,7 @@ button,input{font:inherit;color:inherit}
 <section class="screen" id="c0" hidden>
   <div class="appbar"><h1 style="color:var(--primary);font-weight:700">معاك</h1><button class="btn tonal" data-help style="height:48px;margin-inline-end:8px"><span class="ms">play_circle</span>بالإشارة</button></div>
   <div class="body" style="gap:16px;padding-top:12px">
-    <a class="door door-main" href="agent.html"><span class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
+    <a class="door door-main" href="agent/"><span class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
     <button class="door door-alt" id="c0talk"><span class="ms" aria-hidden="true">sign_language</span><span class="door-t"><b>أكلّم الموظف</b><small>أنا عند الشباك دلوقتي</small></span></button>
     <p class="intro-en" lang="en" dir="ltr" style="margin-top:auto">Maak Sign is an AI agent that helps deaf Egyptians get counter errands done. <a href="https://github.com/waelabdlrahman16-ux/maak-sign#readme" target="_blank" rel="noopener" style="padding:12px 0;margin:-12px 0">About Maak</a></p>
   </div>
@@ -579,7 +579,7 @@ async function sbRoom(){
     return {emit:async(t,d)=>{const r=await ch.send({type:'broadcast',event:t,payload:d});if(r!=='ok')throw new Error(r)},
       on:(t,f)=>{(H[t]=H[t]||[]).push(f)},presence:async p=>{await ch.track({p})},
       onPeers:f=>{PF.push(f)},peers:()=>peers,leave:async()=>{await sb.removeChannel(ch)}}}}}
-try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent.html')}catch(e){}
+try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent/')}catch(e){}
 try{if(new URLSearchParams(location.search).has('notext'))document.documentElement.classList.add('notext')}catch(e){}
 const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
 /* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */
