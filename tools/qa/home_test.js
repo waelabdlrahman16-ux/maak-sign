@@ -1,0 +1,18 @@
+const {chromium}=require('playwright');const http=require('http'),fs=require('fs'),path=require('path');
+const root='/home/claude/maak-sign';
+const srv=http.createServer((q,r)=>{const f=path.join(root,decodeURIComponent(q.url.split('?')[0]).replace(/\/$/,'/index.html'));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':f.endsWith('.html')?'text/html':'application/octet-stream'});r.end(d)})}).listen(8791);
+(async()=>{const b=await chromium.launch();const p=await (await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2})).newPage();
+ const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ await p.route(/fonts\.|supabase|jsdelivr|cdnjs/,r=>r.abort());
+ await p.goto('http://localhost:8791/');await p.waitForTimeout(800);
+ const vis=async()=>p.evaluate(()=>[...document.querySelectorAll('.phone .screen')].filter(s=>!s.hidden).map(s=>s.id).join(','));
+ console.log('start',await vis());await p.screenshot({path:'home_b.png'});
+ const sizes=await p.evaluate(()=>[...document.querySelectorAll('#c0 a,#c0 button')].map(e=>{const r=e.getBoundingClientRect();return e.textContent.trim().slice(0,14)+' '+Math.round(r.width)+'x'+Math.round(r.height)}));console.log(sizes.join(' | '));
+ await p.click('#c0talk');await p.waitForTimeout(300);console.log('talk ->',await vis());
+ await p.click('#c1 [data-go="c0"]');await p.waitForTimeout(300);console.log('back ->',await vis());
+ await p.evaluate(()=>localStorage.setItem('maak_onboarded','true'));await p.click('#c0talk');await p.waitForTimeout(300);console.log('returning talk ->',await vis());
+ await p.click('#c4 [data-go="c0"]');await p.waitForTimeout(300);console.log('back ->',await vis());
+ console.log('staff row gone',!(await p.$('#c0 [data-teller]')));
+ await p.goto('http://localhost:8791/?rec');await p.waitForTimeout(600);console.log('rec ->',await vis());
+ const href=await p.goto('http://localhost:8791/').then(()=>p.getAttribute('#c0 .door-main','href'));console.log('door1',href);
+ console.log('errors',errs);await b.close();srv.close()})();

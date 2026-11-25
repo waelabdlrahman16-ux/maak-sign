@@ -1,0 +1,5 @@
+const fs=require('fs');const D=__dirname+'/fontpkg/node_modules/';
+const files={ms:D+'material-symbols/material-symbols-rounded.woff2'};for(const w of [400,500,600,700])files['ar'+w]=D+`@fontsource/noto-sans-arabic/files/noto-sans-arabic-arabic-${w}-normal.woff2`;
+const css=`@font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:100 700;font-display:block;src:url(https://fonts.gstatic.com/x/ms.woff2) format("woff2")}`+[400,500,600,700].map(w=>`@font-face{font-family:"Noto Sans Arabic";font-weight:${w};font-display:block;src:url(https://fonts.gstatic.com/x/ar${w}.woff2) format("woff2")}`).join('');
+module.exports=async p=>{await p.route(/fonts\.googleapis\.com/,r=>r.fulfill({contentType:'text/css',body:css,headers:{'access-control-allow-origin':'*'}}));
+ await p.route(/fonts\.gstatic\.com\/x\//,r=>{const k=r.request().url().match(/x\/(\w+)\.woff2/)[1];r.fulfill({contentType:'font/woff2',body:fs.readFileSync(files[k]),headers:{'access-control-allow-origin':'*'}})})};

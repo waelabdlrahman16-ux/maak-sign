@@ -1,0 +1,13 @@
+const {chromium}=require('playwright');const http=require('http'),fs=require('fs'),path=require('path');
+const root='/home/claude/maak-sign';
+const srv=http.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u.endsWith('/'))u+='index.html';const f=path.join(root,u);fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':f.endsWith('.html')?'text/html':'application/octet-stream'});r.end(d)})}).listen(8792);
+(async()=>{const b=await chromium.launch();const p=await (await b.newContext({viewport:{width:390,height:844}})).newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ await p.route(/fonts\.|supabase|jsdelivr|cdnjs/,r=>r.abort());
+ await p.goto('http://localhost:8792/');await p.waitForTimeout(600);
+ console.log('home items',await p.$$eval('#c0 a,#c0 button',e=>e.map(x=>x.textContent.trim().replace(/\s+/g,' ').slice(0,22))));
+ await p.goto('http://localhost:8792/staff/');await p.waitForTimeout(800);
+ console.log('staff ->',p.url(),await p.evaluate(()=>!!document.querySelector('#t1:not([hidden])')));
+ await p.goto('http://localhost:8792/');await p.waitForTimeout(400);await p.evaluate(()=>localStorage.setItem('maak_onboarded','true'));
+ await p.click('#c0talk');await p.waitForTimeout(300);await p.click('.fab');await p.waitForTimeout(600);
+ console.log('c7 text',await p.$eval('#c7 .body-l',e=>e.textContent));
+ console.log('errors',errs);await b.close();srv.close()})();
