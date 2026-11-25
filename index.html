@@ -610,6 +610,7 @@ async function agent(task,payload){
    Recognition (MediaPipe Holistic on this device)
    ========================================================= */
 let holistic=null,booting=null;
+let CPU_ONLY=false;
 function bootModel(){
   if(booting) return booting;
   booting=(async()=>{
@@ -617,7 +618,7 @@ function bootModel(){
     const WASM=new URL('./vendor/wasm',location.href).href;
     let base;try{const r=await fetch('./models/holistic_model.wasm');base={modelAssetBuffer:new Uint8Array(await r.arrayBuffer())}}catch(e){base={modelAssetPath:'./models/holistic_model.wasm'}}
     const fs=await V.FilesetResolver.forVisionTasks(WASM);
-    try{holistic=await V.HolisticLandmarker.createFromOptions(fs,{baseOptions:{...base,delegate:'GPU'},runningMode:'VIDEO'})}
+    try{if(CPU_ONLY)throw 0;holistic=await V.HolisticLandmarker.createFromOptions(fs,{baseOptions:{...base,delegate:'GPU'},runningMode:'VIDEO'})}
     catch(e){holistic=await V.HolisticLandmarker.createFromOptions(fs,{baseOptions:{...base,delegate:'CPU'},runningMode:'VIDEO'})}
   })();
   return booting;
@@ -710,13 +711,20 @@ function segment(f,now){const up=raised(f),w=wrist(f);const sp=(w&&prevW)?Math.h
   if(now-startT>3500)return endSign(now,'cap')}
 function draw(r){const c=CAM.c,v=CAM.v;c.width=v.videoWidth;c.height=v.videoHeight;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);const hs=[r.leftHandLandmarks&&r.leftHandLandmarks[0],r.rightHandLandmarks&&r.rightHandLandmarks[0]];g.fillStyle=signing?'#ff5a4e':'#adc3fe';hs.forEach(h=>h&&h.forEach(p=>{g.beginPath();g.arc(p.x*c.width,p.y*c.height,4,0,7);g.fill()}))}
 function loop(){
-  if(!CAM.running)return;const v=CAM.v;
+  if(!CAM.running)return;
+  /* one bad frame (iPhone GPU hiccup, video switching) must never stop tracking for good: always schedule the next frame */
+  try{loopFrame();CAM.errs=0}catch(e){CAM.errs=(CAM.errs||0)+1;console.error('track',e);
+    if(CAM.errs===30&&!CAM.rebooting){CAM.rebooting=true;holistic=null;booting=null;CPU_ONLY=true;CAM.pill&&(CAM.pill.textContent='بيعيد تشغيل التتبّع…');bootModel().finally(()=>{CAM.rebooting=false;CAM.errs=0;CAM.pill&&(CAM.pill.textContent='ارفع إيدك وابدأ الإشارة')})}}
+  requestAnimationFrame(loop);
+}
+function loopFrame(){const v=CAM.v;
+  /* iPhone Safari can pause the camera preview (another video starting, a screen change): resume it */
+  if(v&&v.srcObject&&v.paused&&CAM.onSign&&!CAM.resuming){CAM.resuming=true;v.play().catch(()=>{}).finally(()=>{CAM.resuming=false})}
   if(holistic&&v&&v.readyState>=2&&!v.paused&&CAM.onSign){const ts=performance.now();if(ts>CAM.lastTs){CAM.lastTs=ts;
     const t0=performance.now();const r=holistic.detectForVideo(v,nextTs(ts));const dt=performance.now()-t0;PERF.ms=PERF.ms?PERF.ms*0.9+dt*0.1:dt;if(PERF.last){const f=1000/(ts-PERF.last);PERF.fps=PERF.fps?PERF.fps*0.9+f*0.1:f}PERF.last=ts;
     if(CAM.perf){CAM.perf.hidden=!SET.perf;CAM.perf.textContent=PERF.fps.toFixed(0)+' fps · '+PERF.ms.toFixed(0)+' ms'}
     if(PERF.fps&&PERF.fps<3&&CAM.startAt&&ts-CAM.startAt>4000&&!CAM.warned){CAM.warned=true;snack('الجهاز ده بطيء على الكاميرا المباشرة. صوّر الإشارة فيديو بزرار «أو صوّر فيديو» وهتشتغل.')}
     draw(r);const f=frameRaw(r,v.videoWidth,v.videoHeight);if(f)segment(f,ts)}}
-  requestAnimationFrame(loop);
 }
 async function camButton(phEl,pill){
   pill.textContent='بيحمّل النموذج…';
