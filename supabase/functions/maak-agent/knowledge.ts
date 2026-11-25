@@ -1,6 +1,7 @@
 // Maak knowledge pack. Only facts with a source. level "official" = the provider's own page;
 // level "news" = a news report — the agent must present it as "usually" and ask staff to confirm.
 // Checked 24 Nov 2026. Social Solidarity facts: Ministry of Social Solidarity FAQ (official).
+// 25 Nov 2026: civil registry official facts from Digital Egypt and the Civil Status Sector site; hospital facts (news level).
 
 export type Fact = { text: string; level: "official" | "news"; source: string };
 
@@ -23,6 +24,8 @@ export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
       { text: "At the civil registry office bring a recent personal photo and a copy of the police report.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
       { text: "The office tells you the fee after you submit the papers, and you pay it at the same office.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
       { text: "A replacement can also be requested on the Digital Egypt portal and is delivered to your address within a few days.", level: "news", source: "https://www.masrawy.com/news/news_cases/details/2026/2/25/2948349" },
+      { text: "The Digital Egypt portal (digital.gov.eg) has an official service to replace a lost national ID card from home and deliver it to your address; you sign in to the portal, and the service page lists no papers to upload.", level: "official", source: "https://digital.gov.eg/categories/terms/%D8%A8%D8%AF%D9%84-%D9%81%D8%A7%D9%82%D8%AF-%D8%A8%D8%B7%D8%A7%D9%82%D8%A9-%D8%A7%D9%84%D8%B1%D9%82%D9%85-%D8%A7%D9%84%D9%82%D9%88%D9%85%D9%8A" },
+      { text: "The Civil Status Sector call center numbers are 15340, 15341 and 16582, until 9 PM; line 15341 is for people with disabilities. These are voice calls, so a deaf customer needs someone to call for them.", level: "official", source: "https://cso.moi.gov.eg/" },
     ],
   },
   social_solidarity: {
@@ -37,7 +40,14 @@ export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
       { text: "After a Takaful and Karama application, a social researcher visits the home to check eligibility.", level: "news", source: "https://www.masrawy.com/news/news_egypt/details/2026/11/8/3075284" },
     ],
   },
-  hospital: { name: "المستشفى", facts: [] },
+  hospital: {
+    name: "المستشفى",
+    facts: [
+      { text: "In an emergency, 123 calls an ambulance to the nearest Ministry of Health hospital. It is a voice call, so a deaf person needs someone nearby to call.", level: "news", source: "https://help.unhcr.org/egypt/en/health-services/health-2/" },
+      { text: "Public hospitals give basic life-saving emergency care free or at low cost; advanced treatment or a stay longer than 24 hours is paid.", level: "news", source: "https://help.unhcr.org/egypt/en/health-services/health-2/" },
+      { text: "In 2020 the Ministry of Communications launched the Wasel app (واصل) so deaf users can reach police, ambulance and fire services in sign language; check it still works before relying on it.", level: "news", source: "https://www.elwatannews.com/news/details/4994283" },
+    ],
+  },
 };
 
 export const ICONS = [
