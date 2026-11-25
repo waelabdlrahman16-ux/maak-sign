@@ -1,7 +1,7 @@
 // Maak knowledge pack. Only facts with a source. level "official" = the provider's own page;
 // level "news" = a news report — the agent must present it as "usually" and ask staff to confirm.
 // Checked 24 Nov 2026. Social Solidarity facts: Ministry of Social Solidarity FAQ (official).
-// 25 Nov 2026: civil registry official facts from Digital Egypt and the Civil Status Sector site; hospital facts (news level).
+// 25 Nov 2026: National Bank of Egypt official card fees (cards tariff PDF) and hotline; civil registry official facts from Digital Egypt and the Civil Status Sector site; hospital facts (123 news level; Wasel app official, MCIT).
 
 export type Fact = { text: string; level: "official" | "news"; source: string };
 
@@ -15,6 +15,15 @@ export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
       { text: "Stopping a lost or stolen card is done through the call center 19888, open day and night (a voice call), so a deaf customer should ask the branch staff to stop it.", level: "official", source: "https://www.banquemisr.com/en/Home/CONTACT-US/Call-Center" },
       { text: "The 19888 call center also creates a PIN and cancels wrong-PIN attempts.", level: "official", source: "https://www.banquemisr.com/en/Home/CONTACT-US/Call-Center" },
       { text: "The BM Online app can pause a card temporarily, set a PIN, unblock a PIN after wrong attempts, and request a new card.", level: "official", source: "https://www.banquemisr.com/ar-EG/Home/Pages/BM-Online---Internet-and-Mobile-banking" },
+    ],
+  },
+  nbe: {
+    name: "البنك الأهلي المصري",
+    facts: [
+      { text: "Replacing a lost or damaged Meeza debit card costs 75 EGP.", level: "official", source: "https://www.nbe.com.eg/AssetsManager/392308a7-962c-4905-ad02-c0f07ed1eadf.pdf" },
+      { text: "Replacing a lost or damaged Classic Visa or Mastercard debit card costs 150 EGP.", level: "official", source: "https://www.nbe.com.eg/AssetsManager/392308a7-962c-4905-ad02-c0f07ed1eadf.pdf" },
+      { text: "Issuing a Meeza debit card costs 75 EGP; issuing a Classic Visa or Mastercard debit card costs 125 EGP.", level: "official", source: "https://www.nbe.com.eg/AssetsManager/392308a7-962c-4905-ad02-c0f07ed1eadf.pdf" },
+      { text: "A lost card or any card problem is reported to the 24-hour hotline 19623 (a voice call), so a deaf customer should ask the branch staff to stop the card.", level: "official", source: "https://www.nbe.com.eg/NBE/E/#/AR/ProductCategory?inParams=%7B%22CategoryID%22%3A%22Tariff%22%7D" },
     ],
   },
   civil_registry: {
@@ -45,7 +54,7 @@ export const KNOWLEDGE: Record<string, { name: string; facts: Fact[] }> = {
     facts: [
       { text: "In an emergency, 123 calls an ambulance to the nearest Ministry of Health hospital. It is a voice call, so a deaf person needs someone nearby to call.", level: "news", source: "https://help.unhcr.org/egypt/en/health-services/health-2/" },
       { text: "Public hospitals give basic life-saving emergency care free or at low cost; advanced treatment or a stay longer than 24 hours is paid.", level: "news", source: "https://help.unhcr.org/egypt/en/health-services/health-2/" },
-      { text: "In 2020 the Ministry of Communications launched the Wasel app (واصل) so deaf users can reach police, ambulance and fire services in sign language; check it still works before relying on it.", level: "news", source: "https://www.elwatannews.com/news/details/4994283" },
+      { text: "The Ministry of Communications' Technical Center for Services of Persons with Disabilities runs the Wasel app (واصل), a relay call centre that lets deaf and hard-of-hearing people reach emergency services such as ambulance, police and fire, around the clock (announced April 2020; check it still works before relying on it).", level: "official", source: "https://mcit.gov.eg/Ar/Media_Center/Press_Room/Press_Releases/45681" },
     ],
   },
 };

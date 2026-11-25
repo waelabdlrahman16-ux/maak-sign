@@ -94,6 +94,10 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
     <h2>عايز تعمل إيه؟</h2>
     <p class="sub">اختار صورة. معاك يجهّز الزيارة ويكلّم الموظف بدالك.</p>
     <div class="grid" id="goals"></div>
+    <div class="card" id="bankBox" hidden>
+      <p class="sub" style="margin:0">أنهي بنك؟</p>
+      <div class="grid" id="banks"></div>
+    </div>
     <div class="card" id="otherBox" hidden>
       <label for="otherIn" class="sub">اكتب أو خلّي حد يكتب المطلوب</label>
       <input id="otherIn" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card)" maxlength="110">
@@ -247,11 +251,11 @@ const VOCAB=[['bta2a','بطاقة'],['bdal_fa2ed','بدل فاقد'],['bdal_tale
 const AR=Object.fromEntries(VOCAB.map(v=>[v.k,v.ar]));
 const CLIP={shokran:'kg_shokran',fein:'kg_fein',mo7tag:'kg_mo7tag',mosa3da:'kg_mosa3da',asef:'kg_asef'};
 
-const PLACES={bank_misr:{ar:'بنك مصر',icon:'account_balance'},civil_registry:{ar:'السجل المدني',icon:'badge'},social_solidarity:{ar:'الوحدة الاجتماعية',icon:'family_restroom'},hospital:{ar:'المستشفى',icon:'local_hospital'}};
+const PLACES={bank_misr:{ar:'بنك مصر',icon:'account_balance'},nbe:{ar:'البنك الأهلي',icon:'account_balance'},civil_registry:{ar:'السجل المدني',icon:'badge'},social_solidarity:{ar:'الوحدة الاجتماعية',icon:'family_restroom'},hospital:{ar:'المستشفى',icon:'local_hospital'}};
 const GOALS=[
- {icon:'credit_card_off',ar:'بطاقة البنك ضاعت',goal:'بطاقة البنك ضاعت وعايز أوقفها وآخد بدل فاقد',place:'bank_misr'},
- {icon:'build',ar:'بطاقة البنك باظت',goal:'بطاقة البنك باظت وعايز بدل تالف',place:'bank_misr'},
- {icon:'password',ar:'نسيت الرقم السري',goal:'نسيت الرقم السري لبطاقة البنك',place:'bank_misr'},
+ {icon:'credit_card_off',ar:'بطاقة البنك ضاعت',goal:'بطاقة البنك ضاعت وعايز أوقفها وآخد بدل فاقد',place:'bank'},
+ {icon:'build',ar:'بطاقة البنك باظت',goal:'بطاقة البنك باظت وعايز بدل تالف',place:'bank'},
+ {icon:'password',ar:'نسيت الرقم السري',goal:'نسيت الرقم السري لبطاقة البنك',place:'bank'},
  {icon:'badge',ar:'البطاقة الشخصية ضاعت',goal:'البطاقة الشخصية (الرقم القومي) ضاعت وعايز بدل فاقد',place:'civil_registry'},
  {icon:'family_restroom',ar:'معاش تكافل وكرامة',goal:'عايز أقدّم على معاش تكافل وكرامة',place:'social_solidarity'},
  {icon:'local_hospital',ar:'كشف عند دكتور',goal:'عايز أكشف عند دكتور في المستشفى',place:'hospital'},
@@ -308,10 +312,12 @@ function mergeFacts(nf){for(const f of nf||[]){const i=S.facts.findIndex(x=>x.la
 const addTurn=(who,text)=>{if(!text)return;S.turns.push({who,text:String(text).slice(0,300)});S.turns=S.turns.slice(-30)};
 
 /* ---------- screens ---------- */
-const render={};
+const render={};let BANKGOAL='';
 render.sGoal=()=>{
-  $('#goals').innerHTML=GOALS.map((g,i)=>`<button class="tile" data-i="${i}"><span class="ms">${g.icon}</span>${esc(g.ar)}${g.place?`<small>${esc(PLACES[g.place].ar)}</small>`:''}</button>`).join('');
-  $('#goals').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const g=GOALS[b.dataset.i];if(g.other){$('#otherBox').hidden=false;$('#otherIn').focus();return}startPlan(g.goal,g.place)});
+  $('#goals').innerHTML=GOALS.map((g,i)=>`<button class="tile" data-i="${i}"><span class="ms">${g.icon}</span>${esc(g.ar)}${g.place?`<small>${esc(g.place==='bank'?'بنك مصر · الأهلي':PLACES[g.place].ar)}</small>`:''}</button>`).join('');
+  $('#goals').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const g=GOALS[b.dataset.i];if(g.other){$('#otherBox').hidden=false;$('#otherIn').focus();return}if(g.place==='bank'){BANKGOAL=g.goal;$('#bankBox').hidden=false;$('#bankBox').scrollIntoView({block:'center',behavior:'smooth'});return}startPlan(g.goal,g.place)});
+  $('#banks').innerHTML=['bank_misr','nbe'].map(k=>`<button class="tile" data-p="${k}" style="min-height:80px"><span class="ms">${PLACES[k].icon}</span>${esc(PLACES[k].ar)}</button>`).join('');
+  $('#banks').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(!BANKGOAL)return;$('#bankBox').hidden=true;startPlan(BANKGOAL,b.dataset.p)});
   $('#places').innerHTML=Object.entries(PLACES).map(([k,p])=>`<button class="tile" data-p="${k}" style="min-height:80px"><span class="ms">${p.icon}</span>${esc(p.ar)}</button>`).join('');
   $('#places').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const t=$('#otherIn').value.trim();if(!t){snack('اكتب المطلوب الأول');return}startPlan(t,b.dataset.p)});
 };
@@ -455,7 +461,7 @@ $('#sgSend').onclick=async()=>{
 document.addEventListener('click',e=>{if(e.target.closest('#sSign [data-back]'))stopCam()},true);
 
 /* ---------- find the place ---------- */
-const MAPQ={bank_misr:'فرع بنك مصر',civil_registry:'سجل مدني',social_solidarity:'وحدة الشؤون الاجتماعية',hospital:'مستشفى حكومي'};
+const MAPQ={bank_misr:'فرع بنك مصر',nbe:'فرع البنك الأهلي المصري',civil_registry:'سجل مدني',social_solidarity:'وحدة الشؤون الاجتماعية',hospital:'مستشفى حكومي'};
 const mapUrl=place=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(MAPQ[place]||PLACES[place]?.ar||'');
 
 /* ---------- write the paper ---------- */
