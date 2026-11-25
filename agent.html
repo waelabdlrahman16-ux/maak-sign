@@ -435,7 +435,7 @@ function sgShow(){
 function sgOnSign(F){
   const r=classify(F);if(!r.length)return;
   /* same ask step as the main app: unsure when far from every example or the top two are close */
-  if(r[0][1]>78||(r[1]&&r[1][1]/r[0][1]<1.08)){
+  if(r.nonSign||r[0][1]>78||(r[1]&&r[1][1]/r[0][1]<1.08)){
     $('#sgAlts').hidden=false;
     $('#sgAltList').innerHTML=r.slice(0,3).map(x=>`<button class="chip" data-k="${x[0]}">${esc(RAR[x[0]]||x[0])}</button>`).join('')+'<button class="chip" data-k="">ولا واحدة</button>';
     $('#sgAltList').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('#sgAlts').hidden=true;if(b.dataset.k){SG.push(b.dataset.k);sgShow()}});
