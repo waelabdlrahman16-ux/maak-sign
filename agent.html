@@ -269,7 +269,7 @@ let S=store.get('maak_agent',null);
 let CASES=store.get('maak_cases',[]);
 const newId=()=>Array.from(crypto.getRandomValues(new Uint8Array(9)),b=>'abcdefghijklmnopqrstuvwxyz0123456789'[b%36]).join('');
 function syncCase(){
-  if(!S||!S.caseId||!(S.plan||S.turns.length))return;
+  if(!S||!S.caseId||!S.started||!(S.plan||S.turns.length))return; // a visit is kept only once the customer starts it (counter or paper)
   const st=S.summary?(S.summary.remind&&S.summary.remind.date?'pickup':'closed'):'open';
   const c={id:S.caseId,goal:S.goal,place:S.place,title:(S.plan&&S.plan.title)||S.goal,status:st,remind:S.summary?S.summary.remind:null,updated:Date.now(),state:{...S,screen:undefined}};
   const old=CASES.find(x=>x.id===c.id);if(old){c.push=old.push;if(old.status==='closed'&&st!=='open')c.status='closed'}
@@ -340,7 +340,7 @@ render.sPlan=()=>{
   $('#planBringList').innerHTML=p.bring.map(b=>`<span class="chip"><span class="ms">${esc(b.icon)}</span>${esc(b.text)} <span class="tag ${b.sure?'ok':'ask'}">${b.sure?'✓':'؟'}</span></span>`).join('');
   $('#planWarn').hidden=!p.warn;$('#planWarn span:last-child').textContent=p.warn;
 };
-$('#toCounter').onclick=()=>go('sStaff');
+$('#toCounter').onclick=()=>{S.started=true;save();go('sStaff')};
 
 /* staff side */
 let rec=null;
@@ -469,6 +469,7 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMo
 async function openLetter(want){
   const payload={goal:S.goal,place:S.place,vocab:VOCAB,facts:S.facts.map(f=>({label:f.label,value:f.value}))};
   if(S.steps.length)payload.steps=stepsForServer();if(S.turns.length)payload.turns=S.turns;if(want)payload.want=want;
+  S.started=true;save();
   const l=await call('letter',payload);if(!l)return;
   S.letter=l;save();go('sLetter');
 }
