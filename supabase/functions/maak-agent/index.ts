@@ -1,6 +1,7 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v8): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v19: letter — the paper the customer hands to the staff (request or police statement).
 // Only text and, for "read", one photo reach this function; the photo is used once and never stored.
 // Video never leaves the customer's phone. The Anthropic key lives in the ANTHROPIC_API_KEY secret;
 // without it the function answers {fallback:true} and the app keeps using its built-in rules.
@@ -10,7 +11,7 @@ import { ICONS, KNOWLEDGE } from "./knowledge.ts";
 const ALLOWED = ["https://maaksign.com", "https://www.maaksign.com", "https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
 const FAST = "claude-haiku-5-5";
 const SMART = "claude-sonnet-5-5";
-const AGENT_TASKS = ["plan", "next", "read", "summary"];
+const AGENT_TASKS = ["plan", "next", "read", "summary", "letter"];
 // plan and read use the smart model; the counter loop (next) and summary use the fast one so each turn is quick.
 const SMART_TASKS = ["plan", "read"];
 
@@ -34,6 +35,8 @@ const PROMPTS: Record<string, string> = {
     "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
   read:
     "You are Maak. A deaf Egyptian person photographed a paper or a phone screen at a service counter. Say what it is (kind), a short title (at most 8 words), up to 5 key facts copied EXACTLY as printed (amounts, dates, reference numbers, names of places or documents) with a short label each, and the one next step the person should take (at most 14 words). If the photo is blurry, cut off or unreadable, set unclear=true and say so in next instead of guessing. Do not read out or repeat full card numbers, national ID numbers or account numbers: show only the last 4 digits. " + STYLE,
+  letter:
+    "You are Maak. Write the short paper a deaf Egyptian customer will hand to the staff, in the customer's own voice (first person). If paper_wanted is given, use that kind; otherwise pick \"police_statement\" only when the goal is reporting a lost or stolen national ID or document to the police, else \"request\". A police_statement is addressed to the police station (\"السيد مأمور قسم الشرطة\") and states what was lost, roughly when and where only if the customer or staff said so, and asks for a police report (محضر فقد) to be written. to = who it is addressed to (e.g. \"السيد مدير فرع بنك مصر\", \"السيد رئيس الوحدة الاجتماعية\", \"السيد مأمور القسم\"), at most 8 words. subject = at most 8 words. lines = 3 to 6 short sentences in clear, polite, simple Modern Standard Arabic that any clerk understands: first say the customer is deaf and communicates in Egyptian Sign Language and asks for written replies; then state exactly what happened and what they request, using only the goal, the conversation and the facts. Never invent dates, amounts, names, numbers, places or events; never write a card, account or national ID number (the customer fills those by hand). Never say that anything was paid, done, received or stopped unless the staff said exactly that; a fee the staff mentioned is only a fee to pay. Do not promise anything on behalf of the staff. Numbers as digits. A fact marked level \"news\" is not confirmed: do not state it as a rule.",
   summary:
     "You are Maak. Summarise a finished visit for a deaf Egyptian customer: a title (at most 5 words), up to 5 lines (each at most 8 words) covering what was done, the fee paid, and what happens next, using only what the staff said and the facts collected during the visit; never claim something was paid or done unless the staff said so. If the staff gave a pickup or follow-up date, set remind.date as YYYY-MM-DD (today's date is given; resolve phrases like \"after 3 days\") and remind.text (at most 8 words); otherwise leave remind.date empty. " + STYLE,
 };
@@ -93,6 +96,12 @@ function validate(task: string, p: any): string | null {
     if (!factsOk(p?.facts)) return "facts";
   }
   if (task === "summary" && !/^\d{4}-\d{2}-\d{2}$/.test(String(p?.today || ""))) return "today";
+  if (task === "letter") {
+    if (p?.want != null && !["request", "police_statement"].includes(p.want)) return "want";
+    if (p?.steps != null && !stepsOk(p.steps)) return "steps";
+    if (!(p?.turns == null || (Array.isArray(p.turns) && p.turns.length === 0) || turnsOk(p.turns))) return "turns";
+    if (!factsOk(p?.facts)) return "facts";
+  }
   if (task === "read") {
     if (!["image/jpeg", "image/png", "image/webp"].includes(p?.media_type)) return "media_type";
     if (typeof p?.image !== "string" || p.image.length < 100 || p.image.length > 3_000_000) return "image";
@@ -175,6 +184,16 @@ const SCHEMAS: Record<string, any> = {
     },
     required: ["kind", "title", "facts", "next", "words", "unclear"],
   },
+  letter: {
+    type: "object",
+    properties: {
+      kind: { type: "string", enum: ["request", "police_statement"] },
+      to: { type: "string" },
+      subject: { type: "string" },
+      lines: { type: "array", minItems: 2, maxItems: 6, items: { type: "string" } },
+    },
+    required: ["kind", "to", "subject", "lines"],
+  },
   summary: {
     type: "object",
     properties: {
@@ -251,8 +270,9 @@ function buildInput(task: string, p: any): unknown {
     vocabulary: (p.vocab || []).map((v: any) => `${v.k}: ${v.ar}`),
     icons: ICONS,
   };
-  if (task === "next" || task === "summary") Object.assign(base, { steps: p.steps, conversation: p.turns, facts_so_far: p.facts || [] });
+  if (task === "next" || task === "summary" || task === "letter") Object.assign(base, { steps: p.steps || [], conversation: p.turns || [], facts_so_far: p.facts || [] });
   if (task === "summary") base.today = p.today;
+  if (task === "letter" && p.want) base.paper_wanted = p.want;
   if (task !== "read") return JSON.stringify(base);
   return [
     { type: "image", source: { type: "base64", media_type: p.media_type, data: p.image } },
@@ -319,6 +339,21 @@ function shape(task: string, out: any, p: any): any | null {
       next: clip(out.next, 120),
       words: signKeys(out.words, p.vocab),
       unclear: out.unclear === true,
+    };
+  }
+
+  if (task === "letter") {
+    // numbers only from the official/news facts, what the staff said, or facts gathered in the visit; long numbers never appear
+    const evidence = kText + " " + staff + " " + factsSoFar;
+    const noLong = (t: string) => !/[\d٠-٩][\d٠-٩ -]{6,}[\d٠-٩]/.test(t);
+    const lines = (Array.isArray(out.lines) ? out.lines : []).slice(0, 6)
+      .map((l: unknown) => clip(l, 220)).filter((l: string) => l && supported(l, evidence) && noLong(l));
+    if (lines.length < 2) return null;
+    return {
+      kind: p.want || (out.kind === "police_statement" ? "police_statement" : "request"),
+      to: supported(clip(out.to, 80), evidence) ? clip(out.to, 80) : "",
+      subject: supported(clip(out.subject, 80), evidence) ? clip(out.subject, 80) : "",
+      lines,
     };
   }
 

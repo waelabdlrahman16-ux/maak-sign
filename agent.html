@@ -5,6 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Maak Agent</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#485e92">
+<link rel="apple-touch-icon" href="icons/maak-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
 <style>
@@ -63,6 +66,14 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 .snack{position:fixed;inset-inline:16px;bottom:24px;max-width:398px;margin:auto;background:#282a2f;color:#eeedf4;border-radius:12px;padding:14px 16px;z-index:10}
 .note{font-size:12px;color:var(--var);display:flex;gap:6px;align-items:center}
 .note .ms{font-size:16px}
+.paper{background:#fff;color:#1a1b21;border-radius:8px;border:1px solid #c6c8d2;padding:20px 18px;display:flex;flex-direction:column;gap:10px;font-size:17px;line-height:1.8}
+.paper h3{margin:0;font-size:18px}.paper .lines p{margin:0 0 6px}.paper .meta{font-size:14px;color:#44464f}
+.paper .fill{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;margin-top:8px;font-size:16px}.paper .fill span:nth-child(even){border-bottom:1px dotted #757780;min-height:26px}
+.casecard{background:var(--pc);color:var(--on-pc);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.casecard .row .btn{min-height:44px;font-size:15px;padding:0 14px}
+.code{font-size:28px;letter-spacing:.12em;font-weight:700;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+.btn.sm{min-height:48px;font-size:15px}
+@media print{body{background:#fff}.phone>*:not(#sLetter),#sLetter .bar,#sLetter .foot,#sLetter .noprint{display:none!important}#sLetter{min-height:0}.paper{border:0;font-size:15pt}}
 .media{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:4/3;max-width:100%}
 .media video,.media canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .media .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;background:#1a1b21}
@@ -79,6 +90,7 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 <section class="screen" id="sGoal">
   <div class="bar"><h1 style="padding-inline-start:8px">معاك</h1><a class="ib" href="./" aria-label="الرئيسية"><span class="ms">home</span></a></div>
   <div class="body">
+    <div id="cases" style="display:flex;flex-direction:column;gap:10px"></div>
     <h2>عايز تعمل إيه؟</h2>
     <p class="sub">اختار صورة. معاك يجهّز الزيارة ويكلّم الموظف بدالك.</p>
     <div class="grid" id="goals"></div>
@@ -86,6 +98,12 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
       <label for="otherIn" class="sub">اكتب أو خلّي حد يكتب المطلوب</label>
       <input id="otherIn" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card)" maxlength="110">
       <div class="grid" id="places"></div>
+    </div>
+    <button class="btn text" id="restoreBtn"><span class="ms">key</span>عندي كود نسخة من موبايل تاني</button>
+    <div class="card" id="restoreBox" hidden>
+      <label for="restoreIn" class="sub">اكتب الكود (١٠ حروف وأرقام)</label>
+      <input id="restoreIn" dir="ltr" autocomplete="off" autocapitalize="characters" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card);font-size:20px;letter-spacing:.1em;text-align:center" maxlength="14">
+      <button class="btn tonal" id="restoreGo"><span class="ms">download</span>رجّع زياراتي</button>
     </div>
   </div>
 </section>
@@ -100,6 +118,7 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
     <div class="card" id="planBring" hidden><b>هات معاك</b><div class="chips" id="planBringList"></div></div>
     <p class="note" id="planWarn" hidden><span class="ms">warning</span><span></span></p>
     <p class="note"><span class="ms">verified</span><span>✓ = من موقع الجهة الرسمي · ؟ = معاك هيسأل الموظف</span></p>
+    <div class="row" style="gap:8px"><a class="btn tonal sm" id="planMap" target="_blank" rel="noopener" style="flex:1;text-decoration:none"><span class="ms">map</span>فين أقرب مكان؟</a><button class="btn tonal sm" id="planPaper" style="flex:1"><span class="ms">edit_document</span>اكتب الورقة</button></div>
   </div>
   <div class="foot"><button class="btn" id="toCounter"><span class="ms">storefront</span>أنا عند الشباك</button></div>
 </section>
@@ -132,6 +151,7 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
     <div class="card" id="cuAskBox" hidden><span class="note"><span class="ms">help</span>معاك هيسأل الموظف بدالك</span><b id="cuAsk"></b></div>
     <div class="card"><b>الزيارة</b><div id="cuSteps" style="display:flex;flex-direction:column;gap:8px"></div></div>
     <div><span class="sub">قول بلمسة</span><div class="chips" id="cuReplies" style="margin-top:6px"></div></div>
+    <button class="btn text" id="cuPaper"><span class="ms">edit_document</span>اكتب ورقة للموظف</button>
   </div>
   <div class="foot">
     <div class="row"><button class="btn" id="cuShow" style="flex:1"><span class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="cuSign" style="flex:none;padding:0 18px"><span class="ms">sign_language</span>إشارة</button></div>
@@ -173,8 +193,25 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
     <div class="card" id="smLines"></div>
     <div class="fee" id="smRem" hidden><span class="ms">notifications_active</span><div><b style="font-size:18px" id="smRemDate"></b><div id="smRemTx"></div></div></div>
     <div class="chips" id="smWords"></div>
+    <div class="row" style="gap:8px"><button class="btn tonal sm" id="smPush" hidden style="flex:1"><span class="ms">notifications</span>فكّرني بإشعار</button><button class="btn tonal sm" id="smSave" style="flex:1"><span class="ms">lock</span>احفظ نسخة</button></div>
+    <div class="card" id="smCodeBox" hidden><b>الكود بتاعك</b><div class="code" id="smCode"></div><p class="sub" style="margin:0">اكتب الكود ده في مكان آمن. بيه ترجّع زياراتك على أي موبايل. من غيره محدش يقدر يفتح النسخة، ولا إحنا.</p><button class="btn text" id="smCopy"><span class="ms">content_copy</span>انسخ الكود</button></div>
   </div>
   <div class="foot"><button class="btn" id="smCal" hidden><span class="ms">event_available</span>ضيف للتقويم</button><button class="btn text" data-home>زيارة جديدة</button></div>
+</section>
+
+<!-- 7 Paper the customer hands to the staff -->
+<section class="screen" id="sLetter" hidden>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الورقة</h1></div>
+  <div class="body">
+    <div class="noprint" style="display:flex;flex-direction:column;gap:8px">
+      <label for="ltName" class="sub">اسمك (اختياري، بيتكتب على الورقة بس ومش بيتبعت لحد)</label>
+      <input id="ltName" maxlength="60" autocomplete="name" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card)">
+      <div class="chips" id="ltKinds" hidden><button class="chip" data-want="request">طلب للمكتب</button><button class="chip" data-want="police_statement">ورقة محضر فقد للقسم</button></div>
+    </div>
+    <div class="paper" id="ltPaper"></div>
+    <p class="note noprint"><span class="ms">lock</span><span>الرقم القومي ورقم الكارت بتكتبهم بإيدك. معاك مش بيكتبهم ولا بيحفظهم.</span></p>
+  </div>
+  <div class="foot"><div class="row"><button class="btn" id="ltShow" style="flex:1"><span class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="ltPrint" style="flex:none;padding:0 18px"><span class="ms">print</span>اطبع</button><button class="btn tonal" id="ltShare" style="flex:none;padding:0 18px" aria-label="شارك"><span class="ms">share</span></button></div></div>
 </section>
 
 </div>
@@ -224,7 +261,17 @@ const GOALS=[
 
 /* ---------- state ---------- */
 let S=store.get('maak_agent',null);
-const save=()=>store.set('maak_agent',S);
+/* Cases live on this phone (maak_cases). S is the visit on screen; every save mirrors it into its case. */
+let CASES=store.get('maak_cases',[]);
+const newId=()=>Array.from(crypto.getRandomValues(new Uint8Array(9)),b=>'abcdefghijklmnopqrstuvwxyz0123456789'[b%36]).join('');
+function syncCase(){
+  if(!S||!S.caseId||!(S.plan||S.turns.length))return;
+  const st=S.summary?(S.summary.remind&&S.summary.remind.date?'pickup':'closed'):'open';
+  const c={id:S.caseId,goal:S.goal,place:S.place,title:(S.plan&&S.plan.title)||S.goal,status:st,remind:S.summary?S.summary.remind:null,updated:Date.now(),state:{...S,screen:undefined}};
+  const old=CASES.find(x=>x.id===c.id);if(old){c.push=old.push;if(old.status==='closed'&&st!=='open')c.status='closed'}
+  CASES=[c,...CASES.filter(x=>x.id!==c.id)].slice(0,20);store.set('maak_cases',CASES);
+}
+const save=()=>{store.set('maak_agent',S);syncCase()};
 const fresh=()=>({goal:'',place:'',plan:null,steps:[],turns:[],facts:[],ask:'',said:'',tell:'',words:[],replies:[],finished:false,summary:null,screen:'sGoal'});
 if(!S||!S.screen)S=fresh();
 
@@ -269,7 +316,8 @@ render.sGoal=()=>{
   $('#places').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const t=$('#otherIn').value.trim();if(!t){snack('اكتب المطلوب الأول');return}startPlan(t,b.dataset.p)});
 };
 async function startPlan(goal,place){
-  S=fresh();S.goal=goal;S.place=place;save();
+  const carry=S&&S.carry?S.carry:null;
+  S=fresh();S.caseId=newId();S.goal=goal;S.place=place;if(carry){S.facts=carry.facts||[];S.prev=carry.prev||null}save();
   const p=await call('plan',{goal,place,vocab:VOCAB});
   if(!p){go('sGoal',false);return}
   S.plan=p;S.steps=p.steps.map(s=>({id:s.id,text:s.text,status:'open',ask:s.ask}));S.words=p.words||[];
@@ -405,6 +453,125 @@ $('#sgSend').onclick=async()=>{
   stopCam();addTurn('customer',text);S.said=text;SG=[];save();go('sStaff');
 };
 document.addEventListener('click',e=>{if(e.target.closest('#sSign [data-back]'))stopCam()},true);
+
+/* ---------- find the place ---------- */
+const MAPQ={bank_misr:'فرع بنك مصر',civil_registry:'سجل مدني',social_solidarity:'وحدة الشؤون الاجتماعية',hospital:'مستشفى حكومي'};
+const mapUrl=place=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(MAPQ[place]||PLACES[place]?.ar||'');
+
+/* ---------- write the paper ---------- */
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+async function openLetter(want){
+  const payload={goal:S.goal,place:S.place,vocab:VOCAB,facts:S.facts.map(f=>({label:f.label,value:f.value}))};
+  if(S.steps.length)payload.steps=stepsForServer();if(S.turns.length)payload.turns=S.turns;if(want)payload.want=want;
+  const l=await call('letter',payload);if(!l)return;
+  S.letter=l;save();go('sLetter');
+}
+render.sLetter=()=>{
+  const l=S.letter;if(!l)return go('sGoal',false);
+  $('#ltName').value=store.get('maak_name','');
+  $('#ltKinds').hidden=S.place!=='civil_registry';
+  $('#ltKinds').querySelectorAll('.chip').forEach(b=>{b.style.background=b.dataset.want===l.kind?'var(--pc)':'';b.onclick=()=>{if(b.dataset.want!==l.kind)openLetter(b.dataset.want)}});
+  paint();
+  function paint(){
+    const name=$('#ltName').value.trim();const [y,m,d]=todayStr().split('-');
+    $('#ltPaper').innerHTML=`<div class="meta">التاريخ: ${ar(+d)}/${ar(+m)}/${ar(y)}</div>${l.to?`<h3>${esc(l.to)}</h3>`:''}${l.subject?`<div><b>الموضوع:</b> ${esc(l.subject)}</div>`:''}<div class="lines">${l.lines.map(x=>`<p>${esc(x)}</p>`).join('')}</div><div class="fill"><span>الاسم:</span><span>${esc(name)}</span><span>الرقم القومي:</span><span></span><span>التليفون:</span><span></span><span>التوقيع:</span><span></span></div>`;
+  }
+  $('#ltName').oninput=()=>{store.set('maak_name',$('#ltName').value.trim().slice(0,60));paint()};
+};
+$('#planPaper').onclick=()=>openLetter();
+$('#cuPaper').onclick=()=>openLetter();
+$('#ltPrint').onclick=()=>window.print();
+$('#ltShow').onclick=()=>{const p=$('#ltPaper');p.style.fontSize=p.style.fontSize?'':'21px';p.scrollIntoView({behavior:'smooth'})};
+$('#ltShare').onclick=async()=>{const t=$('#ltPaper').innerText;try{if(navigator.share){await navigator.share({title:'معاك',text:t});return}}catch(e){return}try{await navigator.clipboard.writeText(t);snack('اتنسخت الورقة')}catch(e){snack('مش قادر أشاركها، اطبعها أو ورّيها')}};
+
+/* ---------- remember the case ---------- */
+function closeCase(id){const c=CASES.find(x=>x.id===id);if(c){c.status='closed';c.updated=Date.now();store.set('maak_cases',CASES);cancelPush(c)}}
+render.sGoal=(orig=>()=>{orig();
+  const open=CASES.filter(c=>c.status!=='closed').slice(0,3);
+  const fmt=dt=>{const [y,m,d]=dt.split('-');return ar(+d)+'/'+ar(+m)};
+  const today=todayStr();
+  $('#cases').innerHTML=open.map(c=>{
+    const due=c.status==='pickup'&&c.remind&&c.remind.date;const isDue=due&&c.remind.date<=today;
+    return `<div class="casecard" data-c="${c.id}"><div class="row"><span class="ms">${isDue?'notifications_active':PLACES[c.place]?.icon||'history'}</span><div style="flex:1"><b>${esc(c.title)}</b><div style="font-size:14px">${c.status==='pickup'?(isDue?'النهارده ميعاد الاستلام. استلمت؟':'ميعاد الاستلام: '+fmt(c.remind.date)):'الزيارة لسه مخلصتش'}</div></div></div>
+    <div class="row" style="gap:8px;flex-wrap:wrap">${c.status==='pickup'?`<button class="btn sm" data-a="got">استلمت</button><button class="btn tonal sm" data-a="back">رايح أستلم</button>`:`<button class="btn sm" data-a="go">كمّل الزيارة</button>`}<button class="btn text sm" data-a="del" style="margin-inline-start:auto">امسح</button></div></div>`}).join('');
+  $('#cases').querySelectorAll('.casecard').forEach(el=>el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
+    const c=CASES.find(x=>x.id===el.dataset.c);if(!c)return;const a=b.dataset.a;
+    if(a==='got'){closeCase(c.id);snack('تمام! الزيارة اتقفلت');render.sGoal()}
+    if(a==='del'){CASES=CASES.filter(x=>x.id!==c.id);store.set('maak_cases',CASES);cancelPush(c);render.sGoal()}
+    if(a==='go'){S={...fresh(),...c.state};hist.length=0;go(S.turns.length?'sCust':'sPlan',false)}
+    if(a==='back'){S={...fresh(),carry:{facts:(c.state.facts||[]),prev:c.id}};closeCase(c.id);startPlan('رجعت أستلم: '+c.goal,c.place)}
+  }));
+  if(FOCUS){const el=document.querySelector(`.casecard[data-c="${FOCUS}"]`);if(el){el.style.outline='3px solid var(--primary)';el.scrollIntoView()}FOCUS=null}
+})(render.sGoal);
+$('#restoreBtn').onclick=()=>{$('#restoreBox').hidden=false;$('#restoreIn').focus()};
+
+/* locked copy on the server: AES-GCM with a key made from a 10-character code only the customer has */
+const CASE_URL='https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-case',PUSH_URL='https://lkvdivexgzhavuijydsb.supabase.co/functions/v1/maak-push',FKEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
+async function fn(url,body){const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json',apikey:FKEY,authorization:'Bearer '+FKEY},body:JSON.stringify(body)});return r.json()}
+const ALPH='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const normCode=c=>String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/O/g,'0').replace(/I|L/g,'1');
+const showCode=c=>c.slice(0,5)+'-'+c.slice(5);
+const b64u=u=>btoa(String.fromCharCode(...u)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4)),c=>c.charCodeAt(0));
+async function codeKeys(code){
+  const enc=new TextEncoder();
+  const idb=new Uint8Array(await crypto.subtle.digest('SHA-256',enc.encode('maak-id:'+code)));
+  const id=Array.from(idb.slice(0,16),b=>b.toString(16).padStart(2,'0')).join('');
+  const base=await crypto.subtle.importKey('raw',enc.encode(code),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:enc.encode('maak-case-v1'),iterations:150000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  return {id,key};
+}
+async function saveCopy(){
+  let code=store.get('maak_code','');
+  if(!code){code=Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>ALPH[b%ALPH.length]).join('');}
+  $('#load').hidden=false;
+  try{const {id,key}=await codeKeys(code);const iv=crypto.getRandomValues(new Uint8Array(12));
+    const data=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify({v:1,cases:CASES}))));
+    const r=await fn(CASE_URL,{op:'put',id,iv:b64u(iv),data:b64u(data)});if(!r.ok)throw 0;
+    store.set('maak_code',code);$('#smCodeBox').hidden=false;$('#smCode').textContent=showCode(code);snack('النسخة اتحفظت');
+  }catch(e){snack('مقدرتش أحفظ النسخة دلوقتي. جرّب تاني.')}finally{$('#load').hidden=true}
+}
+$('#restoreGo').onclick=async()=>{
+  const code=normCode($('#restoreIn').value);if(code.length!==10){snack('الكود ١٠ حروف وأرقام');return}
+  $('#load').hidden=false;
+  try{const {id,key}=await codeKeys(code);const r=await fn(CASE_URL,{op:'get',id});
+    if(!r.found){snack('الكود ده ملوش نسخة');return}
+    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64u(r.iv)},key,unb64u(r.data));
+    const got=JSON.parse(new TextDecoder().decode(plain)).cases||[];
+    const ids=new Set(CASES.map(c=>c.id));CASES=[...CASES,...got.filter(c=>!ids.has(c.id))].sort((a,b)=>b.updated-a.updated).slice(0,20);
+    store.set('maak_cases',CASES);store.set('maak_code',code);$('#restoreBox').hidden=true;snack('رجّعت '+ar(got.length)+' زيارة');render.sGoal();
+  }catch(e){snack('الكود مش صح أو النسخة مش متاحة')}finally{$('#load').hidden=true}
+};
+$('#smSave').onclick=()=>saveCopy();
+$('#smCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#smCode').textContent);snack('اتنسخ')}catch(e){snack('اكتبه بإيدك')}};
+
+/* ---------- follow up by itself (web push) ---------- */
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+async function addPush(){
+  const m=S.summary;if(!m?.remind?.date)return;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+    snack(isIOS&&!standalone?'على الآيفون: دوس «مشاركة» ثم «إضافة إلى الشاشة الرئيسية»، وافتح معاك من هناك':'الموبايل ده مش بيدعم الإشعارات. استخدم «ضيف للتقويم».');return}
+  try{
+    const perm=await Notification.requestPermission();if(perm!=='granted'){snack('الإشعارات مقفولة. افتحها من إعدادات المتصفح');return}
+    $('#load').hidden=false;
+    const reg=await navigator.serviceWorker.register('sw.js');await navigator.serviceWorker.ready;
+    const {key}=await fn(PUSH_URL,{op:'key'});
+    const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:unb64u(key)});
+    let text=String(m.remind.text||'').replace(/\d{5,}/g,'').trim();
+    const r=await fn(PUSH_URL,{op:'add',sub:sub.toJSON(),date:m.remind.date,case:S.caseId,text:('النهارده ميعادك: '+(text||'متابعة الزيارة')+'. استلمت؟').slice(0,120)});
+    if(!r.ok)throw 0;
+    const c=CASES.find(x=>x.id===S.caseId);if(c){c.push=sub.endpoint;store.set('maak_cases',CASES)}
+    const [y,mo,d]=m.remind.date.split('-');snack('هبعتلك إشعار يوم '+ar(+d)+'/'+ar(+mo));$('#smPush').disabled=true;
+  }catch(e){snack('مقدرتش أفعّل الإشعار. استخدم «ضيف للتقويم».')}finally{$('#load').hidden=true}
+}
+async function cancelPush(c){if(!c||!c.push)return;try{await fn(PUSH_URL,{op:'cancel',endpoint:c.push,case:c.id})}catch(e){}}
+$('#smPush').onclick=()=>addPush();
+render.sSum=(orig=>()=>{orig();const m=S.summary;if(!m)return;$('#smPush').hidden=!m.remind?.date;const c=CASES.find(x=>x.id===S.caseId);$('#smPush').disabled=!!(c&&c.push);$('#smCodeBox').hidden=true})(render.sSum);
+render.sPlan=(orig=>()=>{orig();$('#planMap').href=mapUrl(S.place)})(render.sPlan);
+
+/* opened from a follow-up notification: ?case=<id> */
+let FOCUS=null;
+try{const q=new URLSearchParams(location.search).get('case');if(q&&/^[a-z0-9]{8,24}$/.test(q)){FOCUS=q;if(!S.turns.length||S.summary){S.screen='sGoal'}history.replaceState(null,'',location.pathname)}}catch(e){}
 
 go(S.screen==='sSign'?'sCust':(S.screen||'sGoal'),false);
 </script>

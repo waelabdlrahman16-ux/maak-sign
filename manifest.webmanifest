@@ -1,0 +1,16 @@
+{
+  "name": "معاك",
+  "short_name": "معاك",
+  "description": "Maak Sign: an agent that helps deaf people get counter errands done in Egyptian Sign Language.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/agent.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf8ff",
+  "theme_color": "#485e92",
+  "icons": [
+    { "src": "icons/maak-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/maak-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
