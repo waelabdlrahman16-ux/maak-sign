@@ -671,15 +671,17 @@ async function useFile(file){
   /* iPhone Safari only shows frames of a video that has played once: play it silently for a moment, then pause */
   try{await v.play()}catch(e){}v.pause();
   /* copy each frame into a canvas and track that: reliable on Safari, same pixels everywhere */
-  const W=v.videoWidth,H=v.videoHeight,fc=document.createElement('canvas');fc.width=W;fc.height=H;const fg=fc.getContext('2d');
+  /* track a small copy (long side 480 px, like the live camera): an iPhone video is 1080p+ and full size made each frame ~4x slower */
+  const sc=Math.min(1,480/Math.max(v.videoWidth,v.videoHeight)),W=Math.round(v.videoWidth*sc),H=Math.round(v.videoHeight*sc),fc=document.createElement('canvas');fc.width=W;fc.height=H;const fg=fc.getContext('2d');
   const tc=document.createElement('canvas');tc.width=tc.height=16;const tg=tc.getContext('2d',{willReadFrequently:true});
-  buf=[];signing=false;upSince=0;cool=0;prevW=null;emitted=0;const all=[];const step=1/12;let n=0,blank=0;
+  buf=[];signing=false;upSince=0;cool=0;prevW=null;emitted=0;const all=[];const step=1/10;let n=0,blank=0;
   for(let t=0;t<dur;t+=step){
     if(CAM.onSign!==onSign)return;
     await seekFrame(v,t);
     fg.drawImage(v,0,0,W,H);n++;
     tg.drawImage(fc,0,0,16,16);const px=tg.getImageData(0,0,16,16).data;let mx=0;for(let k=0;k<px.length;k+=4)mx=Math.max(mx,px[k],px[k+1],px[k+2]);if(mx<12)blank++;
     const r=holistic.detectForVideo(fc,nextTs(performance.now()));draw(r);
+    {const g=CAM.c.getContext('2d');g.globalCompositeOperation='destination-over';g.drawImage(fc,0,0,CAM.c.width,CAM.c.height);g.globalCompositeOperation='source-over'} /* show the frame being read, so the box is not black on iPhone */
     const f=frameRaw(r,W,H);if(f){if(f.L||f.R)all.push(f);segment(f,t*1000)}
     CAM.pill.textContent='بحلل الفيديو… '+arDigits(Math.min(100,Math.round(t/dur*100)))+'٪';
   }
@@ -692,8 +694,8 @@ async function useFile(file){
 function seekFrame(v,t){return new Promise(res=>{let sk=false,fr=!v.requestVideoFrameCallback,done=false;
   const fin=()=>{if(!done&&sk&&fr){done=true;res()}};
   if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>{fr=true;fin()});
-  const h=()=>{v.removeEventListener('seeked',h);sk=true;fin();setTimeout(()=>{fr=true;fin()},120)};v.addEventListener('seeked',h);
-  setTimeout(()=>{v.removeEventListener('seeked',h);sk=fr=true;fin()},1500);v.currentTime=t})}
+  const h=()=>{v.removeEventListener('seeked',h);sk=true;fin();setTimeout(()=>{fr=true;fin()},40)};v.addEventListener('seeked',h);
+  setTimeout(()=>{v.removeEventListener('seeked',h);sk=fr=true;fin()},800);v.currentTime=t})}
 function stopCam(){if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}CAM.onSign=null}
 function raised(f){const up=h=>h&&h[0][1]<f.hipY-0.3;return up(f.L)||up(f.R)}
 function wrist(f){const h=f.R||f.L;return h?h[0]:null}
