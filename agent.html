@@ -88,7 +88,7 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
 
 <!-- 1 Goal -->
 <section class="screen" id="sGoal">
-  <div class="bar"><h1 style="padding-inline-start:8px">معاك</h1><a class="ib" href="./" aria-label="الرئيسية"><span class="ms">home</span></a></div>
+  <div class="bar"><h1 style="padding-inline-start:8px">معاك</h1><a class="ib" href="./" aria-label="الرئيسية"><span aria-hidden="true" class="ms">home</span></a></div>
   <div class="body">
     <div id="cases" style="display:flex;flex-direction:column;gap:10px"></div>
     <h2>عايز تعمل إيه؟</h2>
@@ -103,109 +103,109 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
       <input id="otherIn" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card)" maxlength="110">
       <div class="grid" id="places"></div>
     </div>
-    <button class="btn text" id="restoreBtn"><span class="ms">key</span>عندي كود نسخة من موبايل تاني</button>
+    <button class="btn text" id="restoreBtn"><span aria-hidden="true" class="ms">key</span>عندي كود نسخة من موبايل تاني</button>
     <div class="card" id="restoreBox" hidden>
       <label for="restoreIn" class="sub">اكتب الكود (١٠ حروف وأرقام)</label>
       <input id="restoreIn" dir="ltr" autocomplete="off" autocapitalize="characters" style="height:52px;border-radius:12px;border:1px solid var(--outline);padding:0 12px;background:var(--card);font-size:20px;letter-spacing:.1em;text-align:center" maxlength="14">
-      <button class="btn tonal" id="restoreGo"><span class="ms">download</span>رجّع زياراتي</button>
+      <button class="btn tonal" id="restoreGo"><span aria-hidden="true" class="ms">download</span>رجّع زياراتي</button>
     </div>
   </div>
 </section>
 
 <!-- 2 Plan -->
 <section class="screen" id="sPlan" hidden>
-  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>خطة الزيارة</h1></div>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>خطة الزيارة</h1></div>
   <div class="body">
     <div class="chips" id="planHead"></div>
-    <div class="fee" id="planFee" hidden><span class="ms" style="font-size:32px">payments</span><div><b id="planFeeTx"></b><div id="planFeeTag"></div></div></div>
+    <div class="fee" id="planFee" hidden><span aria-hidden="true" class="ms" style="font-size:32px">payments</span><div><b id="planFeeTx"></b><div id="planFeeTag"></div></div></div>
     <div class="card" id="planSteps"></div>
     <div class="card" id="planBring" hidden><b>هات معاك</b><div class="chips" id="planBringList"></div></div>
-    <p class="note" id="planWarn" hidden><span class="ms">warning</span><span></span></p>
-    <p class="note"><span class="ms">verified</span><span>✓ = من موقع الجهة الرسمي · ؟ = معاك هيسأل الموظف</span></p>
-    <div class="row" style="gap:8px"><a class="btn tonal sm" id="planMap" target="_blank" rel="noopener" style="flex:1;text-decoration:none"><span class="ms">map</span>فين أقرب مكان؟</a><button class="btn tonal sm" id="planPaper" style="flex:1"><span class="ms">edit_document</span>اكتب الورقة</button></div>
+    <p class="note" id="planWarn" hidden><span aria-hidden="true" class="ms">warning</span><span></span></p>
+    <p class="note"><span aria-hidden="true" class="ms">verified</span><span>✓ = من موقع الجهة الرسمي · ؟ = معاك هيسأل الموظف</span></p>
+    <div class="row" style="gap:8px"><a class="btn tonal sm" id="planMap" target="_blank" rel="noopener" style="flex:1;text-decoration:none"><span aria-hidden="true" class="ms">map</span>فين أقرب مكان؟</a><button class="btn tonal sm" id="planPaper" style="flex:1"><span aria-hidden="true" class="ms">edit_document</span>اكتب الورقة</button></div>
   </div>
-  <div class="foot"><button class="btn" id="toCounter"><span class="ms">storefront</span>أنا عند الشباك</button></div>
+  <div class="foot"><button class="btn" id="toCounter"><span aria-hidden="true" class="ms">storefront</span>أنا عند الشباك</button></div>
 </section>
 
 <!-- 3 Staff view (phone turned to the staff) -->
 <section class="screen staff" id="sStaff" hidden>
-  <div class="bar"><button class="ib" id="staffBack" aria-label="رجوع للعميل"><span class="ms">arrow_forward</span></button><h1>للموظف</h1></div>
+  <div class="bar"><button class="ib" id="staffBack" aria-label="رجوع للعميل"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>للموظف</h1></div>
   <div class="body">
     <div class="card">
-      <div class="row"><span class="ms" style="font-size:32px;color:#485e92">sign_language</span><b>العميل أصم. أنا «معاك»، مساعد بالذكاء الاصطناعي بساعده.</b></div>
+      <div class="row"><span aria-hidden="true" class="ms" style="font-size:32px;color:#485e92">sign_language</span><b>العميل أصم. أنا «معاك»، مساعد بالذكاء الاصطناعي بساعده.</b></div>
       <p class="sub" style="color:#44464f;margin:0">العميل جاي عشان: <b id="stGoal"></b></p>
       <p class="said" id="stSaid" hidden></p>
       <p class="big" id="stAsk"></p>
     </div>
     <label for="stIn" style="font-size:15px">اكتب ردّك هنا، أو دوس الميكروفون واتكلم</label>
     <textarea id="stIn" maxlength="280"></textarea>
-    <p class="note" style="color:#c6c8d2"><span class="ms">lock</span><span>الكلام بيروح للمساعد عشان يبسّطه، ومش بيتحفظ.</span></p>
+    <p class="note" style="color:#c6c8d2"><span aria-hidden="true" class="ms">lock</span><span>الكلام بيروح للمساعد عشان يبسّطه، ومش بيتحفظ.</span></p>
   </div>
   <div class="foot">
-    <div class="row"><button class="btn tonal" id="stMic" style="flex:none;width:56px;padding:0" aria-label="اتكلم"><span class="ms">mic</span></button><button class="btn" id="stSend" style="flex:1"><span class="ms">send</span>ابعت للعميل</button></div>
+    <div class="row"><button class="btn tonal" id="stMic" style="flex:none;width:56px;padding:0" aria-label="اتكلم"><span aria-hidden="true" class="ms">mic</span></button><button class="btn" id="stSend" style="flex:1"><span aria-hidden="true" class="ms">send</span>ابعت للعميل</button></div>
   </div>
 </section>
 
 <!-- 4 Customer view -->
 <section class="screen" id="sCust" hidden>
-  <div class="bar"><button class="ib" data-home aria-label="إنهاء"><span class="ms">close</span></button><h1>مع الموظف</h1><span class="tag ok" id="cuProg"></span></div>
+  <div class="bar"><button class="ib" data-home aria-label="إنهاء"><span aria-hidden="true" class="ms">close</span></button><h1>مع الموظف</h1><span class="tag ok" id="cuProg"></span></div>
   <div class="body">
-    <div class="card"><span class="note" style="font-size:13px"><span class="ms">support_agent</span>الموظف قال</span><p class="big" id="cuTell"></p><div class="chips" id="cuWords"></div><video class="sign" id="cuVid" playsinline muted hidden></video></div>
+    <div class="card"><span class="note" style="font-size:13px"><span aria-hidden="true" class="ms">support_agent</span>الموظف قال</span><p class="big" id="cuTell"></p><div class="chips" id="cuWords"></div><video class="sign" id="cuVid" playsinline muted hidden></video></div>
     <div id="cuFacts" style="display:flex;flex-direction:column;gap:8px"></div>
-    <div class="card" id="cuAskBox" hidden><span class="note"><span class="ms">help</span>معاك هيسأل الموظف بدالك</span><b id="cuAsk"></b></div>
+    <div class="card" id="cuAskBox" hidden><span class="note"><span aria-hidden="true" class="ms">help</span>معاك هيسأل الموظف بدالك</span><b id="cuAsk"></b></div>
     <div class="card"><b>الزيارة</b><div id="cuSteps" style="display:flex;flex-direction:column;gap:8px"></div></div>
     <div><span class="sub">قول بلمسة</span><div class="chips" id="cuReplies" style="margin-top:6px"></div></div>
-    <button class="btn text" id="cuPaper"><span class="ms">edit_document</span>اكتب ورقة للموظف</button>
+    <button class="btn text" id="cuPaper"><span aria-hidden="true" class="ms">edit_document</span>اكتب ورقة للموظف</button>
   </div>
   <div class="foot">
-    <div class="row"><button class="btn" id="cuShow" style="flex:1"><span class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="cuSign" style="flex:none;padding:0 18px"><span class="ms">sign_language</span>إشارة</button></div>
-    <div class="row"><button class="btn tonal" id="cuPhoto" style="flex:1"><span class="ms">document_scanner</span>صوّر ورقة</button><button class="btn tonal" id="cuDone" style="flex:1"><span class="ms">task_alt</span>خلصت</button></div>
+    <div class="row"><button class="btn" id="cuShow" style="flex:1"><span aria-hidden="true" class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="cuSign" style="flex:none;padding:0 18px"><span aria-hidden="true" class="ms">sign_language</span>إشارة</button></div>
+    <div class="row"><button class="btn tonal" id="cuPhoto" style="flex:1"><span aria-hidden="true" class="ms">document_scanner</span>صوّر ورقة</button><button class="btn tonal" id="cuDone" style="flex:1"><span aria-hidden="true" class="ms">task_alt</span>خلصت</button></div>
     <input type="file" id="cuFile" accept="image/*" capture="environment" hidden>
   </div>
 </section>
 
 <!-- 4b Sign to the staff (sign reader runs on this phone; video never leaves it) -->
 <section class="screen" id="sSign" hidden>
-  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>قول بالإشارة</h1></div>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>قول بالإشارة</h1></div>
   <div class="body">
     <div class="media"><video id="sgV" playsinline muted></video><canvas id="sgC"></canvas>
-      <div class="ph" id="sgPh"><span class="ms" style="font-size:48px">videocam</span><button class="btn" id="sgStart"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" style="color:#d9e2ff">أو صوّر فيديو<input type="file" id="sgFile" accept="video/*" capture="user" hidden></label></div>
+      <div class="ph" id="sgPh"><span aria-hidden="true" class="ms" style="font-size:48px">videocam</span><button class="btn" id="sgStart"><span aria-hidden="true" class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" style="color:#d9e2ff">أو صوّر فيديو<input type="file" id="sgFile" accept="video/*" capture="user" hidden></label></div>
       <span class="pill" id="sgPill">ارفع إيدك وابدأ الإشارة</span><span id="sgPerf" hidden></span></div>
-    <p class="note"><span class="ms">lock</span><span>الفيديو مش بيخرج من الموبايل. بنقرا حركة الإيد بس.</span></p>
+    <p class="note"><span aria-hidden="true" class="ms">lock</span><span>الفيديو مش بيخرج من الموبايل. بنقرا حركة الإيد بس.</span></p>
     <div class="card" id="sgAlts" hidden><b>قصدك أنهي؟</b><div class="chips" id="sgAltList"></div></div>
     <div><span class="sub">اللي قلته</span><div class="chips" id="sgWords" style="margin-top:6px"><span class="sub">لسه مفيش</span></div></div>
   </div>
-  <div class="foot"><div class="row"><button class="btn tonal" id="sgClear" style="flex:none;padding:0 18px"><span class="ms">backspace</span>امسح</button><button class="btn" id="sgSend" style="flex:1" disabled><span class="ms">send</span>ابعت للموظف</button></div></div>
+  <div class="foot"><div class="row"><button class="btn tonal" id="sgClear" style="flex:none;padding:0 18px"><span aria-hidden="true" class="ms">backspace</span>امسح</button><button class="btn" id="sgSend" style="flex:1" disabled><span aria-hidden="true" class="ms">send</span>ابعت للموظف</button></div></div>
 </section>
 
 <!-- 5 Paper -->
 <section class="screen" id="sRead" hidden>
-  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الورقة دي فيها إيه؟</h1></div>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>الورقة دي فيها إيه؟</h1></div>
   <div class="body">
     <img id="rdImg" alt="الصورة اللي اتصورت" style="border-radius:16px;max-height:200px;object-fit:contain;background:var(--high)">
-    <p class="note"><span class="ms">lock</span><span>الصورة بتروح للمساعد يقراها مرة واحدة، ومش بتتحفظ. الأرقام الطويلة بتظهر آخر ٤ أرقام بس.</span></p>
-    <div class="card"><p class="big" id="rdTitle"></p><div id="rdFacts" style="display:flex;flex-direction:column;gap:8px"></div><div class="row"><span class="ms" style="color:var(--primary)">arrow_back</span><b id="rdNext"></b></div><div class="chips" id="rdWords"></div></div>
+    <p class="note"><span aria-hidden="true" class="ms">lock</span><span>الصورة بتروح للمساعد يقراها مرة واحدة، ومش بتتحفظ. الأرقام الطويلة بتظهر آخر ٤ أرقام بس.</span></p>
+    <div class="card"><p class="big" id="rdTitle"></p><div id="rdFacts" style="display:flex;flex-direction:column;gap:8px"></div><div class="row"><span aria-hidden="true" class="ms" style="color:var(--primary)">arrow_back</span><b id="rdNext"></b></div><div class="chips" id="rdWords"></div></div>
   </div>
-  <div class="foot"><button class="btn" data-back><span class="ms">check</span>فهمت</button></div>
+  <div class="foot"><button class="btn" data-back><span aria-hidden="true" class="ms">check</span>فهمت</button></div>
 </section>
 
 <!-- 6 Summary -->
 <section class="screen" id="sSum" hidden>
-  <div class="bar"><button class="ib" data-home aria-label="قفل"><span class="ms">close</span></button><h1>ملخص الزيارة</h1></div>
+  <div class="bar"><button class="ib" data-home aria-label="قفل"><span aria-hidden="true" class="ms">close</span></button><h1>ملخص الزيارة</h1></div>
   <div class="body">
-    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px"><span style="width:72px;height:72px;border-radius:36px;background:var(--good-c);color:var(--good);display:grid;place-items:center"><span class="ms" style="font-size:40px">task_alt</span></span><h2 id="smTitle"></h2></div>
+    <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px"><span style="width:72px;height:72px;border-radius:36px;background:var(--good-c);color:var(--good);display:grid;place-items:center"><span aria-hidden="true" class="ms" style="font-size:40px">task_alt</span></span><h2 id="smTitle"></h2></div>
     <div class="card" id="smLines"></div>
-    <div class="fee" id="smRem" hidden><span class="ms">notifications_active</span><div><b style="font-size:18px" id="smRemDate"></b><div id="smRemTx"></div></div></div>
+    <div class="fee" id="smRem" hidden><span aria-hidden="true" class="ms">notifications_active</span><div><b style="font-size:18px" id="smRemDate"></b><div id="smRemTx"></div></div></div>
     <div class="chips" id="smWords"></div>
-    <div class="row" style="gap:8px"><button class="btn tonal sm" id="smPush" hidden style="flex:1"><span class="ms">notifications</span>فكّرني بإشعار</button><button class="btn tonal sm" id="smSave" style="flex:1"><span class="ms">lock</span>احفظ نسخة</button></div>
-    <div class="card" id="smCodeBox" hidden><b>الكود بتاعك</b><div class="code" id="smCode"></div><p class="sub" style="margin:0">اكتب الكود ده في مكان آمن. بيه ترجّع زياراتك على أي موبايل. من غيره محدش يقدر يفتح النسخة، ولا إحنا.</p><button class="btn text" id="smCopy"><span class="ms">content_copy</span>انسخ الكود</button></div>
+    <div class="row" style="gap:8px"><button class="btn tonal sm" id="smPush" hidden style="flex:1"><span aria-hidden="true" class="ms">notifications</span>فكّرني بإشعار</button><button class="btn tonal sm" id="smSave" style="flex:1"><span aria-hidden="true" class="ms">lock</span>احفظ نسخة</button></div>
+    <div class="card" id="smCodeBox" hidden><b>الكود بتاعك</b><div class="code" id="smCode"></div><p class="sub" style="margin:0">اكتب الكود ده في مكان آمن. بيه ترجّع زياراتك على أي موبايل. من غيره محدش يقدر يفتح النسخة، ولا إحنا.</p><button class="btn text" id="smCopy"><span aria-hidden="true" class="ms">content_copy</span>انسخ الكود</button></div>
   </div>
-  <div class="foot"><button class="btn" id="smCal" hidden><span class="ms">event_available</span>ضيف للتقويم</button><button class="btn text" data-home>زيارة جديدة</button></div>
+  <div class="foot"><button class="btn" id="smCal" hidden><span aria-hidden="true" class="ms">event_available</span>ضيف للتقويم</button><button class="btn text" data-home>زيارة جديدة</button></div>
 </section>
 
 <!-- 7 Paper the customer hands to the staff -->
 <section class="screen" id="sLetter" hidden>
-  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الورقة</h1></div>
+  <div class="bar"><button class="ib" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>الورقة</h1></div>
   <div class="body">
     <div class="noprint" style="display:flex;flex-direction:column;gap:8px">
       <label for="ltName" class="sub">اسمك (اختياري، بيتكتب على الورقة بس ومش بيتبعت لحد)</label>
@@ -213,9 +213,9 @@ video.sign{width:100%;max-height:220px;border-radius:16px;background:#000;object
       <div class="chips" id="ltKinds" hidden><button class="chip" data-want="request">طلب للمكتب</button><button class="chip" data-want="police_statement">ورقة محضر فقد للقسم</button></div>
     </div>
     <div class="paper" id="ltPaper"></div>
-    <p class="note noprint"><span class="ms">lock</span><span>الرقم القومي ورقم الكارت بتكتبهم بإيدك. معاك مش بيكتبهم ولا بيحفظهم.</span></p>
+    <p class="note noprint"><span aria-hidden="true" class="ms">lock</span><span>الرقم القومي ورقم الكارت بتكتبهم بإيدك. معاك مش بيكتبهم ولا بيحفظهم.</span></p>
   </div>
-  <div class="foot"><div class="row"><button class="btn" id="ltShow" style="flex:1"><span class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="ltPrint" style="flex:none;padding:0 18px"><span class="ms">print</span>اطبع</button><button class="btn tonal" id="ltShare" style="flex:none;padding:0 18px" aria-label="شارك"><span class="ms">share</span></button></div></div>
+  <div class="foot"><div class="row"><button class="btn" id="ltShow" style="flex:1"><span aria-hidden="true" class="ms">screen_rotation</span>ورّي الموظف</button><button class="btn tonal" id="ltPrint" style="flex:none;padding:0 18px"><span aria-hidden="true" class="ms">print</span>اطبع</button><button class="btn tonal" id="ltShare" style="flex:none;padding:0 18px" aria-label="شارك"><span aria-hidden="true" class="ms">share</span></button></div></div>
 </section>
 
 </div>
@@ -302,11 +302,11 @@ document.addEventListener('click',e=>{
 
 /* ---------- pieces ---------- */
 function wordChips(el,words){
-  el.innerHTML=(words||[]).filter(k=>AR[k]).map(k=>`<button class="chip" data-k="${k}"><span class="ms">sign_language</span>${esc(AR[k])}</button>`).join('');
+  el.innerHTML=(words||[]).filter(k=>AR[k]).map(k=>`<button class="chip" data-k="${k}"><span aria-hidden="true" class="ms">sign_language</span>${esc(AR[k])}</button>`).join('');
   el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k],v=$('#cuVid');if(c&&v){v.hidden=false;v.src='clips/'+c+'.mp4';v.play().catch(()=>{})}else snack('الإشارة دي لسه مش متسجّلة بالفيديو')});
 }
-const factHtml=f=>`<div class="fact"><span class="ms">${esc(f.icon||'info')}</span><div><span>${esc(f.label)}</span><b>${esc(f.value)}</b></div></div>`;
-function stepsHtml(){return S.steps.map((s,i)=>`<div class="row"><span class="num ${s.status==='done'?'done':''}">${s.status==='done'?'<span class="ms">check</span>':ar(i+1)}</span><span style="${s.status==='done'?'color:var(--var)':''}">${esc(s.text)}</span>${s.status==='todo'?'<span class="tag ask" style="margin-inline-start:auto">عليك</span>':''}</div>`).join('')}
+const factHtml=f=>`<div class="fact"><span aria-hidden="true" class="ms">${esc(f.icon||'info')}</span><div><span>${esc(f.label)}</span><b>${esc(f.value)}</b></div></div>`;
+function stepsHtml(){return S.steps.map((s,i)=>`<div class="row"><span class="num ${s.status==='done'?'done':''}">${s.status==='done'?'<span aria-hidden="true" class="ms">check</span>':ar(i+1)}</span><span style="${s.status==='done'?'color:var(--var)':''}">${esc(s.text)}</span>${s.status==='todo'?'<span class="tag ask" style="margin-inline-start:auto">عليك</span>':''}</div>`).join('')}
 const stepsForServer=()=>S.steps.map(s=>({id:s.id,text:s.text,status:s.status==='done'?'done':'open'}));
 function mergeFacts(nf){for(const f of nf||[]){const i=S.facts.findIndex(x=>x.label===f.label);const v={icon:f.icon,label:String(f.label).slice(0,40),value:String(f.value).slice(0,80)};if(i>=0)S.facts[i]=v;else S.facts.push(v)}S.facts=S.facts.slice(-12)}
 const addTurn=(who,text)=>{if(!text)return;S.turns.push({who,text:String(text).slice(0,300)});S.turns=S.turns.slice(-30)};
@@ -314,11 +314,11 @@ const addTurn=(who,text)=>{if(!text)return;S.turns.push({who,text:String(text).s
 /* ---------- screens ---------- */
 const render={};let BANKGOAL='';
 render.sGoal=()=>{
-  $('#goals').innerHTML=GOALS.map((g,i)=>`<button class="tile" data-i="${i}"><span class="ms">${g.icon}</span>${esc(g.ar)}${g.place?`<small>${esc(g.place==='bank'?'بنك مصر · الأهلي':PLACES[g.place].ar)}</small>`:''}</button>`).join('');
+  $('#goals').innerHTML=GOALS.map((g,i)=>`<button class="tile" data-i="${i}"><span aria-hidden="true" class="ms">${g.icon}</span>${esc(g.ar)}${g.place?`<small>${esc(g.place==='bank'?'بنك مصر · الأهلي':PLACES[g.place].ar)}</small>`:''}</button>`).join('');
   $('#goals').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const g=GOALS[b.dataset.i];if(g.other){$('#otherBox').hidden=false;$('#otherIn').focus();return}if(g.place==='bank'){BANKGOAL=g.goal;$('#bankBox').hidden=false;$('#bankBox').scrollIntoView({block:'center',behavior:'smooth'});return}startPlan(g.goal,g.place)});
-  $('#banks').innerHTML=['bank_misr','nbe'].map(k=>`<button class="tile" data-p="${k}" style="min-height:80px"><span class="ms">${PLACES[k].icon}</span>${esc(PLACES[k].ar)}</button>`).join('');
+  $('#banks').innerHTML=['bank_misr','nbe'].map(k=>`<button class="tile" data-p="${k}" style="min-height:80px"><span aria-hidden="true" class="ms">${PLACES[k].icon}</span>${esc(PLACES[k].ar)}</button>`).join('');
   $('#banks').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(!BANKGOAL)return;$('#bankBox').hidden=true;startPlan(BANKGOAL,b.dataset.p)});
-  $('#places').innerHTML=Object.entries(PLACES).map(([k,p])=>`<button class="tile" data-p="${k}" style="min-height:80px"><span class="ms">${p.icon}</span>${esc(p.ar)}</button>`).join('');
+  $('#places').innerHTML=Object.entries(PLACES).map(([k,p])=>`<button class="tile" data-p="${k}" style="min-height:80px"><span aria-hidden="true" class="ms">${p.icon}</span>${esc(p.ar)}</button>`).join('');
   $('#places').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{const t=$('#otherIn').value.trim();if(!t){snack('اكتب المطلوب الأول');return}startPlan(t,b.dataset.p)});
 };
 async function startPlan(goal,place){
@@ -332,12 +332,12 @@ async function startPlan(goal,place){
 }
 render.sPlan=()=>{
   const p=S.plan;if(!p)return go('sGoal',false);
-  $('#planHead').innerHTML=`<span class="chip"><span class="ms">${PLACES[S.place]?.icon||'help'}</span>${esc(PLACES[S.place]?.ar||'')}</span><span class="chip" style="background:var(--pc);color:var(--on-pc);border:0">${esc(p.title)}</span>`;
+  $('#planHead').innerHTML=`<span class="chip"><span aria-hidden="true" class="ms">${PLACES[S.place]?.icon||'help'}</span>${esc(PLACES[S.place]?.ar||'')}</span><span class="chip" style="background:var(--pc);color:var(--on-pc);border:0">${esc(p.title)}</span>`;
   $('#planFee').hidden=!p.fee.text;$('#planFeeTx').textContent=p.fee.text;
-  $('#planFeeTag').innerHTML=p.fee.sure?'<span class="tag ok"><span class="ms" style="font-size:16px">verified</span>الرسوم من موقع البنك</span>':'<span class="tag ask">؟ نتأكد من الموظف</span>';
+  $('#planFeeTag').innerHTML=p.fee.sure?'<span class="tag ok"><span aria-hidden="true" class="ms" style="font-size:16px">verified</span>الرسوم من موقع البنك</span>':'<span class="tag ask">؟ نتأكد من الموظف</span>';
   $('#planSteps').innerHTML='<b>معاك جهّزلك الخطوات</b>'+p.steps.map((s,i)=>`<div class="row" style="align-items:flex-start"><span class="num">${ar(i+1)}</span><div><b>${esc(s.text)}</b>${s.ask?`<div class="sub" style="font-size:14px">معاك هيسأل: «${esc(s.ask)}»</div>`:''}</div><span class="tag ${s.sure?'ok':'ask'}" style="margin-inline-start:auto">${s.sure?'✓':'؟'}</span></div>`).join('');
   $('#planBring').hidden=!p.bring.length;
-  $('#planBringList').innerHTML=p.bring.map(b=>`<span class="chip"><span class="ms">${esc(b.icon)}</span>${esc(b.text)} <span class="tag ${b.sure?'ok':'ask'}">${b.sure?'✓':'؟'}</span></span>`).join('');
+  $('#planBringList').innerHTML=p.bring.map(b=>`<span class="chip"><span aria-hidden="true" class="ms">${esc(b.icon)}</span>${esc(b.text)} <span class="tag ${b.sure?'ok':'ask'}">${b.sure?'✓':'؟'}</span></span>`).join('');
   $('#planWarn').hidden=!p.warn;$('#planWarn span:last-child').textContent=p.warn;
 };
 $('#toCounter').onclick=()=>{S.started=true;save();go('sStaff')};
@@ -382,7 +382,7 @@ render.sCust=()=>{
   const reps=[...new Set([...(S.replies||[]),'مش فاهم، ممكن تكتبها أبسط؟'])];
   $('#cuReplies').innerHTML=reps.map(r=>`<button class="reply">${esc(r)}</button>`).join('');
   $('#cuReplies').querySelectorAll('.reply').forEach(b=>b.onclick=()=>{addTurn('customer',b.textContent);S.said=b.textContent;save();go('sStaff')});
-  $('#cuShow').innerHTML=S.finished?'<span class="ms">task_alt</span>الملخص':'<span class="ms">screen_rotation</span>ورّي الموظف';
+  $('#cuShow').innerHTML=S.finished?'<span aria-hidden="true" class="ms">task_alt</span>الملخص':'<span aria-hidden="true" class="ms">screen_rotation</span>ورّي الموظف';
 };
 $('#cuShow').onclick=()=>S.finished?finish():go('sStaff');
 $('#cuDone').onclick=()=>finish();
@@ -413,7 +413,7 @@ $('#cuFile').onchange=async e=>{
 render.sSum=()=>{
   const m=S.summary;if(!m)return go('sGoal',false);
   $('#smTitle').textContent=m.title||'الزيارة خلصت';
-  $('#smLines').innerHTML=m.lines.map(l=>`<div class="row"><span class="ms" style="color:var(--primary)">${esc(l.icon)}</span><span style="font-size:17px">${esc(l.text)}</span></div>`).join('')||'<span class="sub">مفيش تفاصيل كفاية</span>';
+  $('#smLines').innerHTML=m.lines.map(l=>`<div class="row"><span aria-hidden="true" class="ms" style="color:var(--primary)">${esc(l.icon)}</span><span style="font-size:17px">${esc(l.text)}</span></div>`).join('')||'<span class="sub">مفيش تفاصيل كفاية</span>';
   const has=!!m.remind.date;$('#smRem').hidden=!has;$('#smCal').hidden=!has;
   if(has){const [y,mo,da]=m.remind.date.split('-');$('#smRemDate').textContent='هفكّرك يوم '+ar(+da)+'/'+ar(+mo)+'/'+ar(y);$('#smRemTx').textContent=m.remind.text}
   wordChips($('#smWords'),m.words);
@@ -499,7 +499,7 @@ render.sGoal=(orig=>()=>{orig();
   const today=todayStr();
   $('#cases').innerHTML=open.map(c=>{
     const due=c.status==='pickup'&&c.remind&&c.remind.date;const isDue=due&&c.remind.date<=today;
-    return `<div class="casecard" data-c="${c.id}"><div class="row"><span class="ms">${isDue?'notifications_active':PLACES[c.place]?.icon||'history'}</span><div style="flex:1"><b>${esc(c.title)}</b><div style="font-size:14px">${c.status==='pickup'?(isDue?'النهارده ميعاد الاستلام. استلمت؟':'ميعاد الاستلام: '+fmt(c.remind.date)):'الزيارة لسه مخلصتش'}</div></div></div>
+    return `<div class="casecard" data-c="${c.id}"><div class="row"><span aria-hidden="true" class="ms">${isDue?'notifications_active':PLACES[c.place]?.icon||'history'}</span><div style="flex:1"><b>${esc(c.title)}</b><div style="font-size:14px">${c.status==='pickup'?(isDue?'النهارده ميعاد الاستلام. استلمت؟':'ميعاد الاستلام: '+fmt(c.remind.date)):'الزيارة لسه مخلصتش'}</div></div></div>
     <div class="row" style="gap:8px;flex-wrap:wrap">${c.status==='pickup'?`<button class="btn sm" data-a="got">استلمت</button><button class="btn tonal sm" data-a="back">رايح أستلم</button>`:`<button class="btn sm" data-a="go">كمّل الزيارة</button>`}<button class="btn text sm" data-a="del" style="margin-inline-start:auto">امسح</button></div></div>`}).join('');
   $('#cases').querySelectorAll('.casecard').forEach(el=>el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
     const c=CASES.find(x=>x.id===el.dataset.c);if(!c)return;const a=b.dataset.a;

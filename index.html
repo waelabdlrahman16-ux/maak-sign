@@ -208,46 +208,46 @@ button,input{font:inherit;color:inherit}
 <div class="phone">
 
 <section class="screen" id="c0" hidden>
-  <div class="appbar"><h1 style="color:var(--primary);font-weight:700">معاك</h1><button class="btn tonal" data-help style="height:48px;margin-inline-end:8px"><span class="ms">play_circle</span>بالإشارة</button></div>
+  <div class="appbar"><h1 style="color:var(--primary);font-weight:700">معاك</h1><button class="btn tonal" data-help style="height:48px;margin-inline-end:8px"><span aria-hidden="true" class="ms">play_circle</span>بالإشارة</button></div>
   <div class="body" style="gap:16px;padding-top:12px">
-    <a class="door door-main" href="agent/"><span class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
-    <button class="door door-alt" id="c0talk"><span class="ms" aria-hidden="true">sign_language</span><span class="door-t"><b>أكلّم الموظف</b><small>أنا عند الشباك دلوقتي</small></span></button>
+    <a class="door door-main" href="agent/"><span aria-hidden="true" class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
+    <button class="door door-alt" id="c0talk"><span aria-hidden="true" class="ms" aria-hidden="true">sign_language</span><span class="door-t"><b>أكلّم الموظف</b><small>أنا عند الشباك دلوقتي</small></span></button>
     <p class="intro-en" lang="en" dir="ltr" style="margin-top:auto">Maak Sign is an AI agent that helps deaf Egyptians get counter errands done. <a href="https://github.com/waelabdlrahman16-ux/maak-sign#readme" target="_blank" rel="noopener" style="padding:12px 0;margin:-12px 0">About Maak</a></p>
   </div>
 </section>
 
 <section class="screen" id="c1" hidden>
-  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body">
     <p class="body-l">اتكلم بالإشارة، ومعاك يوصّل كلامك</p>
     <div class="media" style="height:420px"><video data-clip="kg_3amel_eh" muted playsinline loop autoplay></video></div>
     <p class="intro-en" lang="en" dir="ltr">Maak Sign helps deaf customers talk to bank tellers in Egyptian Sign Language. Bank teller? <a href="#teller">Open the teller screen</a></p>
   </div>
   <div class="actions">
-    <button class="btn filled wide" data-go="c2"><span class="ms">sign_language</span>ابدأ</button>
-    <button class="btn text" data-go="c4"><span class="ms">smartphone</span>عندي حساب على جهاز تاني</button>
+    <button class="btn filled wide" data-go="c2"><span aria-hidden="true" class="ms">sign_language</span>ابدأ</button>
+    <button class="btn text" data-go="c4"><span aria-hidden="true" class="ms">smartphone</span>عندي حساب على جهاز تاني</button>
   </div>
 </section>
 
 <section class="screen" id="c2" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>قبل ما نبدأ</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>قبل ما نبدأ</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
-    <div class="pad"><div class="media" style="height:200px"><div class="ph"><span class="ms lg">play_circle</span>الخصوصية بلغة الإشارة</div></div></div>
-    <div class="li static"><span class="ms lead">smartphone</span><span class="txt"><b>الفيديو مايخرجش من موبايلك</b></span></div>
-    <div class="li static"><span class="ms lead">lock</span><span class="txt"><b>الكلام بس بيروح للمساعد</b></span></div>
+    <div class="pad"><div class="media" style="height:200px"><div class="ph"><span aria-hidden="true" class="ms lg">play_circle</span>الخصوصية بلغة الإشارة</div></div></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">smartphone</span><span class="txt"><b>الفيديو مايخرجش من موبايلك</b></span></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">lock</span><span class="txt"><b>الكلام بس بيروح للمساعد</b></span></div>
     <div class="setrow"><span class="txt"><b>أستخدم معاك</b><small>مطلوب</small></span><button class="sw" role="switch" aria-checked="true" disabled aria-label="أستخدم معاك"></button></div>
     <div class="setrow"><span class="txt"><b>أشارك إشاراتي علشان معاك يتحسن</b><small>اختياري، تقدر تقفله في أي وقت</small></span><button class="sw" role="switch" aria-checked="false" data-setting="share" aria-label="أشارك إشاراتي"></button></div>
   </div>
-  <div class="actions"><button class="btn filled wide" id="c2ok"><span class="ms">check_circle</span>موافق</button></div>
+  <div class="actions"><button class="btn filled wide" id="c2ok"><span aria-hidden="true" class="ms">check_circle</span>موافق</button></div>
 </section>
 
 <section class="screen" id="rv" hidden>
   <div class="appbar"><span></span><h1>ساعد معاك يفهم الإشارة</h1><span></span></div>
   <div class="body flush">
     <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">هتعمل ١٥ إشارة بنك، كل إشارة ٣ مرات. حوالي ١٠ دقايق.</p></div>
-    <div class="li static"><span class="ms lead">front_hand</span><span class="txt"><b>بنسجّل نقط حركة الإيد بس</b><small>من غير فيديو ومن غير وشّك</small></span></div>
-    <div class="li static"><span class="ms lead">school</span><span class="txt"><b>علشان معاك يفهم ناس أكتر</b><small>مش هتتنشر ومش هتتباع</small></span></div>
-    <div class="li static"><span class="ms lead">delete</span><span class="txt"><b>تقدر تطلب مسحها في أي وقت</b><small>بالكود اللي هيظهرلك في الآخر</small></span></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">front_hand</span><span class="txt"><b>بنسجّل نقط حركة الإيد بس</b><small>من غير فيديو ومن غير وشّك</small></span></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">school</span><span class="txt"><b>علشان معاك يفهم ناس أكتر</b><small>مش هتتنشر ومش هتتباع</small></span></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">delete</span><span class="txt"><b>تقدر تطلب مسحها في أي وقت</b><small>بالكود اللي هيظهرلك في الآخر</small></span></div>
     <div class="pad" style="display:flex;flex-direction:column;gap:8px;padding-block:8px">
       <p class="label-l">إيدك الأساسية</p>
       <div class="chips" data-rvpick="hand"><button class="btn tonal" data-v="R" aria-pressed="false">يمين</button><button class="btn tonal" data-v="L" aria-pressed="false">شمال</button></div>
@@ -257,153 +257,153 @@ button,input{font:inherit;color:inherit}
     <div class="setrow"><span class="txt"><b>عندي ١٨ سنة أو أكتر</b></span><button class="sw" role="switch" aria-checked="false" data-rv="adult" aria-label="عندي ١٨ سنة أو أكتر"></button></div>
     <div class="setrow"><span class="txt"><b>موافق إن نقط حركة إيدي تتسجل لتحسين معاك</b></span><button class="sw" role="switch" aria-checked="false" data-rv="agree" aria-label="موافق على التسجيل"></button></div>
   </div>
-  <div class="actions"><button class="btn filled wide" id="rvstart" disabled><span class="ms">videocam</span>ابدأ</button></div>
+  <div class="actions"><button class="btn filled wide" id="rvstart" disabled><span aria-hidden="true" class="ms">videocam</span>ابدأ</button></div>
 </section>
 
 <section class="screen" id="rvdone" hidden>
   <div class="appbar"><span></span><h1>شكرًا ليك</h1><span></span></div>
   <div class="body">
-    <div class="media" style="height:200px"><div class="ph"><span class="ms lg">volunteer_activism</span><b>إشاراتك هتساعد الصم في مصر</b></div></div>
+    <div class="media" style="height:200px"><div class="ph"><span aria-hidden="true" class="ms lg">volunteer_activism</span><b>إشاراتك هتساعد الصم في مصر</b></div></div>
     <p class="title-l" style="text-align:center" id="rvmsg"></p>
     <p class="status">الكود بتاعك</p>
     <p class="title-l num" style="text-align:center;letter-spacing:.2em" id="rvcode"></p>
     <p class="status" id="rvpending"></p>
   </div>
-  <div class="actions"><button class="btn filled wide" id="rvretry" hidden><span class="ms">cloud_upload</span>ابعت الباقي</button></div>
+  <div class="actions"><button class="btn filled wide" id="rvretry" hidden><span aria-hidden="true" class="ms">cloud_upload</span>ابعت الباقي</button></div>
 </section>
 
 <section class="screen" id="c3" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>علّم معاك إشاراتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>علّم معاك إشاراتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body">
     <span class="label-l" id="c3count">إشارة ١ من ١٨</span>
-    <div class="media" style="height:180px"><video id="c3ref" muted playsinline loop></video><iframe id="c3yt" hidden title="الإشارة على يوتيوب" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe><div class="ph" id="c3noref" hidden><span class="ms lg">sign_language</span><b id="c3word2"></b>اعملها زي ما بتعملها عادي</div></div>
+    <div class="media" style="height:180px"><video id="c3ref" muted playsinline loop></video><iframe id="c3yt" hidden title="الإشارة على يوتيوب" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe><div class="ph" id="c3noref" hidden><span aria-hidden="true" class="ms lg">sign_language</span><b id="c3word2"></b>اعملها زي ما بتعملها عادي</div></div>
     <p class="status" id="c3ytsrc" hidden></p>
     <p class="title-l" id="c3word" style="text-align:center"></p>
     <div class="media cam" style="height:240px"><video id="c3v" muted playsinline></video><canvas id="c3c"></canvas><span class="pill" id="c3pill">الكاميرا</span><span class="perf" id="c3perf" hidden></span>
-      <div class="ph" id="c3ph"><span class="ms lg">videocam</span>ارفع إيدك واعمل الإشارة<button class="btn tonal" id="c3cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c3file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c3file" accept="video/*" capture="user" hidden></div>
+      <div class="ph" id="c3ph"><span aria-hidden="true" class="ms lg">videocam</span>ارفع إيدك واعمل الإشارة<button class="btn tonal" id="c3cam"><span aria-hidden="true" class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c3file"><span aria-hidden="true" class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c3file" accept="video/*" capture="user" hidden></div>
     </div>
     <p class="status" id="c3st">اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة</p>
   </div>
   <div class="actions">
-    <button class="btn filled wide" id="c3next"><span class="ms">chevron_left</span>التالي</button>
+    <button class="btn filled wide" id="c3next"><span aria-hidden="true" class="ms">chevron_left</span>التالي</button>
     <button class="btn text" id="c3skip">خلّصت، روح للرئيسية</button>
   </div>
 </section>
 
 <section class="screen" id="c4" hidden>
-  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-go="c14" aria-label="الإعدادات"><span class="ms">settings</span></button></div>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button><button class="ib" data-go="c14" aria-label="الإعدادات"><span aria-hidden="true" class="ms">settings</span></button></div>
   <div class="body flush">
-    <button class="li two" data-go="c5"><span class="ms lead">account_balance</span><span class="txt"><b>بنك</b><small>سحب · إيداع · كارت</small></span><span class="ms trail">chevron_left</span></button>
-    <div class="li two" aria-disabled="true"><span class="ms lead">local_hospital</span><span class="txt"><b>مستشفى</b><small>قريبًا</small></span></div>
-    <div class="li two" aria-disabled="true"><span class="ms lead">local_pharmacy</span><span class="txt"><b>صيدلية</b><small>قريبًا</small></span></div>
+    <button class="li two" data-go="c5"><span aria-hidden="true" class="ms lead">account_balance</span><span class="txt"><b>بنك</b><small>سحب · إيداع · كارت</small></span><span aria-hidden="true" class="ms trail">chevron_left</span></button>
+    <div class="li two" aria-disabled="true"><span aria-hidden="true" class="ms lead">local_hospital</span><span class="txt"><b>مستشفى</b><small>قريبًا</small></span></div>
+    <div class="li two" aria-disabled="true"><span aria-hidden="true" class="ms lead">local_pharmacy</span><span class="txt"><b>صيدلية</b><small>قريبًا</small></span></div>
     <div class="pad" id="c4last" hidden style="display:flex;flex-direction:column;gap:8px;padding-top:16px">
       <span class="title-s">آخر زيارة</span>
-      <button class="card filled" style="border:0;cursor:pointer;text-align:start" data-go="c11"><div class="visit-sum"><span class="ms lg">credit_card</span><span class="ms">chevron_left</span><span class="ms lg">schedule</span><span class="n" id="c4lastn"></span></div></button>
+      <button class="card filled" style="border:0;cursor:pointer;text-align:start" data-go="c11"><div class="visit-sum"><span aria-hidden="true" class="ms lg">credit_card</span><span aria-hidden="true" class="ms">chevron_left</span><span aria-hidden="true" class="ms lg">schedule</span><span class="n" id="c4lastn"></span></div></button>
     </div>
     <p class="status" id="c4trained" style="padding-top:16px"></p>
   </div>
-  <button class="fab" data-go="c7"><span class="ms">sign_language</span>ابدأ محادثة</button>
+  <button class="fab" data-go="c7"><span aria-hidden="true" class="ms">sign_language</span>ابدأ محادثة</button>
   <nav class="navbar" data-nav="c4"></nav>
 </section>
 
 <section class="screen" id="c5" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>جهّز زيارتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>جهّز زيارتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
     <span class="title-s pad" style="padding-top:8px">عايز إيه؟</span>
     <div id="c5opts"></div>
     <div class="pad" style="padding-block:8px"><div class="media" style="height:120px"><video id="c5vid" muted playsinline loop autoplay></video></div></div>
     <span class="title-s pad">هتحتاج</span>
-    <div class="li static"><span class="ms lead">id_card</span><span class="txt"><b>البطاقة الشخصية</b></span></div>
-    <div class="li static two" id="c5amtrow"><span class="ms lead">payments</span><span class="txt"><b id="c5amt"></b><small>المبلغ</small></span><button class="ib" id="c5edit" aria-label="تعديل المبلغ"><span class="ms">edit</span></button></div>
+    <div class="li static"><span aria-hidden="true" class="ms lead">id_card</span><span class="txt"><b>البطاقة الشخصية</b></span></div>
+    <div class="li static two" id="c5amtrow"><span aria-hidden="true" class="ms lead">payments</span><span class="txt"><b id="c5amt"></b><small>المبلغ</small></span><button class="ib" id="c5edit" aria-label="تعديل المبلغ"><span aria-hidden="true" class="ms">edit</span></button></div>
     <div class="amount-row" id="c5field" hidden><div class="field" style="flex:1"><label for="c5in">المبلغ بالجنيه</label><input id="c5in" class="num" inputmode="numeric"></div><button class="btn tonal" id="c5ok">تمام</button></div>
   </div>
-  <div class="actions"><button class="btn filled wide" data-go="c6"><span class="ms">description</span>جهّز كارت الزيارة</button></div>
+  <div class="actions"><button class="btn filled wide" data-go="c6"><span aria-hidden="true" class="ms">description</span>جهّز كارت الزيارة</button></div>
 </section>
 
 <section class="screen" id="c6" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>كارت الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span class="ms">volume_up</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>كارت الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span aria-hidden="true" class="ms">volume_up</span></button></div>
   <div class="body">
     <p class="body-l">ورّي الكارت ده للموظف</p>
     <div class="card outlined"><div class="in" style="gap:12px;padding:20px">
-      <div style="display:flex;align-items:center;gap:12px"><span class="ms" style="font-size:32px;color:var(--primary)">sign_language</span><span class="title-m" style="font-weight:400">العميل أصم ويستخدم لغة الإشارة</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><span aria-hidden="true" class="ms" style="font-size:32px;color:var(--primary)">sign_language</span><span class="title-m" style="font-weight:400">العميل أصم ويستخدم لغة الإشارة</span></div>
       <p class="headline-s" id="c6want"></p>
       <p class="title-l" style="color:var(--primary)" id="c6amt"></p>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ms mute">id_card</span>البطاقة الشخصية<span class="ms mute">credit_card</span>كارت البنك</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span aria-hidden="true" class="ms mute">id_card</span>البطاقة الشخصية<span aria-hidden="true" class="ms mute">credit_card</span>كارت البنك</div>
     </div></div>
-    <div class="li static two" style="padding-inline:0"><span class="ms lead">info</span><span class="txt"><b>للموظف</b><small>افتح maaksign.com/staff على جهازك واكتب رقم التوصيل علشان تكلّمه كتابة</small></span></div>
+    <div class="li static two" style="padding-inline:0"><span aria-hidden="true" class="ms lead">info</span><span class="txt"><b>للموظف</b><small>افتح maaksign.com/staff على جهازك واكتب رقم التوصيل علشان تكلّمه كتابة</small></span></div>
   </div>
-  <div class="actions"><button class="btn filled wide" data-go="c7"><span class="ms">qr_code_2</span>أنا عند الشباك</button><button class="btn outline wide" data-back><span class="ms">edit</span>عدّل الطلب</button></div>
+  <div class="actions"><button class="btn filled wide" data-go="c7"><span aria-hidden="true" class="ms">qr_code_2</span>أنا عند الشباك</button><button class="btn outline wide" data-back><span aria-hidden="true" class="ms">edit</span>عدّل الطلب</button></div>
 </section>
 
 <section class="screen" id="c7" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>وصّل بالموظف</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>وصّل بالموظف</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body" style="align-items:center;padding-top:24px;gap:16px">
     <p class="body-l" style="text-align:center">للموظف: افتح <b dir="ltr" style="color:var(--primary)">maaksign.com/staff</b> واكتب الرقم ده</p>
     <div class="card filled" style="padding:16px"><div class="qr" id="c7qr"></div></div>
     <p class="code" id="c7code"></p>
     <div class="waiting" id="c7wait"><span class="spin" aria-hidden="true"></span><span id="c7st">مستني الموظف…</span></div>
   </div>
-  <div class="actions"><button class="btn text" data-go="c8"><span class="ms">smartphone</span>كمّل على موبايلي بس</button><p class="body-m" style="text-align:center">من غير توصيل: الموظف يقرا من شاشتك</p></div>
+  <div class="actions"><button class="btn text" data-go="c8"><span aria-hidden="true" class="ms">smartphone</span>كمّل على موبايلي بس</button><p class="body-m" style="text-align:center">من غير توصيل: الموظف يقرا من شاشتك</p></div>
 </section>
 
 <section class="screen" id="c8" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1 id="c8title">عند الشباك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span class="ms">volume_up</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1 id="c8title">عند الشباك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span aria-hidden="true" class="ms">volume_up</span></button></div>
   <div class="body" style="gap:8px">
     <span class="label-l">الموظف</span>
-    <div class="media" style="height:200px" id="c8tbox"><video id="c8tv" muted playsinline></video><div class="ph" id="c8tph"><span class="ms lg">play_circle</span>رد الموظف هيظهر هنا بالإشارة</div></div>
-    <div class="teller-msg"><p id="c8ttext" class="mute">لسه مفيش رد</p><button class="ib tonal" id="c8replay" aria-label="أعيد إشارة الموظف"><span class="ms">replay</span></button></div>
+    <div class="media" style="height:200px" id="c8tbox"><video id="c8tv" muted playsinline></video><div class="ph" id="c8tph"><span aria-hidden="true" class="ms lg">play_circle</span>رد الموظف هيظهر هنا بالإشارة</div></div>
+    <div class="teller-msg"><p id="c8ttext" class="mute">لسه مفيش رد</p><button class="ib tonal" id="c8replay" aria-label="أعيد إشارة الموظف"><span aria-hidden="true" class="ms">replay</span></button></div>
     <div class="chips" id="c8twords" hidden></div>
     <span class="label-l" style="margin-top:8px">إنت</span>
     <div class="media cam" style="height:300px"><video id="c8v" muted playsinline></video><canvas id="c8c"></canvas><span class="pill" id="c8pill">الكاميرا</span><span class="perf" id="c8perf" hidden></span>
-      <div class="ph" id="c8ph"><span class="ms lg">videocam</span>اعمل الإشارة<button class="btn tonal" id="c8cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c8file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c8file" accept="video/*" capture="user" hidden></div>
+      <div class="ph" id="c8ph"><span aria-hidden="true" class="ms lg">videocam</span>اعمل الإشارة<button class="btn tonal" id="c8cam"><span aria-hidden="true" class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c8file"><span aria-hidden="true" class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c8file" accept="video/*" capture="user" hidden></div>
     </div>
     <div class="chips" id="c8chips" aria-live="polite"></div>
-    <button class="btn text" data-pick style="align-self:flex-start"><span class="ms">touch_app</span>مش بيفهمني؟ اختار الكلمة بإيدك</button>
+    <button class="btn text" data-pick style="align-self:flex-start"><span aria-hidden="true" class="ms">touch_app</span>مش بيفهمني؟ اختار الكلمة بإيدك</button>
   </div>
   <div class="actions">
     <div class="banner" id="c8end" hidden><p>الموظف خلّص الزيارة</p><button class="btn text" data-go="c11">شوف الملخص</button></div>
-    <div class="row"><button class="btn filled" id="c8send"><span class="ms">send</span>ابعت</button><button class="btn tonal" id="c8clear"><span class="ms">close</span>امسح</button></div>
+    <div class="row"><button class="btn filled" id="c8send"><span aria-hidden="true" class="ms">send</span>ابعت</button><button class="btn tonal" id="c8clear"><span aria-hidden="true" class="ms">close</span>امسح</button></div>
   </div>
 </section>
 
 <section class="screen" id="c9" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>اتأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>اتأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body">
     <p class="body-l">معاك فهمك كده:</p>
     <div class="chips" id="c9chips"></div>
     <p class="headline-m" id="c9text"></p>
     <p class="title-l" style="color:var(--primary)">صح؟</p>
   </div>
-  <div class="actions"><button class="btn filled wide" id="c9yes"><span class="ms">check_circle</span>أيوه، ابعت</button><button class="btn outline wide" id="c9no"><span class="ms">replay</span>لأ، أعيد</button></div>
+  <div class="actions"><button class="btn filled wide" id="c9yes"><span aria-hidden="true" class="ms">check_circle</span>أيوه، ابعت</button><button class="btn outline wide" id="c9no"><span aria-hidden="true" class="ms">replay</span>لأ، أعيد</button></div>
 </section>
 
 <section class="screen" id="c10" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>مش متأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>مش متأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
     <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">قصدك أنهي إشارة؟</p><p class="body-m">دوس على الإشارة اللي قصدك عليها</p></div>
     <div id="c10opts"></div>
-    <div class="pad"><div class="media" style="height:160px"><video id="c10v" muted playsinline loop></video><div class="ph" id="c10ph"><span class="ms lg">play_circle</span>معاينة الإشارة</div></div></div>
+    <div class="pad"><div class="media" style="height:160px"><video id="c10v" muted playsinline loop></video><div class="ph" id="c10ph"><span aria-hidden="true" class="ms lg">play_circle</span>معاينة الإشارة</div></div></div>
   </div>
-  <div class="actions"><button class="btn filled wide" data-go="c8"><span class="ms">replay</span>أعيد الإشارة</button><button class="btn text" data-pick><span class="ms">touch_app</span>مش لاقيها؟ اختار الكلمة</button></div>
+  <div class="actions"><button class="btn filled wide" data-go="c8"><span aria-hidden="true" class="ms">replay</span>أعيد الإشارة</button><button class="btn text" data-pick><span aria-hidden="true" class="ms">touch_app</span>مش لاقيها؟ اختار الكلمة</button></div>
 </section>
 
 <section class="screen" id="c11" hidden>
-  <div class="appbar"><button class="ib lead" data-go="c4" aria-label="قفل"><span class="ms">close</span></button><h1>ملخص الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-go="c4" aria-label="قفل"><span aria-hidden="true" class="ms">close</span></button><h1>ملخص الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
     <div class="pad" style="padding-bottom:8px"><div class="media" style="height:240px"><video data-clip="kg_kwayes" muted playsinline loop autoplay></video></div></div>
     <div id="c11list"></div>
   </div>
-  <div class="actions"><button class="btn filled wide" data-go="c4"><span class="ms">home</span>رجوع للرئيسية</button></div>
+  <div class="actions"><button class="btn filled wide" data-go="c4"><span aria-hidden="true" class="ms">home</span>رجوع للرئيسية</button></div>
 </section>
 
 <section class="screen" id="c12" hidden>
-  <div class="appbar"><h1>زياراتي</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><h1>زياراتي</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush" id="c12list"></div>
   <nav class="navbar" data-nav="c12"></nav>
 </section>
 
 <section class="screen" id="c13" hidden>
-  <div class="appbar"><h1>تمرين</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><h1>تمرين</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
     <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">اتمرّن على إشارات البنك</p><p class="body-m">معاك بيتعلّم طريقتك كل ما تتمرّن</p></div>
     <div id="c13list"></div>
@@ -412,13 +412,13 @@ button,input{font:inherit;color:inherit}
 </section>
 
 <section class="screen" id="c14" hidden>
-  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الإعدادات</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span aria-hidden="true" class="ms">arrow_forward</span></button><h1>الإعدادات</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span aria-hidden="true" class="ms">play_circle</span></button></div>
   <div class="body flush">
     <div class="setrow"><span class="txt"><b>الصوت</b><small>الموظف يسمع كلامك بصوت على جهازه</small></span><button class="sw" role="switch" aria-checked="false" data-setting="voice" aria-label="الصوت"></button></div>
     <div class="setrow"><span class="txt"><b>عدّاد السرعة</b><small>يظهر سرعة تتبع الإيد (للتجربة)</small></span><button class="sw" role="switch" aria-checked="true" data-setting="perf" aria-label="عدّاد السرعة"></button></div>
     <div class="setrow"><span class="txt"><b>أشارك إشاراتي علشان معاك يتحسن</b><small>تقدر تقفله في أي وقت</small></span><button class="sw" role="switch" aria-checked="false" data-setting="share" aria-label="أشارك إشاراتي"></button></div>
-    <button class="li two" id="c14reset"><span class="ms lead">restart_alt</span><span class="txt"><b>امسح الإشارات اللي اتعلمها</b><small id="c14n"></small></span></button>
-    <button class="li two" data-teller><span class="ms lead">desktop_windows</span><span class="txt"><b>افتح شاشة الموظف</b><small>للتجربة على نفس الجهاز</small></span></button>
+    <button class="li two" id="c14reset"><span aria-hidden="true" class="ms lead">restart_alt</span><span class="txt"><b>امسح الإشارات اللي اتعلمها</b><small id="c14n"></small></span></button>
+    <button class="li two" data-teller><span aria-hidden="true" class="ms lead">desktop_windows</span><span class="txt"><b>افتح شاشة الموظف</b><small>للتجربة على نفس الجهاز</small></span></button>
   </div>
 </section>
 
@@ -430,26 +430,26 @@ button,input{font:inherit;color:inherit}
 <div class="web">
 
 <section class="screen" id="t1">
-  <div class="appbar"><h1>معاك · شاشة الموظف</h1><button class="ib" data-customer aria-label="شاشة العميل"><span class="ms">smartphone</span></button></div>
+  <div class="appbar"><h1>معاك · شاشة الموظف</h1><button class="ib" data-customer aria-label="شاشة العميل"><span aria-hidden="true" class="ms">smartphone</span></button></div>
   <div class="center"><div class="panel">
     <p class="headline-m">وصّل بالعميل</p>
     <p class="body-l">اكتب الرقم اللي ظاهر على موبايل العميل</p>
     <div class="field"><label for="t1code">رقم التوصيل</label><input id="t1code" class="num" inputmode="numeric" maxlength="7" placeholder="482913" autocomplete="off"></div>
-    <button class="btn filled wide" id="t1go"><span class="ms">check_circle</span>وصّل</button>
+    <button class="btn filled wide" id="t1go"><span aria-hidden="true" class="ms">check_circle</span>وصّل</button>
     <p class="status" id="t1st"></p>
   </div></div>
 </section>
 
 <section class="screen" id="t2" hidden>
-  <div class="appbar"><h1 id="t2title">العميل</h1><button class="btn text" id="t2end"><span class="ms">task_alt</span>إنهاء الزيارة</button><button class="ib" id="t2voice" aria-label="اقرا كلام العميل بصوت" aria-pressed="false"><span class="ms">volume_off</span></button></div>
+  <div class="appbar"><h1 id="t2title">العميل</h1><button class="btn text" id="t2end"><span aria-hidden="true" class="ms">task_alt</span>إنهاء الزيارة</button><button class="ib" id="t2voice" aria-label="اقرا كلام العميل بصوت" aria-pressed="false"><span aria-hidden="true" class="ms">volume_off</span></button></div>
   <div class="tbody">
     <div class="thread" id="t2thread"><p class="title-m mute">المحادثة</p><div class="waiting" id="t2wait"><span class="spin" aria-hidden="true"></span>مستني العميل يبعت…</div></div>
     <div class="reply">
       <p class="title-m mute">ردّك</p>
       <div id="t2phr" style="display:flex;flex-direction:column;max-height:300px;overflow:auto"></div>
-      <div class="media preview" id="t2prev"><video id="t2pv" muted playsinline></video><div class="ph" id="t2pph"><span class="ms lg">play_circle</span>معاينة الإشارة</div></div>
-      <div class="field"><label for="t2in">اكتب أو اتكلم</label><input id="t2in" autocomplete="off"><button class="ib" id="t2mic" aria-label="اتكلم" hidden><span class="ms">mic</span></button></div>
-      <button class="btn filled wide" id="t2send"><span class="ms">send</span>ابعت بالإشارة</button>
+      <div class="media preview" id="t2prev"><video id="t2pv" muted playsinline></video><div class="ph" id="t2pph"><span aria-hidden="true" class="ms lg">play_circle</span>معاينة الإشارة</div></div>
+      <div class="field"><label for="t2in">اكتب أو اتكلم</label><input id="t2in" autocomplete="off"><button class="ib" id="t2mic" aria-label="اتكلم" hidden><span aria-hidden="true" class="ms">mic</span></button></div>
+      <button class="btn filled wide" id="t2send"><span aria-hidden="true" class="ms">send</span>ابعت بالإشارة</button>
     </div>
   </div>
 </section>
@@ -460,7 +460,7 @@ button,input{font:inherit;color:inherit}
     <p class="headline-m">ملخص الزيارة</p>
     <p class="body-l">العميل شاف الملخص ده بالإشارة على موبايله</p>
     <div id="t4list"></div>
-    <div style="display:flex;gap:12px"><button class="btn filled" style="flex:1" id="t4new"><span class="ms">qr_code_2</span>عميل جديد</button></div>
+    <div style="display:flex;gap:12px"><button class="btn filled" style="flex:1" id="t4new"><span aria-hidden="true" class="ms">qr_code_2</span>عميل جديد</button></div>
   </div></div>
 </section>
 
@@ -469,16 +469,16 @@ button,input{font:inherit;color:inherit}
 
 <template id="help"><div class="scrim" role="dialog" aria-modal="true" aria-label="شرح الشاشة بالإشارة"><div class="dialog">
   <p class="headline-s">شرح الشاشة بلغة الإشارة</p>
-  <div class="media" style="height:200px"><div class="ph"><span class="ms lg">sign_language</span>فيديو الشرح لسه بيتسجّل مع متطوعين صم</div></div>
-  <div class="acts"><button class="btn text" data-close><span class="ms">close</span>قفل</button></div>
+  <div class="media" style="height:200px"><div class="ph"><span aria-hidden="true" class="ms lg">sign_language</span>فيديو الشرح لسه بيتسجّل مع متطوعين صم</div></div>
+  <div class="acts"><button class="btn text" data-close><span aria-hidden="true" class="ms">close</span>قفل</button></div>
 </div></div></template>
 
-<template id="picker"><div class="scrim" style="place-items:end center;padding:0" data-scrim></div><div class="sheet" role="dialog" aria-modal="true" aria-label="اختار الكلمة"><div class="handle"></div><p class="title-l">اختار الكلمة</p><div class="words" data-words></div><button class="btn text" data-close style="align-self:center"><span class="ms">close</span>قفل</button></div></template>
+<template id="picker"><div class="scrim" style="place-items:end center;padding:0" data-scrim></div><div class="sheet" role="dialog" aria-modal="true" aria-label="اختار الكلمة"><div class="handle"></div><p class="title-l">اختار الكلمة</p><div class="words" data-words></div><button class="btn text" data-close style="align-self:center"><span aria-hidden="true" class="ms">close</span>قفل</button></div></template>
 <template id="confirm"><div class="scrim" role="dialog" aria-modal="true" aria-label="تأكيد الرد"><div class="dialog">
-  <span class="ms" style="color:var(--primary);margin-inline:auto">sign_language</span>
+  <span aria-hidden="true" class="ms" style="color:var(--primary);margin-inline:auto">sign_language</span>
   <p class="headline-s" data-title>هيتبعت للعميل بالإشارة</p>
   <p class="body-l" data-text></p>
-  <div class="media" style="height:160px"><video data-v muted playsinline></video><div class="ph" data-ph><span class="ms lg">play_circle</span><span data-phtext></span></div></div>
+  <div class="media" style="height:160px"><video data-v muted playsinline></video><div class="ph" data-ph><span aria-hidden="true" class="ms lg">play_circle</span><span data-phtext></span></div></div>
   <div class="acts"><button class="btn text" data-no>عدّل</button><button class="btn text" data-yes>ابعت</button></div>
 </div></div></template>
 
@@ -762,7 +762,7 @@ function customer(){
   function syncSwitches(){document.querySelectorAll('.sw[data-setting]').forEach(s=>s.setAttribute('aria-checked',!!SET[s.dataset.setting]));document.querySelectorAll('[data-voice] .ms').forEach(i=>i.textContent=SET.voice?'volume_up':'volume_off')}
   syncSwitches();
   // bottom nav
-  document.querySelectorAll('[data-nav]').forEach(n=>{const here=n.dataset.nav;n.innerHTML=[['c4','home','الرئيسية'],['c12','history','زياراتي'],['c13','front_hand','تمرين']].map(([id,ic,l])=>`<button data-go="${id}" aria-current="${id===here}"><span class="ind"><span class="ms ${id===here?'fill':''}">${ic}</span></span>${l}</button>`).join('')});
+  document.querySelectorAll('[data-nav]').forEach(n=>{const here=n.dataset.nav;n.innerHTML=[['c4','home','الرئيسية'],['c12','history','زياراتي'],['c13','front_hand','تمرين']].map(([id,ic,l])=>`<button data-go="${id}" aria-current="${id===here}"><span class="ind"><span aria-hidden="true" class="ms ${id===here?'fill':''}">${ic}</span></span>${l}</button>`).join('')});
   const trainedCount=()=>SIGNS.filter(s=>(TEMPL[s.k]||[]).length).length;
 
   /* ---------- C3 teach signs ---------- */
@@ -786,7 +786,7 @@ function customer(){
     /* minimal player: no controls or keyboard, our own play icon; YouTube's small logo stays (YouTube's terms) */
     const u='https://www.youtube-nocookie.com/embed/'+id+'?rel=0&playsinline=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin='+encodeURIComponent(location.origin)+(st!=null?'&start='+st+'&end='+en:'');
     let pb=f.parentElement.querySelector('.ytplay');
-    if(!pb){pb=document.createElement('button');pb.className='ytplay';pb.type='button';pb.setAttribute('aria-label','شغّل الإشارة');pb.innerHTML='<span class="ms">play_arrow</span>';
+    if(!pb){pb=document.createElement('button');pb.className='ytplay';pb.type='button';pb.setAttribute('aria-label','شغّل الإشارة');pb.innerHTML='<span aria-hidden="true" class="ms">play_arrow</span>';
       pb.style.cssText='position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer';
       pb.querySelector('.ms').style.fontSize='40px';f.parentElement.appendChild(pb)}
     pb.style.display='flex';
@@ -822,7 +822,7 @@ function customer(){
   function openPicker(){
     const frag=$('#picker').content.cloneNode(true);const scrim=frag.querySelector('[data-scrim]'),sheet=frag.querySelector('.sheet');document.body.append(scrim,sheet);
     const close=()=>{scrim.remove();sheet.remove()};scrim.onclick=close;sheet.querySelector('[data-close]').onclick=close;
-    const ws=sheet.querySelector('[data-words]');ws.innerHTML=SIGNS.map(x=>`<button class="word" data-k="${x.k}"><span class="ms">${x.clip?'sign_language':'text_fields'}</span>${x.ar}</button>`).join('');
+    const ws=sheet.querySelector('[data-words]');ws.innerHTML=SIGNS.map(x=>`<button class="word" data-k="${x.k}"><span aria-hidden="true" class="ms">${x.clip?'sign_language':'text_fields'}</span>${x.ar}</button>`).join('');
     ws.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{st.words.push(b.dataset.k);close();renderChips();if(cur!=='c8')go('c8',false)});
     sheet.addEventListener('keydown',e=>{if(e.key==='Escape')close()});ws.querySelector('button').focus();
   }
@@ -830,7 +830,7 @@ function customer(){
   $('#c2ok').onclick=()=>{T.list=CORE;T.i=0;T.ret='c4';go('c3')};
   /* ---------- C5 plan ---------- */
   function renderPlan(){
-    $('#c5opts').innerHTML=INTENTS.map(i=>`<button class="li ${st.plan.intent===i.k?'sel':''}" data-intent="${i.k}" aria-pressed="${st.plan.intent===i.k}"><span class="ms lead">${i.icon}</span><span class="txt"><b>${i.ar}</b></span></button>`).join('');
+    $('#c5opts').innerHTML=INTENTS.map(i=>`<button class="li ${st.plan.intent===i.k?'sel':''}" data-intent="${i.k}" aria-pressed="${st.plan.intent===i.k}"><span aria-hidden="true" class="ms lead">${i.icon}</span><span class="txt"><b>${i.ar}</b></span></button>`).join('');
     $('#c5opts').querySelectorAll('[data-intent]').forEach(b=>b.onclick=()=>{st.plan.intent=b.dataset.intent;savePlan();renderPlan()});
     const it=INTENTS.find(i=>i.k===st.plan.intent);const v=$('#c5vid');v.parentElement.hidden=!okClip(it.clip);if(okClip(it.clip)){const want='clips/'+it.clip+'.mp4';if(!v.src.endsWith(want)){v.src=want;v.play().catch(()=>{})}}else v.removeAttribute('src')
     $('#c5amtrow').hidden=st.plan.intent==='card';$('#c5amt').textContent=money(st.plan.amount)+' جنيه';
@@ -867,9 +867,9 @@ function customer(){
     st.lastClips=(d.clips||[]).filter(c=>/^[a-z0-9_]+$/.test(c));
     playClips($('#c8tv'),st.lastClips,$('#c8tph'));
     const ws=(Array.isArray(d.words)?d.words:[]).filter(k=>AR[k]).slice(0,5);const wb=$('#c8twords');wb.hidden=!ws.length;
-    wb.innerHTML=ws.map(k=>`<button class="chip" data-k="${k}"><span class="ms">sign_language</span>${AR[k]}</button>`).join('');
+    wb.innerHTML=ws.map(k=>`<button class="chip" data-k="${k}"><span aria-hidden="true" class="ms">sign_language</span>${AR[k]}</button>`).join('');
     wb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k];if(c)playClips($('#c8tv'),[c],$('#c8tph'))});
-    if(!st.lastClips.length){$('#c8tph').innerHTML=ws.length?'<span class="ms lg">sign_language</span>الكلمات الأساسية تحت':'<span class="ms lg">text_snippet</span>الرد ده لسه ملوش فيديو إشارة، اقراه تحت'}
+    if(!st.lastClips.length){$('#c8tph').innerHTML=ws.length?'<span aria-hidden="true" class="ms lg">sign_language</span>الكلمات الأساسية تحت':'<span aria-hidden="true" class="ms lg">text_snippet</span>الرد ده لسه ملوش فيديو إشارة، اقراه تحت'}
     if(cur!=='c8'&&cur!=='c9'&&cur!=='c10') go('c8');
   }
   $('#c8replay').onclick=()=>playClips($('#c8tv'),st.lastClips||[],$('#c8tph'));
@@ -883,7 +883,7 @@ function customer(){
     const r=await agent('compose',{signs:st.words.map(w=>AR[w]),goal:it?it.want:null,amount:st.plan.intent==='card'?null:String(st.plan.amount)});
     if(r&&st.words.join(',')===key&&cur==='c9'){st.composed={key,text:r.text};$('#c9text').textContent=r.text}}
   function renderChips(){
-    $('#c8chips').innerHTML=st.words.length?st.words.map((w,i)=>`<span class="chip">${AR[w]}<button aria-label="امسح ${AR[w]}" data-i="${i}"><span class="ms">close</span></button></span>`).join(''):'<span class="body-m">الإشارات اللي فهمتها هتظهر هنا</span>';
+    $('#c8chips').innerHTML=st.words.length?st.words.map((w,i)=>`<span class="chip">${AR[w]}<button aria-label="امسح ${AR[w]}" data-i="${i}"><span aria-hidden="true" class="ms">close</span></button></span>`).join(''):'<span class="body-m">الإشارات اللي فهمتها هتظهر هنا</span>';
     $('#c8chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{st.words.splice(+b.dataset.i,1);renderChips()});
     $('#c8send').disabled=!st.words.length;
   }
@@ -910,7 +910,7 @@ function customer(){
   $('#c9no').onclick=()=>{st.words=[];renderChips();go('c8',false)};
   /* ---------- C10 not sure ---------- */
   function renderAlts(){
-    $('#c10opts').innerHTML=st.alts.map((k,i)=>`<button class="li two" data-k="${k}"><span class="ms lead">play_circle</span><span class="txt"><b>${AR[k]}</b><small>إشارة ${arDigits(i+1)}</small></span></button>`).join('');
+    $('#c10opts').innerHTML=st.alts.map((k,i)=>`<button class="li two" data-k="${k}"><span aria-hidden="true" class="ms lead">play_circle</span><span class="txt"><b>${AR[k]}</b><small>إشارة ${arDigits(i+1)}</small></span></button>`).join('');
     $('#c10opts').querySelectorAll('[data-k]').forEach(b=>{
       b.onmouseenter=b.onfocus=()=>{const c=CLIP[b.dataset.k];if(c){$('#c10v').hidden=false;$('#c10ph').hidden=true;$('#c10v').src='clips/'+c+'.mp4';$('#c10v').play().catch(()=>{})}else{$('#c10v').hidden=true;$('#c10ph').hidden=false}};
       b.onclick=()=>{st.words.push(b.dataset.k);renderChips();go('c8',false)};
@@ -937,13 +937,13 @@ function customer(){
     c10(){renderAlts();$('#c10v').hidden=true;$('#c10ph').hidden=false},
     c11(){stopCam();const v=store.get('maak_visits',[]);const it=st.ended?{want:wantText(),amount:st.plan.amount,items:st.thread,date:new Date().toISOString().slice(0,10)}:v[viewVisit];
       if(!it){$('#c11list').innerHTML='<p class="body-m pad">مفيش زيارات لسه</p>';return}
-      const rows=[`<div class="li static two"><span class="ms lead">check_circle</span><span class="txt"><b>${esc(it.want)}${it.amount?' · '+money(it.amount)+' جنيه':''}</b><small>${fmtDate(it.date)}</small></span></div>`];
-      (it.items||[]).forEach(m=>rows.push(`<div class="li static two"><span class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'إنت قلت':'الموظف قال'}</small></span></div>`));
+      const rows=[`<div class="li static two"><span aria-hidden="true" class="ms lead">check_circle</span><span class="txt"><b>${esc(it.want)}${it.amount?' · '+money(it.amount)+' جنيه':''}</b><small>${fmtDate(it.date)}</small></span></div>`];
+      (it.items||[]).forEach(m=>rows.push(`<div class="li static two"><span aria-hidden="true" class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'إنت قلت':'الموظف قال'}</small></span></div>`));
       $('#c11list').innerHTML=rows.join('');
       if(st.ended){st.ended=false;st.thread=[];if(st.room){st.room.leave().catch(()=>{});st.room=null;st.code=null}}},
-    c12(){stopCam();const v=store.get('maak_visits',[]);$('#c12list').innerHTML=v.length?v.map((x,i)=>`<button class="li two" data-visit="${i}"><span class="ms lead">account_balance</span><span class="txt"><b>بنك · ${esc(x.want)}${x.amount?' '+money(x.amount):''}</b><small>${fmtDate(x.date)}</small></span><span class="ms trail">chevron_left</span></button>`).join(''):'<p class="body-m pad" style="padding-top:16px">لسه مفيش زيارات. أول زيارة هتظهر هنا.</p>';
+    c12(){stopCam();const v=store.get('maak_visits',[]);$('#c12list').innerHTML=v.length?v.map((x,i)=>`<button class="li two" data-visit="${i}"><span aria-hidden="true" class="ms lead">account_balance</span><span class="txt"><b>بنك · ${esc(x.want)}${x.amount?' '+money(x.amount):''}</b><small>${fmtDate(x.date)}</small></span><span aria-hidden="true" class="ms trail">chevron_left</span></button>`).join(''):'<p class="body-m pad" style="padding-top:16px">لسه مفيش زيارات. أول زيارة هتظهر هنا.</p>';
       $('#c12list').querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{viewVisit=+b.dataset.visit;st.ended=false;go('c11')})},
-    c13(){stopCam();$('#c13list').innerHTML=SIGNS.map((s,i)=>{const n=(TEMPL[s.k]||[]).length;return `<button class="li two" data-t="${i}"><span class="ms lead">play_circle</span><span class="txt"><b>${s.ar}</b><small>${n?'اتعلمتها':'لسه'}</small></span>${n?'<span class="ms trail">check_circle</span>':''}</button>`}).join('');
+    c13(){stopCam();$('#c13list').innerHTML=SIGNS.map((s,i)=>{const n=(TEMPL[s.k]||[]).length;return `<button class="li two" data-t="${i}"><span aria-hidden="true" class="ms lead">play_circle</span><span class="txt"><b>${s.ar}</b><small>${n?'اتعلمتها':'لسه'}</small></span>${n?'<span aria-hidden="true" class="ms trail">check_circle</span>':''}</button>`}).join('');
       $('#c13list').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{T.list=[SIGNS[+b.dataset.t].k];T.i=0;T.ret='c13';go('c3')})},
     async rvdone(){stopCam();const done=REC_LIST.filter(k=>(REC.reps[k]||0)>=REC_REPS).length;$('#rvmsg').textContent=`سجّلت ${arDigits(done)} من ${arDigits(REC_LIST.length)} إشارة`;$('#rvcode').textContent=REC.session;const left=await recFlush();$('#rvpending').textContent=left?`فاضل ${arDigits(left)} تسجيل لسه ما اتبعتش. اتأكد من النت ودوس «ابعت الباقي».`:'كل التسجيلات اتبعتت ✔';$('#rvretry').hidden=!left},
     c14(){stopCam();$('#c14n').textContent=`معاك اتعلم ${arDigits(trainedCount())} إشارة على الموبايل ده`},
@@ -971,8 +971,8 @@ function teller(){
     for(const p of TELLER){let s=0;for(const k of p.kw){const kw=norm(k).split(/\s+/).map(stem);for(let i=0;i+kw.length<=words.length;i++){if(kw.every((x,j)=>words[i+j]===x)){s=Math.max(s,kw.join('').length);break}}}if(s>bs){second=bs;bs=s;best=p}else if(s>second)second=s}
     if(!best||second===bs)return null;return best}
   // phrases
-  $('#t2phr').innerHTML=TELLER.map((p,i)=>`<button class="li" data-p="${i}"><span class="ms lead">sign_language</span><span class="txt"><b>${p.t}</b></span><span class="ms trail">${p.clips.length?'play_circle':'text_snippet'}</span></button>`).join('');
-  $('#t2phr').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=TELLER[+b.dataset.p];$('#t2in').value=p.t;st.sel=p;playClips($('#t2pv'),p.clips,$('#t2pph'));if(!p.clips.length)$('#t2pph').innerHTML='<span class="ms lg">text_snippet</span>الجملة دي لسه ملهاش فيديو، هتوصل للعميل كتابة'});
+  $('#t2phr').innerHTML=TELLER.map((p,i)=>`<button class="li" data-p="${i}"><span aria-hidden="true" class="ms lead">sign_language</span><span class="txt"><b>${p.t}</b></span><span aria-hidden="true" class="ms trail">${p.clips.length?'play_circle':'text_snippet'}</span></button>`).join('');
+  $('#t2phr').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=TELLER[+b.dataset.p];$('#t2in').value=p.t;st.sel=p;playClips($('#t2pv'),p.clips,$('#t2pph'));if(!p.clips.length)$('#t2pph').innerHTML='<span aria-hidden="true" class="ms lg">text_snippet</span>الجملة دي لسه ملهاش فيديو، هتوصل للعميل كتابة'});
   $('#t2in').oninput=()=>{st.sel=null};
   // connect
   const codeIn=$('#t1code');
@@ -997,7 +997,7 @@ function teller(){
   function addMsg(who,text,meta){
     $('#t2wait').hidden=true;st.items.push({who,text});
     const d=document.createElement('div');d.className='msg '+who;
-    d.innerHTML=`<span class="who">${who==='c'?'العميل':'إنت'}</span><span class="say"></span><span class="meta"><span class="ms">${who==='c'?'check_circle':'sign_language'}</span><span></span></span>`;
+    d.innerHTML=`<span class="who">${who==='c'?'العميل':'إنت'}</span><span class="say"></span><span class="meta"><span aria-hidden="true" class="ms">${who==='c'?'check_circle':'sign_language'}</span><span></span></span>`;
     d.querySelector('.say').textContent=text;d.querySelector('.meta span:last-child').textContent=meta;
     $('#t2thread').appendChild(d);d.scrollIntoView({block:'end',behavior:'smooth'});
   }
@@ -1037,7 +1037,7 @@ function teller(){
   // end
   $('#t2end').onclick=async()=>{
     try{await st.room?.emit('end',{items:st.items.slice(-12)})}catch(e){}
-    $('#t4list').innerHTML=st.items.map(m=>`<div class="li static two" style="padding-inline:0"><span class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'العميل':'إنت'}</small></span></div>`).join('')||'<p class="body-m">مفيش رسايل في الزيارة دي</p>';
+    $('#t4list').innerHTML=st.items.map(m=>`<div class="li static two" style="padding-inline:0"><span aria-hidden="true" class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'العميل':'إنت'}</small></span></div>`).join('')||'<p class="body-m">مفيش رسايل في الزيارة دي</p>';
     show('t4');
   };
   $('#t4new').onclick=async()=>{try{await st.room?.leave()}catch(e){}st.room=null;st.items=[];st.visit=null;$('#t2thread').querySelectorAll('.msg').forEach(m=>m.remove());$('#t2wait').hidden=false;codeIn.value='';$('#t1st').textContent='';show('t1')};
