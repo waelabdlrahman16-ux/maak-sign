@@ -88,7 +88,6 @@ details.more{margin-top:8px}details.more summary{cursor:pointer;font-size:14px;c
 @keyframes lift{0%,100%{transform:translateY(0)}20%,80%{transform:translateY(-12px)}}@keyframes wave{0%,20%,80%,100%{transform:rotate(0)}35%,65%{transform:rotate(-18deg)}50%{transform:rotate(14deg)}}
 @media (prefers-reduced-motion:reduce){.handloop,.handloop .ms,.steps3 .st{animation:none}}
 #sgPh:not([hidden])~#sgPill{display:none}
-html[dir=ltr] .ms[data-i="arrow_forward"],html[dir=ltr] .ms[data-i="chevron_left"],html[dir=ltr] .ms[data-i="arrow_back"],html[dir=ltr] .ms[data-i="chevron_right"]{transform:scaleX(-1)}
 </style>
 </head>
 <body>
@@ -100,7 +99,7 @@ var AD='٠١٢٣٤٥٦٧٨٩';function dg(t){return t.replace(/[٠-٩]/g,functio
 function tr(t){if(!t||!/[؀-ۿ]/.test(t))return dg(t||'');var k=t.trim();if(D[k]!=null)return t.replace(k,D[k]);var o=t.replace(/([0-9\u0660-\u0669]+) من ([0-9\u0660-\u0669]+)/g,'$1 of $2');for(var i=0;i<keys.length;i++){if(o.indexOf(keys[i])>-1)o=o.split(keys[i]).join(D[keys[i]])}if(/[\u0600-\u06FF]/.test(o.replace(/عربي/g,'')))return dg(t.replace(/([0-9\u0660-\u0669]+) من ([0-9\u0660-\u0669]+)/g,'$1 of $2'));return dg(o)}
 window.T=tr;var AT=['aria-label','placeholder','title','alt'];
 function node(n){if(n.nodeType===3){var pe=n.parentNode;if(pe&&(pe.nodeName==='SCRIPT'||pe.nodeName==='STYLE'||pe.nodeName==='TEXTAREA'))return;var v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;return}if(n.nodeType!==1||n.tagName==='SCRIPT'||n.tagName==='STYLE')return;AT.forEach(function(a){if(n.hasAttribute&&n.hasAttribute(a)){var v=n.getAttribute(a),w=tr(v);if(w!==v)n.setAttribute(a,w)}});if(n.tagName==='INPUT'&&/button|submit/.test(n.type)&&n.value)n.value=tr(n.value);for(var c=n.firstChild;c;c=c.nextSibling)node(c)}
-var de=document.documentElement;de.lang='en';de.dir='ltr';document.title='Maak Agent';
+var de=document.documentElement;de.lang='en';de.dir='ltr';var st=document.createElement('style');st.textContent='.ms[data-i="arrow_forward"],.ms[data-i="chevron_left"],.ms[data-i="arrow_back"],.ms[data-i="chevron_right"]{transform:scaleX(-1)}';document.head.appendChild(st);document.title='Maak Agent';
 var oc=window.confirm,oa=window.alert;window.confirm=function(m){return oc.call(window,tr(String(m)))};window.alert=function(m){return oa.call(window,tr(String(m)))};
 new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')node(m.target);else if(m.type==='attributes')node(m.target);else m.addedNodes.forEach(node)})}).observe(de,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:AT});
 document.addEventListener('DOMContentLoaded',function(){node(document.body);document.querySelectorAll('.langBtn,#langBtn').forEach(function(b){b.textContent='عربي'})});})();</script>
