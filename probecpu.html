@@ -1,0 +1,1055 @@
+<!doctype html><html><head>
+<script>if(location.protocol==="http:"&&/(^|\.)maaksign\.com$/.test(location.hostname))location.replace("https:"+location.href.slice(5))</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{height:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Maak Sign</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+<style>
+/* Layout: one phone-width column for the customer app; a two-column web page for the teller. Tokens = Maak UI Kit (Material 3, Wasel scheme). */
+:root{
+  --primary:#485e92;--on-primary:#ffffff;--primary-container:#adc3fe;--on-primary-container:#324574;
+  --secondary-container:#d9dff6;--on-secondary-container:#404659;
+  --surface:#faf8ff;--surface-low:#f4f3fa;--surface-c:#eeedf4;--surface-high:#e8e7ef;--surface-highest:#e2e2e9;
+  --on-surface:#1a1b21;--on-surface-variant:#44464f;--outline:#757780;--outline-variant:#c5c6d0;
+  --error:#b3261e;--inverse-surface:#282a2f;--inverse-on-surface:#eeedf4;--good:#2e7d4f;
+  --scrim:rgba(0,0,0,.32);
+  --font:"Google Sans Flex","Noto Sans Arabic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --primary:#b0c6ff;--on-primary:#152e60;--primary-container:#2e4578;--on-primary-container:#d9e2ff;
+  --secondary-container:#404659;--on-secondary-container:#dce2f9;
+  --surface:#121318;--surface-low:#1a1b21;--surface-c:#1e1f25;--surface-high:#282a2f;--surface-highest:#33343a;
+  --on-surface:#e2e2e9;--on-surface-variant:#c5c6d0;--outline:#8f909a;--outline-variant:#44464f;
+  --error:#f2b8b5;--inverse-surface:#e2e2e9;--inverse-on-surface:#33343a;--good:#7fd3a0;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --primary:#b0c6ff;--on-primary:#152e60;--primary-container:#2e4578;--on-primary-container:#d9e2ff;
+  --secondary-container:#404659;--on-secondary-container:#dce2f9;
+  --surface:#121318;--surface-low:#1a1b21;--surface-c:#1e1f25;--surface-high:#282a2f;--surface-highest:#33343a;
+  --on-surface:#e2e2e9;--on-surface-variant:#c5c6d0;--outline:#8f909a;--outline-variant:#44464f;
+  --error:#f2b8b5;--inverse-surface:#e2e2e9;--inverse-on-surface:#33343a;--good:#7fd3a0;color-scheme:dark}
+html,body{height:100%}
+#app{height:100%}
+body{background:var(--surface-low);color:var(--on-surface);font-family:var(--font);font-size:16px;line-height:1.5}
+*{box-sizing:border-box}
+button,input{font:inherit;color:inherit}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;display:inline-block;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";user-select:none;flex:none}
+.ms{width:1em;overflow:hidden}
+.ms.lg{font-size:48px}
+.ms.fill{font-variation-settings:"FILL" 1}
+/* ---------- shells ---------- */
+.phone{max-width:430px;overflow-x:hidden;margin:0 auto;height:100%;background:var(--surface);display:flex;flex-direction:column;position:relative}
+.door{flex:1 1 0;max-height:300px;min-height:180px;border:0;border-radius:28px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:start;text-decoration:none;cursor:pointer;font:inherit;position:relative;overflow:hidden}
+.door::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s}.door:hover::before{opacity:.08}.door:active::before{opacity:.12}
+.door .ms{font-size:64px;position:relative}.door-t{display:flex;flex-direction:column;gap:6px;position:relative}
+.door b{font-size:30px;line-height:42px;font-weight:700}.door small{font-size:17px;line-height:26px}
+.door-main{background:var(--primary);color:var(--on-primary)}.door-alt{background:var(--secondary-container);color:var(--on-secondary-container)}.door-alt .ms{color:var(--primary)}
+.web{min-height:100%;overflow-x:hidden;background:var(--surface);display:flex;flex-direction:column}
+.screen{display:flex;flex-direction:column;flex:1;min-height:0}
+.web .screen{min-height:100%}
+#c4 .body{padding-bottom:96px}
+.screen[hidden]{display:none!important}
+/* ---------- top app bar ---------- */
+.appbar{height:64px;display:flex;align-items:center;gap:4px;padding-inline:4px;flex:none}
+.appbar h1{flex:1;margin:0;font-size:22px;line-height:28px;font-weight:400;padding-inline-start:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .lead + h1{padding-inline-start:4px}
+.ib{width:48px;height:48px;border:0;background:none;border-radius:24px;display:grid;place-items:center;cursor:pointer;color:var(--on-surface-variant);position:relative}
+.ib::before{content:"";position:absolute;inset:4px;border-radius:20px;background:currentColor;opacity:0;transition:opacity .15s}
+.ib:hover::before{opacity:.08}.ib:active::before{opacity:.12}
+.ib.tonal{color:var(--on-secondary-container)}
+.ib.tonal::after{content:"";position:absolute;inset:4px;border-radius:20px;background:var(--secondary-container);z-index:-1}
+.ib.tonal{z-index:0}
+.ib .ms{position:relative}
+/* ---------- body ---------- */
+.body{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.body.flush{padding-inline:0;gap:4px}
+.pad{padding-inline:16px}
+.actions{display:flex;flex-direction:column;gap:8px;align-items:center;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));flex:none}
+.actions .row{display:flex;gap:8px;width:100%}
+.actions .row .btn{flex:1}
+.display{font-size:36px;line-height:44px;color:var(--primary);margin:0}
+.title-l{font-size:22px;line-height:28px;margin:0;font-weight:400}
+.title-m{font-size:16px;line-height:24px;font-weight:500;margin:0}
+.title-s{font-size:14px;line-height:20px;font-weight:500;color:var(--on-surface-variant);margin:0}
+.headline-s{font-size:24px;line-height:32px;margin:0;font-weight:400}
+.headline-m{font-size:28px;line-height:36px;margin:0;font-weight:400}
+.body-l{font-size:16px;line-height:24px;color:var(--on-surface-variant);margin:0}
+.intro-en{font-size:13px;line-height:20px;color:var(--on-surface-variant);margin:12px 0 0;text-align:left}.intro-en a{color:var(--primary);font-weight:500;display:inline-block;padding:10px 0;margin:-10px 0}
+.body-m{font-size:14px;line-height:20px;color:var(--on-surface-variant);margin:0}
+.label-l{font-size:14px;line-height:20px;font-weight:500;color:var(--on-surface-variant)}
+.mute{color:var(--on-surface-variant)}
+/* ---------- buttons ---------- */
+.btn{height:40px;border-radius:20px;border:0;padding-inline:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;cursor:pointer;position:relative;overflow:hidden;white-space:nowrap}
+.btn::before{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s}
+.btn:hover::before{opacity:.08}.btn:active::before{opacity:.12}
+.btn .ms{font-size:20px}
+.btn.wide{width:100%}
+.btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+.btn.outline{background:none;border:1px solid var(--outline-variant);color:var(--on-surface-variant)}
+.btn.text{background:none;color:var(--primary);padding-inline:12px}
+.btn:disabled{background:color-mix(in srgb,var(--on-surface) 12%,transparent);color:color-mix(in srgb,var(--on-surface) 38%,transparent);cursor:default;border-color:transparent}
+.btn:disabled::before{display:none}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+/* ---------- list ---------- */
+.li{min-height:56px;display:flex;align-items:center;gap:16px;padding:8px 24px 8px 16px;padding-inline-start:16px;padding-inline-end:24px;background:none;border:0;width:100%;text-align:start;cursor:pointer;position:relative;color:var(--on-surface)}
+.li::before{content:"";position:absolute;inset:0;background:var(--on-surface);opacity:0;transition:opacity .15s}
+.li:hover::before{opacity:.06}
+.li.two{min-height:72px}
+.li .lead{color:var(--on-surface-variant)}
+.li .txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.li .txt b{font-weight:400;font-size:16px;line-height:24px}
+.li .txt small{font-size:14px;line-height:20px;color:var(--on-surface-variant)}
+.li .trail{color:var(--on-surface-variant)}
+.li.sel{background:var(--secondary-container);color:var(--on-secondary-container)}
+.li.sel .lead,.li.sel .trail,.li.sel small{color:var(--on-secondary-container)}
+.li[aria-disabled="true"]{opacity:.38;cursor:default}
+.li[aria-disabled="true"]::before{display:none}
+.li.static{cursor:default}.li.static::before{display:none}
+/* ---------- cards ---------- */
+.card{border-radius:12px;overflow:hidden;position:relative}
+.card.filled{background:var(--surface-highest)}
+.card.outlined{background:var(--surface);border:1px solid var(--outline-variant)}
+.card .in{padding:16px 20px;display:flex;flex-direction:column;gap:8px}
+.media{display:grid;place-items:center;background:var(--surface-highest);position:relative;min-height:160px;border-radius:12px;overflow:hidden;color:var(--on-surface-variant)}
+.media video,.media canvas{width:100%;height:100%;object-fit:cover;display:block}
+.media .ph{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;text-align:center;font-size:14px}
+
+/* Test mode for hearing proxy testers: ?notext hides all words on the customer screens, so the flow must work from icons and sign video alone */
+.notext .phone :is(h1,p,b,label,span,a,.chip,.btn,.txt,.status){color:transparent!important;text-shadow:0 0 9px var(--on-surface-variant)!important}
+.notext .phone .ms{color:var(--on-surface)!important;text-shadow:none!important}.notext .phone .btn.filled .ms{color:var(--on-primary)!important}
+.notext .phone input{color:transparent;text-shadow:0 0 9px var(--on-surface)}
+.media>video,.media>canvas,.media>.ph{grid-area:1/1}.media>.ph{z-index:1;align-self:center}.media{flex-shrink:0}.cam .ph{padding:12px;gap:6px}
+.media .over{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.media .over .ms{font-size:56px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+.cam{border:1px solid var(--outline-variant);background:var(--surface)}
+.cam video{transform:scaleX(-1)}.cam canvas{position:absolute;inset:0;transform:scaleX(-1)}
+.pill{position:absolute;top:10px;inset-inline-start:10px;background:var(--inverse-surface);color:var(--inverse-on-surface);font-size:12px;line-height:16px;padding:4px 10px;border-radius:8px}
+.pill.rec{background:var(--error);color:#fff}
+.perf{position:absolute;bottom:8px;inset-inline-end:8px;background:rgba(0,0,0,.55);color:#fff;font:12px/16px var(--font);padding:2px 8px;border-radius:6px;direction:ltr;font-variant-numeric:tabular-nums}
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;min-height:32px;align-items:center}
+.chip{height:32px;border-radius:8px;border:1px solid var(--outline-variant);padding-inline:12px 8px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--on-surface-variant);background:var(--surface)}
+.chip button{border:0;background:none;padding:0;display:grid;place-items:center;cursor:pointer;color:inherit;position:relative}
+.chip button::before{content:"";position:absolute;inset:-11px}
+.chip button .ms{font-size:18px}
+/* ---------- switch ---------- */
+.sw{width:52px;height:32px;border-radius:16px;border:2px solid var(--outline);background:var(--surface-highest);position:relative;flex:none;cursor:pointer;padding:0}
+.sw::before{content:"";position:absolute;inset:-10px -4px}
+.sw::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:var(--outline);top:6px;inset-inline-end:6px;transition:all .15s}
+.sw[aria-checked="true"]{background:var(--primary);border-color:var(--primary)}
+.sw[aria-checked="true"]::after{width:24px;height:24px;top:2px;inset-inline-end:22px;background:var(--on-primary)}
+.sw:disabled{opacity:.38}
+.setrow{display:flex;align-items:center;gap:16px;padding:12px 24px 12px 16px;padding-inline-start:16px;padding-inline-end:24px}
+.setrow .txt{flex:1;display:flex;flex-direction:column}
+.setrow .txt b{font-weight:400}
+.setrow .txt small{font-size:14px;color:var(--on-surface-variant)}
+/* ---------- FAB + nav ---------- */
+.fab{position:absolute;inset-inline-end:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));height:56px;border-radius:16px;border:0;background:var(--primary-container);color:var(--on-primary-container);display:flex;align-items:center;gap:12px;padding-inline:16px 20px;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,.18)}
+.navbar{height:calc(80px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--surface-c);display:grid;grid-template-columns:repeat(3,1fr);flex:none}
+.navbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;line-height:16px;font-weight:500;color:var(--on-surface-variant);cursor:pointer}
+.navbar .ind{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.navbar button[aria-current="true"]{color:var(--on-surface)}
+.navbar button[aria-current="true"] .ind{background:var(--secondary-container);color:var(--on-secondary-container)}
+/* ---------- misc ---------- */
+.visit-sum{display:flex;align-items:center;gap:16px;padding:16px 20px;color:var(--primary)}
+.visit-sum .n{font-size:22px;color:var(--on-surface)}
+.code{font-size:44px;line-height:52px;letter-spacing:.08em;font-variant-numeric:tabular-nums;direction:ltr;text-align:center;margin:0;display:flex;gap:16px;justify-content:center}
+.code span{unicode-bidi:isolate}
+.qr{background:#fff;padding:16px;border-radius:12px;display:grid;place-items:center;width:232px;height:232px;margin-inline:auto}
+.qr img,.qr canvas{width:200px!important;height:200px!important}
+.waiting{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--on-surface-variant)}
+.spin{width:24px;height:24px;border-radius:50%;border:3px solid var(--primary-container);border-top-color:var(--primary);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+.banner{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:var(--surface-highest);width:100%}
+.banner p{flex:1;margin:0}
+.status{font-size:14px;color:var(--on-surface-variant);text-align:center;margin:0;min-height:20px}
+.status.warn{color:var(--error)}
+.teller-msg{display:flex;align-items:center;gap:8px}
+.teller-msg p{flex:1;margin:0;font-size:16px;font-weight:500}
+.snack{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));inset-inline:16px;max-width:400px;margin-inline:auto;background:var(--inverse-surface);color:var(--inverse-on-surface);padding:14px 16px;border-radius:8px;font-size:14px;z-index:30;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.scrim{position:fixed;inset:0;background:var(--scrim);display:grid;place-items:center;z-index:20;padding:16px}
+.dialog{background:var(--surface-high);border-radius:28px;padding:24px;width:min(360px,100%);display:flex;flex-direction:column;gap:16px;text-align:center}
+.dialog .acts{display:flex;justify-content:flex-end;gap:8px}
+.field{position:relative;border:1px solid var(--outline);border-radius:4px;display:flex;align-items:center;min-height:56px;padding-inline:16px 4px}
+.field:focus-within{border:2px solid var(--primary)}
+.field label{position:absolute;top:-9px;inset-inline-start:12px;background:var(--surface);padding-inline:4px;font-size:12px;line-height:16px;color:var(--on-surface-variant)}
+.field input{flex:1;border:0;background:none;outline:0;font-size:16px;min-width:0;height:52px}
+.field input.num{direction:ltr;text-align:right;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.amount-row{display:flex;gap:8px;align-items:center;padding-inline:16px}
+/* ---------- teller web ---------- */
+.tbody{flex:1;display:flex;gap:24px;padding:16px max(24px,env(safe-area-inset-right,0px)) 24px max(24px,env(safe-area-inset-left,0px));min-height:0}
+.thread{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0;overflow:auto}
+.reply{width:440px;flex:none;display:flex;flex-direction:column;gap:12px}
+.msg{border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:6px}
+.msg.c{background:var(--surface-highest)}
+.msg.t{background:var(--surface);border:1px solid var(--outline-variant)}
+.msg .who{font-size:14px;font-weight:500;color:var(--on-surface-variant)}
+.msg .say{font-size:22px;line-height:28px}
+.msg .meta{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--on-surface-variant)}
+.msg .meta .ms{font-size:20px;color:var(--primary)}
+.center{flex:1;display:flex;justify-content:center;padding:48px 16px}
+.panel{width:min(480px,100%);display:flex;flex-direction:column;gap:16px}
+.preview{height:180px}
+.sheet{position:fixed;inset:auto 0 0 0;max-width:430px;margin-inline:auto;background:var(--surface-low);border-radius:28px 28px 0 0;padding:8px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:75%;display:flex;flex-direction:column;gap:12px;z-index:21}
+.sheet .handle{width:32px;height:4px;border-radius:2px;background:var(--outline);opacity:.4;margin:8px auto 0}
+.words{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:auto}
+.word{min-height:56px;border-radius:12px;border:1px solid var(--outline-variant);background:var(--surface);display:flex;align-items:center;gap:8px;padding-inline:12px;cursor:pointer;font-size:16px;text-align:start}
+.word .ms{color:var(--primary)}
+.word:hover{background:var(--surface-c)}
+@media (max-width:820px){.tbody{flex-direction:column}.reply{width:auto}}
+</style>
+
+<div id="app"></div>
+
+<!-- =================== CUSTOMER =================== -->
+<template id="customer">
+<div class="phone">
+
+<section class="screen" id="c0" hidden>
+  <div class="appbar"><h1 style="color:var(--primary);font-weight:700">معاك</h1><button class="btn tonal" data-help style="height:48px;margin-inline-end:8px"><span class="ms">play_circle</span>بالإشارة</button></div>
+  <div class="body" style="gap:16px;padding-top:12px">
+    <a class="door door-main" href="agent/"><span class="ms" aria-hidden="true">route</span><span class="door-t"><b>جهّز مشواري</b><small>بنك · سجل مدني · تضامن · مستشفى</small></span></a>
+    <button class="door door-alt" id="c0talk"><span class="ms" aria-hidden="true">sign_language</span><span class="door-t"><b>أكلّم الموظف</b><small>أنا عند الشباك دلوقتي</small></span></button>
+    <p class="intro-en" lang="en" dir="ltr" style="margin-top:auto">Maak Sign is an AI agent that helps deaf Egyptians get counter errands done. <a href="https://github.com/waelabdlrahman16-ux/maak-sign#readme" target="_blank" rel="noopener" style="padding:12px 0;margin:-12px 0">About Maak</a></p>
+  </div>
+</section>
+
+<section class="screen" id="c1" hidden>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body">
+    <p class="body-l">اتكلم بالإشارة، ومعاك يوصّل كلامك</p>
+    <div class="media" style="height:420px"><video data-clip="kg_3amel_eh" muted playsinline loop autoplay></video></div>
+    <p class="intro-en" lang="en" dir="ltr">Maak Sign helps deaf customers talk to bank tellers in Egyptian Sign Language. Bank teller? <a href="#teller">Open the teller screen</a></p>
+  </div>
+  <div class="actions">
+    <button class="btn filled wide" data-go="c2"><span class="ms">sign_language</span>ابدأ</button>
+    <button class="btn text" data-go="c4"><span class="ms">smartphone</span>عندي حساب على جهاز تاني</button>
+  </div>
+</section>
+
+<section class="screen" id="c2" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>قبل ما نبدأ</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <div class="pad"><div class="media" style="height:200px"><div class="ph"><span class="ms lg">play_circle</span>الخصوصية بلغة الإشارة</div></div></div>
+    <div class="li static"><span class="ms lead">smartphone</span><span class="txt"><b>الفيديو مايخرجش من موبايلك</b></span></div>
+    <div class="li static"><span class="ms lead">lock</span><span class="txt"><b>الكلام بس بيروح للمساعد</b></span></div>
+    <div class="setrow"><span class="txt"><b>أستخدم معاك</b><small>مطلوب</small></span><button class="sw" role="switch" aria-checked="true" disabled aria-label="أستخدم معاك"></button></div>
+    <div class="setrow"><span class="txt"><b>أشارك إشاراتي علشان معاك يتحسن</b><small>اختياري، تقدر تقفله في أي وقت</small></span><button class="sw" role="switch" aria-checked="false" data-setting="share" aria-label="أشارك إشاراتي"></button></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="c2ok"><span class="ms">check_circle</span>موافق</button></div>
+</section>
+
+<section class="screen" id="rv" hidden>
+  <div class="appbar"><span></span><h1>ساعد معاك يفهم الإشارة</h1><span></span></div>
+  <div class="body flush">
+    <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">هتعمل ١٥ إشارة بنك، كل إشارة ٣ مرات. حوالي ١٠ دقايق.</p></div>
+    <div class="li static"><span class="ms lead">front_hand</span><span class="txt"><b>بنسجّل نقط حركة الإيد بس</b><small>من غير فيديو ومن غير وشّك</small></span></div>
+    <div class="li static"><span class="ms lead">school</span><span class="txt"><b>علشان معاك يفهم ناس أكتر</b><small>مش هتتنشر ومش هتتباع</small></span></div>
+    <div class="li static"><span class="ms lead">delete</span><span class="txt"><b>تقدر تطلب مسحها في أي وقت</b><small>بالكود اللي هيظهرلك في الآخر</small></span></div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:8px;padding-block:8px">
+      <p class="label-l">إيدك الأساسية</p>
+      <div class="chips" data-rvpick="hand"><button class="btn tonal" data-v="R" aria-pressed="false">يمين</button><button class="btn tonal" data-v="L" aria-pressed="false">شمال</button></div>
+      <p class="label-l">علاقتك بلغة الإشارة</p>
+      <div class="chips" data-rvpick="rel"><button class="btn tonal" data-v="deaf" aria-pressed="false">أصم / ضعيف سمع</button><button class="btn tonal" data-v="interp" aria-pressed="false">مترجم إشارة</button><button class="btn tonal" data-v="family" aria-pressed="false">أهل أو صديق لأصم</button><button class="btn tonal" data-v="learner" aria-pressed="false">بتعلّم الإشارة</button></div>
+    </div>
+    <div class="setrow"><span class="txt"><b>عندي ١٨ سنة أو أكتر</b></span><button class="sw" role="switch" aria-checked="false" data-rv="adult" aria-label="عندي ١٨ سنة أو أكتر"></button></div>
+    <div class="setrow"><span class="txt"><b>موافق إن نقط حركة إيدي تتسجل لتحسين معاك</b></span><button class="sw" role="switch" aria-checked="false" data-rv="agree" aria-label="موافق على التسجيل"></button></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="rvstart" disabled><span class="ms">videocam</span>ابدأ</button></div>
+</section>
+
+<section class="screen" id="rvdone" hidden>
+  <div class="appbar"><span></span><h1>شكرًا ليك</h1><span></span></div>
+  <div class="body">
+    <div class="media" style="height:200px"><div class="ph"><span class="ms lg">volunteer_activism</span><b>إشاراتك هتساعد الصم في مصر</b></div></div>
+    <p class="title-l" style="text-align:center" id="rvmsg"></p>
+    <p class="status">الكود بتاعك</p>
+    <p class="title-l num" style="text-align:center;letter-spacing:.2em" id="rvcode"></p>
+    <p class="status" id="rvpending"></p>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="rvretry" hidden><span class="ms">cloud_upload</span>ابعت الباقي</button></div>
+</section>
+
+<section class="screen" id="c3" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>علّم معاك إشاراتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body">
+    <span class="label-l" id="c3count">إشارة ١ من ١٨</span>
+    <div class="media" style="height:180px"><video id="c3ref" muted playsinline loop></video><iframe id="c3yt" hidden title="الإشارة على يوتيوب" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe><div class="ph" id="c3noref" hidden><span class="ms lg">sign_language</span><b id="c3word2"></b>اعملها زي ما بتعملها عادي</div></div>
+    <p class="status" id="c3ytsrc" hidden></p>
+    <p class="title-l" id="c3word" style="text-align:center"></p>
+    <div class="media cam" style="height:240px"><video id="c3v" muted playsinline></video><canvas id="c3c"></canvas><span class="pill" id="c3pill">الكاميرا</span><span class="perf" id="c3perf" hidden></span>
+      <div class="ph" id="c3ph"><span class="ms lg">videocam</span>ارفع إيدك واعمل الإشارة<button class="btn tonal" id="c3cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c3file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c3file" accept="video/*" capture="user" hidden></div>
+    </div>
+    <p class="status" id="c3st">اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة</p>
+  </div>
+  <div class="actions">
+    <button class="btn filled wide" id="c3next"><span class="ms">chevron_left</span>التالي</button>
+    <button class="btn text" id="c3skip">خلّصت، روح للرئيسية</button>
+  </div>
+</section>
+
+<section class="screen" id="c4" hidden>
+  <div class="appbar"><button class="ib lead" data-go="c0" aria-label="الرئيسية"><span class="ms">arrow_forward</span></button><h1>معاك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-go="c14" aria-label="الإعدادات"><span class="ms">settings</span></button></div>
+  <div class="body flush">
+    <button class="li two" data-go="c5"><span class="ms lead">account_balance</span><span class="txt"><b>بنك</b><small>سحب · إيداع · كارت</small></span><span class="ms trail">chevron_left</span></button>
+    <div class="li two" aria-disabled="true"><span class="ms lead">local_hospital</span><span class="txt"><b>مستشفى</b><small>قريبًا</small></span></div>
+    <div class="li two" aria-disabled="true"><span class="ms lead">local_pharmacy</span><span class="txt"><b>صيدلية</b><small>قريبًا</small></span></div>
+    <div class="pad" id="c4last" hidden style="display:flex;flex-direction:column;gap:8px;padding-top:16px">
+      <span class="title-s">آخر زيارة</span>
+      <button class="card filled" style="border:0;cursor:pointer;text-align:start" data-go="c11"><div class="visit-sum"><span class="ms lg">credit_card</span><span class="ms">chevron_left</span><span class="ms lg">schedule</span><span class="n" id="c4lastn"></span></div></button>
+    </div>
+    <p class="status" id="c4trained" style="padding-top:16px"></p>
+  </div>
+  <button class="fab" data-go="c7"><span class="ms">sign_language</span>ابدأ محادثة</button>
+  <nav class="navbar" data-nav="c4"></nav>
+</section>
+
+<section class="screen" id="c5" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>جهّز زيارتك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <span class="title-s pad" style="padding-top:8px">عايز إيه؟</span>
+    <div id="c5opts"></div>
+    <div class="pad" style="padding-block:8px"><div class="media" style="height:120px"><video id="c5vid" muted playsinline loop autoplay></video></div></div>
+    <span class="title-s pad">هتحتاج</span>
+    <div class="li static"><span class="ms lead">id_card</span><span class="txt"><b>البطاقة الشخصية</b></span></div>
+    <div class="li static two" id="c5amtrow"><span class="ms lead">payments</span><span class="txt"><b id="c5amt"></b><small>المبلغ</small></span><button class="ib" id="c5edit" aria-label="تعديل المبلغ"><span class="ms">edit</span></button></div>
+    <div class="amount-row" id="c5field" hidden><div class="field" style="flex:1"><label for="c5in">المبلغ بالجنيه</label><input id="c5in" class="num" inputmode="numeric"></div><button class="btn tonal" id="c5ok">تمام</button></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" data-go="c6"><span class="ms">description</span>جهّز كارت الزيارة</button></div>
+</section>
+
+<section class="screen" id="c6" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>كارت الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span class="ms">volume_up</span></button></div>
+  <div class="body">
+    <p class="body-l">ورّي الكارت ده للموظف</p>
+    <div class="card outlined"><div class="in" style="gap:12px;padding:20px">
+      <div style="display:flex;align-items:center;gap:12px"><span class="ms" style="font-size:32px;color:var(--primary)">sign_language</span><span class="title-m" style="font-weight:400">العميل أصم ويستخدم لغة الإشارة</span></div>
+      <p class="headline-s" id="c6want"></p>
+      <p class="title-l" style="color:var(--primary)" id="c6amt"></p>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="ms mute">id_card</span>البطاقة الشخصية<span class="ms mute">credit_card</span>كارت البنك</div>
+    </div></div>
+    <div class="li static two" style="padding-inline:0"><span class="ms lead">info</span><span class="txt"><b>للموظف</b><small>افتح maaksign.com/staff على جهازك واكتب رقم التوصيل علشان تكلّمه كتابة</small></span></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" data-go="c7"><span class="ms">qr_code_2</span>أنا عند الشباك</button><button class="btn outline wide" data-back><span class="ms">edit</span>عدّل الطلب</button></div>
+</section>
+
+<section class="screen" id="c7" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>وصّل بالموظف</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body" style="align-items:center;padding-top:24px;gap:16px">
+    <p class="body-l" style="text-align:center">للموظف: افتح <b dir="ltr" style="color:var(--primary)">maaksign.com/staff</b> واكتب الرقم ده</p>
+    <div class="card filled" style="padding:16px"><div class="qr" id="c7qr"></div></div>
+    <p class="code" id="c7code"></p>
+    <div class="waiting" id="c7wait"><span class="spin" aria-hidden="true"></span><span id="c7st">مستني الموظف…</span></div>
+  </div>
+  <div class="actions"><button class="btn text" data-go="c8"><span class="ms">smartphone</span>كمّل على موبايلي بس</button><p class="body-m" style="text-align:center">من غير توصيل: الموظف يقرا من شاشتك</p></div>
+</section>
+
+<section class="screen" id="c8" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1 id="c8title">عند الشباك</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button><button class="ib" data-voice aria-label="الصوت"><span class="ms">volume_up</span></button></div>
+  <div class="body" style="gap:8px">
+    <span class="label-l">الموظف</span>
+    <div class="media" style="height:200px" id="c8tbox"><video id="c8tv" muted playsinline></video><div class="ph" id="c8tph"><span class="ms lg">play_circle</span>رد الموظف هيظهر هنا بالإشارة</div></div>
+    <div class="teller-msg"><p id="c8ttext" class="mute">لسه مفيش رد</p><button class="ib tonal" id="c8replay" aria-label="أعيد إشارة الموظف"><span class="ms">replay</span></button></div>
+    <div class="chips" id="c8twords" hidden></div>
+    <span class="label-l" style="margin-top:8px">إنت</span>
+    <div class="media cam" style="height:300px"><video id="c8v" muted playsinline></video><canvas id="c8c"></canvas><span class="pill" id="c8pill">الكاميرا</span><span class="perf" id="c8perf" hidden></span>
+      <div class="ph" id="c8ph"><span class="ms lg">videocam</span>اعمل الإشارة<button class="btn tonal" id="c8cam"><span class="ms">videocam</span>شغّل الكاميرا</button><label class="btn text" for="c8file"><span class="ms">video_call</span>أو صوّر فيديو</label><input type="file" id="c8file" accept="video/*" capture="user" hidden></div>
+    </div>
+    <div class="chips" id="c8chips" aria-live="polite"></div>
+    <button class="btn text" data-pick style="align-self:flex-start"><span class="ms">touch_app</span>مش بيفهمني؟ اختار الكلمة بإيدك</button>
+  </div>
+  <div class="actions">
+    <div class="banner" id="c8end" hidden><p>الموظف خلّص الزيارة</p><button class="btn text" data-go="c11">شوف الملخص</button></div>
+    <div class="row"><button class="btn filled" id="c8send"><span class="ms">send</span>ابعت</button><button class="btn tonal" id="c8clear"><span class="ms">close</span>امسح</button></div>
+  </div>
+</section>
+
+<section class="screen" id="c9" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>اتأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body">
+    <p class="body-l">معاك فهمك كده:</p>
+    <div class="chips" id="c9chips"></div>
+    <p class="headline-m" id="c9text"></p>
+    <p class="title-l" style="color:var(--primary)">صح؟</p>
+  </div>
+  <div class="actions"><button class="btn filled wide" id="c9yes"><span class="ms">check_circle</span>أيوه، ابعت</button><button class="btn outline wide" id="c9no"><span class="ms">replay</span>لأ، أعيد</button></div>
+</section>
+
+<section class="screen" id="c10" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>مش متأكد</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">قصدك أنهي إشارة؟</p><p class="body-m">دوس على الإشارة اللي قصدك عليها</p></div>
+    <div id="c10opts"></div>
+    <div class="pad"><div class="media" style="height:160px"><video id="c10v" muted playsinline loop></video><div class="ph" id="c10ph"><span class="ms lg">play_circle</span>معاينة الإشارة</div></div></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" data-go="c8"><span class="ms">replay</span>أعيد الإشارة</button><button class="btn text" data-pick><span class="ms">touch_app</span>مش لاقيها؟ اختار الكلمة</button></div>
+</section>
+
+<section class="screen" id="c11" hidden>
+  <div class="appbar"><button class="ib lead" data-go="c4" aria-label="قفل"><span class="ms">close</span></button><h1>ملخص الزيارة</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <div class="pad" style="padding-bottom:8px"><div class="media" style="height:240px"><video data-clip="kg_kwayes" muted playsinline loop autoplay></video></div></div>
+    <div id="c11list"></div>
+  </div>
+  <div class="actions"><button class="btn filled wide" data-go="c4"><span class="ms">home</span>رجوع للرئيسية</button></div>
+</section>
+
+<section class="screen" id="c12" hidden>
+  <div class="appbar"><h1>زياراتي</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush" id="c12list"></div>
+  <nav class="navbar" data-nav="c12"></nav>
+</section>
+
+<section class="screen" id="c13" hidden>
+  <div class="appbar"><h1>تمرين</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <div class="pad" style="display:flex;flex-direction:column;gap:4px;padding-block:8px"><p class="title-l">اتمرّن على إشارات البنك</p><p class="body-m">معاك بيتعلّم طريقتك كل ما تتمرّن</p></div>
+    <div id="c13list"></div>
+  </div>
+  <nav class="navbar" data-nav="c13"></nav>
+</section>
+
+<section class="screen" id="c14" hidden>
+  <div class="appbar"><button class="ib lead" data-back aria-label="رجوع"><span class="ms">arrow_forward</span></button><h1>الإعدادات</h1><button class="ib" data-help aria-label="شرح الشاشة بالإشارة"><span class="ms">play_circle</span></button></div>
+  <div class="body flush">
+    <div class="setrow"><span class="txt"><b>الصوت</b><small>الموظف يسمع كلامك بصوت على جهازه</small></span><button class="sw" role="switch" aria-checked="false" data-setting="voice" aria-label="الصوت"></button></div>
+    <div class="setrow"><span class="txt"><b>عدّاد السرعة</b><small>يظهر سرعة تتبع الإيد (للتجربة)</small></span><button class="sw" role="switch" aria-checked="true" data-setting="perf" aria-label="عدّاد السرعة"></button></div>
+    <div class="setrow"><span class="txt"><b>أشارك إشاراتي علشان معاك يتحسن</b><small>تقدر تقفله في أي وقت</small></span><button class="sw" role="switch" aria-checked="false" data-setting="share" aria-label="أشارك إشاراتي"></button></div>
+    <button class="li two" id="c14reset"><span class="ms lead">restart_alt</span><span class="txt"><b>امسح الإشارات اللي اتعلمها</b><small id="c14n"></small></span></button>
+    <button class="li two" data-teller><span class="ms lead">desktop_windows</span><span class="txt"><b>افتح شاشة الموظف</b><small>للتجربة على نفس الجهاز</small></span></button>
+  </div>
+</section>
+
+</div>
+</template>
+
+<!-- =================== TELLER =================== -->
+<template id="teller">
+<div class="web">
+
+<section class="screen" id="t1">
+  <div class="appbar"><h1>معاك · شاشة الموظف</h1><button class="ib" data-customer aria-label="شاشة العميل"><span class="ms">smartphone</span></button></div>
+  <div class="center"><div class="panel">
+    <p class="headline-m">وصّل بالعميل</p>
+    <p class="body-l">اكتب الرقم اللي ظاهر على موبايل العميل</p>
+    <div class="field"><label for="t1code">رقم التوصيل</label><input id="t1code" class="num" inputmode="numeric" maxlength="7" placeholder="482913" autocomplete="off"></div>
+    <button class="btn filled wide" id="t1go"><span class="ms">check_circle</span>وصّل</button>
+    <p class="status" id="t1st"></p>
+  </div></div>
+</section>
+
+<section class="screen" id="t2" hidden>
+  <div class="appbar"><h1 id="t2title">العميل</h1><button class="btn text" id="t2end"><span class="ms">task_alt</span>إنهاء الزيارة</button><button class="ib" id="t2voice" aria-label="اقرا كلام العميل بصوت" aria-pressed="false"><span class="ms">volume_off</span></button></div>
+  <div class="tbody">
+    <div class="thread" id="t2thread"><p class="title-m mute">المحادثة</p><div class="waiting" id="t2wait"><span class="spin" aria-hidden="true"></span>مستني العميل يبعت…</div></div>
+    <div class="reply">
+      <p class="title-m mute">ردّك</p>
+      <div id="t2phr" style="display:flex;flex-direction:column;max-height:300px;overflow:auto"></div>
+      <div class="media preview" id="t2prev"><video id="t2pv" muted playsinline></video><div class="ph" id="t2pph"><span class="ms lg">play_circle</span>معاينة الإشارة</div></div>
+      <div class="field"><label for="t2in">اكتب أو اتكلم</label><input id="t2in" autocomplete="off"><button class="ib" id="t2mic" aria-label="اتكلم" hidden><span class="ms">mic</span></button></div>
+      <button class="btn filled wide" id="t2send"><span class="ms">send</span>ابعت بالإشارة</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="t4" hidden>
+  <div class="appbar"><h1>معاك · شاشة الموظف</h1></div>
+  <div class="center"><div class="panel">
+    <p class="headline-m">ملخص الزيارة</p>
+    <p class="body-l">العميل شاف الملخص ده بالإشارة على موبايله</p>
+    <div id="t4list"></div>
+    <div style="display:flex;gap:12px"><button class="btn filled" style="flex:1" id="t4new"><span class="ms">qr_code_2</span>عميل جديد</button></div>
+  </div></div>
+</section>
+
+</div>
+</template>
+
+<template id="help"><div class="scrim" role="dialog" aria-modal="true" aria-label="شرح الشاشة بالإشارة"><div class="dialog">
+  <p class="headline-s">شرح الشاشة بلغة الإشارة</p>
+  <div class="media" style="height:200px"><div class="ph"><span class="ms lg">sign_language</span>فيديو الشرح لسه بيتسجّل مع متطوعين صم</div></div>
+  <div class="acts"><button class="btn text" data-close><span class="ms">close</span>قفل</button></div>
+</div></div></template>
+
+<template id="picker"><div class="scrim" style="place-items:end center;padding:0" data-scrim></div><div class="sheet" role="dialog" aria-modal="true" aria-label="اختار الكلمة"><div class="handle"></div><p class="title-l">اختار الكلمة</p><div class="words" data-words></div><button class="btn text" data-close style="align-self:center"><span class="ms">close</span>قفل</button></div></template>
+<template id="confirm"><div class="scrim" role="dialog" aria-modal="true" aria-label="تأكيد الرد"><div class="dialog">
+  <span class="ms" style="color:var(--primary);margin-inline:auto">sign_language</span>
+  <p class="headline-s" data-title>هيتبعت للعميل بالإشارة</p>
+  <p class="body-l" data-text></p>
+  <div class="media" style="height:160px"><video data-v muted playsinline></video><div class="ph" data-ph><span class="ms lg">play_circle</span><span data-phtext></span></div></div>
+  <div class="acts"><button class="btn text" data-no>عدّل</button><button class="btn text" data-yes>ابعت</button></div>
+</div></div></template>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+/* =========================================================
+   Data: signs the recognizer knows, bank sentences, teller phrases
+   ========================================================= */
+const SIGNS=[
+ {k:'3waz',ar:'عايز'},{k:'ashab',ar:'أسحب'},{k:'awda3',ar:'أودع'},{k:'flos',ar:'فلوس',clip:'flos'},
+ {k:'bta2a',ar:'البطاقة'},{k:'gedid',ar:'جديدة',clip:'gedid'},{k:'msh_shaghal',ar:'مش شغالة'},{k:'kam',ar:'كام',clip:'kam'},
+ {k:'hesab',ar:'الحساب',clip:'hesab'},{k:'emta',ar:'إمتى',clip:'emta'},{k:'aywa',ar:'أيوه',clip:'aywa'},{k:'la',ar:'لأ',clip:'la'},
+ {k:'tmam',ar:'تمام',clip:'tmam'},{k:'tany',ar:'تاني',clip:'tany'},{k:'shokran',ar:'شكراً',clip:'kg_shokran'},{k:'salam',ar:'السلام عليكم',clip:'salam'},
+ {k:'sabah',ar:'صباح الخير',clip:'sabah'},{k:'ana',ar:'أنا',clip:'ana'},
+ {k:'mo7tag',ar:'محتاج',clip:'kg_mo7tag'},{k:'mosa3da',ar:'مساعدة',clip:'kg_mosa3da'},{k:'fein',ar:'فين',clip:'kg_fein'},
+ {k:'asef',ar:'آسف',clip:'kg_asef'},{k:'kwayes',ar:'كويس',clip:'kg_kwayes'},{k:'3amel_eh',ar:'عامل إيه',clip:'kg_3amel_eh'},
+ {k:'bdal_fa2ed',ar:'بدل فاقد'},{k:'bdal_talef',ar:'بدل تالف'},{k:'raqam_serri',ar:'الرقم السري'},
+ {k:'bank',ar:'البنك'},{k:'tawqee3',ar:'توقيع'},{k:'telefon',ar:'تليفون'},{k:'asam',ar:'أصم'},{k:'estelam',ar:'استلام'},{k:'meeza',ar:'بطاقة ميزة'},{k:'sora',ar:'صورة'},{k:'besor3a',ar:'بسرعة'},{k:'ba3d',ar:'بعدين'},{k:'akid',ar:'أكيد'},{k:'7ader',ar:'حاضر'},{k:'ahlan',ar:'أهلاً'},
+];
+/* Only openly licensed (CC0) sign videos are shown. Other reference clips are training data only. */
+const okClip=c=>typeof c==='string'&&/^kg_/.test(c);
+SIGNS.forEach(s=>{if(!okClip(s.clip))delete s.clip});
+const AR=Object.fromEntries(SIGNS.map(s=>[s.k,s.ar])), CLIP=Object.fromEntries(SIGNS.map(s=>[s.k,s.clip]));
+const RULES=[
+ [['3waz','ashab','flos'],'عايز أسحب فلوس'],[['3waz','awda3','flos'],'عايز أودع فلوس'],
+ [['ashab','flos'],'عايز أسحب فلوس'],[['awda3','flos'],'عايز أودع فلوس'],
+ [['bta2a','msh_shaghal'],'البطاقة بتاعتي مش شغالة'],[['ana', 'asam'],'أنا أصم'],[['asam'],'أنا أصم'],[['meeza', 'msh_shaghal'],'بطاقة ميزة بتاعتي مش شغالة'],[['3waz', 'meeza'],'عايز بطاقة ميزة'],[['meeza'],'عندي سؤال عن بطاقة ميزة'],[['estelam', 'bta2a'],'عايز أستلم البطاقة'],[['estelam'],'عايز أستلم'],[['tawqee3', 'fein'],'أوقّع فين؟'],[['tawqee3'],'فين التوقيع؟'],[['sora', 'bta2a'],'معايا صورة البطاقة'],[['sora'],'محتاج صورة؟'],[['telefon'],'رقم التليفون'],[['ahlan'],'أهلاً'],[['akid'],'أكيد'],[['7ader'],'حاضر'],[['besor3a'],'بسرعة لو سمحت'],[['ba3d'],'بعدين'],[['bank'],'البنك'],
+ [['bta2a','bdal_fa2ed'],'عايز بطاقة بدل فاقد'],[['bdal_fa2ed'],'عايز بطاقة بدل فاقد'],[['bta2a','bdal_talef'],'عايز بطاقة بدل تالف'],[['bdal_talef'],'عايز بطاقة بدل تالف'],
+ [['raqam_serri','msh_shaghal'],'الرقم السري مش شغال'],[['3waz','raqam_serri','gedid'],'عايز رقم سري جديد'],[['raqam_serri'],'عندي مشكلة في الرقم السري'],[['msh_shaghal'],'مش شغالة'],[['3waz','bta2a','gedid'],'عايز بطاقة جديدة'],[['bta2a','gedid'],'عايز بطاقة جديدة'],
+ [['bta2a','gedid','emta'],'البطاقة الجديدة هتوصل إمتى؟'],[['flos','kam'],'كام فلوس في حسابي؟'],[['hesab','flos','kam'],'كام فلوس في حسابي؟'],
+ [['3waz','hesab'],'عايز أعرف عن حسابي'],
+ [['ana','mo7tag','mosa3da'],'محتاج مساعدة لو سمحت'],[['mo7tag','mosa3da'],'محتاج مساعدة لو سمحت'],[['3waz','mosa3da'],'محتاج مساعدة لو سمحت'],[['mosa3da'],'ممكن مساعدة؟'],
+ [['bta2a','fein'],'البطاقة بتاعتي فين؟'],[['flos','fein'],'الفلوس فين؟'],[['fein'],'فين؟'],
+ [['asef','tany'],'آسف، ممكن تعيد تاني؟'],[['asef'],'آسف'],[['3amel_eh'],'إزيك؟'],[['kwayes'],'أنا كويس'],[['tany'],'ممكن تعيد تاني؟'],[['emta'],'إمتى؟'],[['kam'],'كام؟'],
+];
+const TELLER=[
+ {t:'أهلاً، أقدر أساعدك إزاي؟',kw:['اهلا','اساعدك','ازاي اساعدك'],clips:['ahlan']},
+ {t:'كام؟',kw:['كام','المبلغ','قد ايه'],clips:['kam']},
+ {t:'محتاج البطاقة لو سمحت',kw:['البطاقه','البطاقه الشخصيه','الرقم القومي','الكارت'],clips:['enta']},
+ {t:'اسمك إيه؟',kw:['اسمك','الاسم'],clips:['kg_esmak']},
+ {t:'محتاج مساعدة تانية؟',kw:['مساعده','حاجه تانيه','اساعدك في حاجه'],clips:['kg_mo7tag','kg_mosa3da']},
+ {t:'آسف على الانتظار',kw:['اسف','اسفين','متاسف','معلش'],clips:['kg_asef']},
+ {t:'رقم الحساب؟',kw:['رقم الحساب','رقم حسابك'],clips:['ra2am','hesab']},
+ {t:'استنى شوية لو سمحت',kw:['استني','لحظه','ثانيه','شويه'],clips:[]},
+ {t:'وقّع هنا لو سمحت',kw:['وقع','امضي','توقيع'],clips:[]},
+ {t:'تعالى بكرة',kw:['بكره','غدا'],clips:['bokra']},
+ {t:'هتوصل خلال أسبوع',kw:['اسبوع'],clips:['esbo3']},
+ {t:'هنطلب بطاقة جديدة',kw:['جديده','نطلب'],clips:['gedid']},
+ {t:'اتفضل الفلوس',kw:['اتفضل','الفلوس','فلوسك'],clips:['flos']},
+ {t:'تمام، خلصنا',kw:['تمام','خلاص','خلصنا','اتعمل'],clips:['tmam']},
+ {t:'أيوه',kw:['ايوه','نعم'],clips:['aywa']},
+ {t:'لأ',kw:['لا','مفيش'],clips:['la']},
+ {t:'شكراً',kw:['شكرا','متشكر'],clips:['kg_shokran']},
+ {t:'ممكن تعيد تاني؟',kw:['تاني','تعيد'],clips:['tany']},
+];
+TELLER.forEach(p=>{p.clips=p.clips.filter(okClip)});
+const INTENTS=[
+ {k:'ashab',icon:'payments',ar:'أسحب فلوس',want:'عايز أسحب فلوس',clip:'flos'},
+ {k:'awda3',icon:'account_balance',ar:'أودع فلوس',want:'عايز أودع فلوس',clip:'flos'},
+ {k:'card',icon:'credit_card',ar:'كارت جديد',want:'عايز بطاقة جديدة',clip:'gedid'},
+];
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const AD='٠١٢٣٤٥٦٧٨٩';
+const arDigits=n=>String(n).replace(/\d/g,d=>AD[d]);
+const toLatin=s=>s.replace(/[٠-٩]/g,d=>AD.indexOf(d));
+const money=n=>arDigits(Number(n).toLocaleString('en-US').replace(/,/g,'٬'));
+const norm=t=>t.replace(/[\u064B-\u0652\u0640]/g,'').replace(/[؟?!.,،"]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function snack(t){const d=document.createElement('div');d.className='snack';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),3200)}
+const SET=store.get('maak_settings',{voice:false,perf:true,share:false});
+const saveSet=()=>store.set('maak_settings',SET);
+function playClips(video,clips,ph){
+  let i=0;
+  if(!clips||!clips.length){video.removeAttribute('src');video.hidden=true;if(ph)ph.hidden=false;return}
+  video.hidden=false;if(ph)ph.hidden=true;
+  const next=()=>{if(i>=clips.length){video.onended=null;return}video.src='clips/'+clips[i]+'.mp4';i++;video.play().catch(()=>{})};
+  video.onended=next;next();
+}
+async function speak(text){
+  try{const t=await window.claude?.use?.('tts');if(t){await t.speak(text,{language:'ar'});return}}catch(e){}
+  try{const u=new SpeechSynthesisUtterance(text);u.lang='ar-EG';speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
+}
+const SB_URL='https://lkvdivexgzhavuijydsb.supabase.co',SB_KEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
+const loadJs=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function sbRoom(){
+  await loadJs('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
+  const sb=window.supabase.createClient(SB_URL,SB_KEY);const me=Math.random().toString(36).slice(2);
+  return {join:async name=>{
+    const ch=sb.channel(name,{config:{broadcast:{self:false,ack:true},presence:{key:me}}});
+    const H={},PF=[];let peers=[];
+    const conv=(k,arr)=>({id:k,isMe:k===me,presence:(arr&&arr[0]&&arr[0].p)||{}});
+    for(const t of ['visit','say','reply','end','hello'])ch.on('broadcast',{event:t},({payload})=>(H[t]||[]).forEach(f=>f({data:payload,isMe:false,sameTab:false})));
+    ch.on('presence',{event:'sync'},()=>{peers=Object.entries(ch.presenceState()).map(([k,a])=>conv(k,a))});
+    ch.on('presence',{event:'join'},({key,newPresences})=>{const j=[conv(key,newPresences)];PF.forEach(f=>f({joined:j,updated:[],left:[]}))});
+    await new Promise((ok,no)=>ch.subscribe(st=>{if(st==='SUBSCRIBED')ok();else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT')no(new Error(st))}));
+    return {emit:async(t,d)=>{const r=await ch.send({type:'broadcast',event:t,payload:d});if(r!=='ok')throw new Error(r)},
+      on:(t,f)=>{(H[t]=H[t]||[]).push(f)},presence:async p=>{await ch.track({p})},
+      onPeers:f=>{PF.push(f)},peers:()=>peers,leave:async()=>{await sb.removeChannel(ch)}}}}}
+try{if(new URLSearchParams(location.search).has('agent'))location.replace('agent/')}catch(e){}
+try{if(new URLSearchParams(location.search).has('notext'))document.documentElement.classList.add('notext')}catch(e){}
+const roomP=(window.claude?.use?window.claude.use('room'):sbRoom()).catch(()=>null);
+/* ---------- Agent brain: Claude in claude.ai, server function elsewhere, rules as fallback ---------- */
+/* Agent server on the Maak-only Supabase project (same project as the teller relay and the recordings). */
+const AGENT_SERVERS=[[SB_URL+'/functions/v1/maak-agent',SB_KEY]];
+let agentSkip=0;
+const sampleP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null);
+const AGENT_SYS={
+  compose:'You are Maak, an assistant for a deaf Egyptian customer at a bank counter. The input lists the signs the customer made, in order, as Arabic words, plus the visit goal and amount if known. Write ONE short, polite sentence in Egyptian Arabic (at most 15 words) that the customer most likely means, for the bank teller to read. The signs come first: use the goal and amount only when the signs are about money, the card, the account or the visit goal. A greeting, thanks, apology, \"how are you\", \"where\" question or request for help stays exactly that, with no goal or amount added. Never invent numbers, names or requests. Reply with JSON only: {"text": "..."}',
+  match:'A bank teller typed a reply for a deaf customer. Pick the phrase from the numbered list that has the same meaning, so it can be shown as a sign-language video. If no phrase means the same thing, answer -1. Reply with JSON only: {"index": n}',
+  simplify:'A bank teller typed a reply for a deaf Egyptian customer who may not read well. Rewrite it as ONE very short, simple Egyptian Arabic sentence (at most 8 words) with the same meaning. Then pick up to 5 signs from the vocabulary list, in order, that together carry that meaning. Use only keys from the list and never add meaning that is not in the reply. Reply with JSON only: {"text": "...", "words": ["key", ...]}'};
+function agentOk(task,v,payload){if(!v||typeof v!=='object')return null;
+  if(task==='compose'){const t=typeof v.text==='string'?v.text.trim():'';return t&&t.length<=160?{text:t}:null}
+  if(task==='simplify'){const t=typeof v.text==='string'?v.text.trim():'';const ks=new Set(payload.vocab.map(x=>x.k));const w=Array.isArray(v.words)?v.words.filter(k=>ks.has(k)).slice(0,5):[];return t&&t.length<=120?{text:t,words:w}:null}
+  const i=Number(v.index);return Number.isInteger(i)&&i>=-1&&i<payload.phrases.length?{index:i}:null}
+async function agent(task,payload){
+  try{const s=await sampleP;if(s){const input=task==='match'?{text:payload.text,phrases:payload.phrases.map((t,i)=>i+': '+t)}:payload;
+    const v=await s.json(AGENT_SYS[task]+'\n\nINPUT:\n'+JSON.stringify(input),{modelTier:'quick'});const ok=agentOk(task,v,payload);if(ok)return ok}}catch(e){}
+  const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),7000);
+  try{for(let i=agentSkip;i<AGENT_SERVERS.length;i++){const [url,key]=AGENT_SERVERS[i];
+    try{const r=await fetch(url,{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',apikey:key,authorization:'Bearer '+key},body:JSON.stringify({task,payload})});
+      const j=await r.json();if(j&&j.fallback&&j.reason==='no_key'){agentSkip=i+1;continue}
+      if(r.ok&&!j.fallback)return agentOk(task,j,payload);return null}catch(e){if(e.name==='AbortError')return null}}}
+  finally{clearTimeout(tm)}
+  return null}
+
+/* =========================================================
+   Recognition (MediaPipe Holistic on this device)
+   ========================================================= */
+let holistic=null,booting=null;
+let CPU_ONLY=true;
+function bootModel(){
+  if(booting) return booting;
+  booting=(async()=>{
+    const V=await import('./vendor/vision_bundle.mjs');
+    const WASM=new URL('./vendor/wasm',location.href).href;
+    let base;try{const r=await fetch('./models/holistic_model.wasm');base={modelAssetBuffer:new Uint8Array(await r.arrayBuffer())}}catch(e){base={modelAssetPath:'./models/holistic_model.wasm'}}
+    const fs=await V.FilesetResolver.forVisionTasks(WASM);
+    try{if(CPU_ONLY)throw 0;holistic=await V.HolisticLandmarker.createFromOptions(fs,{baseOptions:{...base,delegate:'GPU'},runningMode:'VIDEO'})}
+    catch(e){holistic=await V.HolisticLandmarker.createFromOptions(fs,{baseOptions:{...base,delegate:'CPU'},runningMode:'VIDEO'})}
+  })();
+  return booting;
+}
+let TEMPL=store.get('wasel_templates',{});const saveT=()=>store.set('wasel_templates',TEMPL);
+let BUILTIN={};fetch('templates.json').then(r=>r.ok?r.json():{}).then(j=>{BUILTIN=j&&typeof j==='object'?j:{}}).catch(()=>{});
+const allTemplates=()=>{const m={...BUILTIN};for(const [k,arr] of Object.entries(TEMPL))if(arr&&arr.length)m[k]=arr;return m};
+const POSW=0.6;
+function frameRaw(r,W,H){const asp=W/H;const P=r.poseLandmarks&&r.poseLandmarks[0];if(!P)return null;const sh=[P[11],P[12]];const mid=[(sh[0].x+sh[1].x)/2*asp,(sh[0].y+sh[1].y)/2];const w=Math.hypot((sh[0].x-sh[1].x)*asp,sh[0].y-sh[1].y)||1;const hand=h=>h&&h.length?h.map(p=>[(p.x*asp-mid[0])/w,(p.y-mid[1])/w]):null;return {L:hand(r.leftHandLandmarks&&r.leftHandLandmarks[0]),R:hand(r.rightHandLandmarks&&r.rightHandLandmarks[0]),hipY:P[23]?(P[23].y-mid[1])/w:2.5}}
+function shape(h){const o=h[0];let m=1e-6;const r=h.map(p=>[p[0]-o[0],p[1]-o[1]]);r.forEach(p=>m=Math.max(m,Math.hypot(p[0],p[1])));const f=[];for(let i=1;i<21;i++){f.push(r[i][0]/m,r[i][1]/m)}return f}
+function fillGaps(seq){const idx=seq.map((h,i)=>h?i:-1).filter(i=>i>=0);if(!idx.length)return null;return seq.map((h,i)=>{if(h)return h;let a=idx.filter(j=>j<i).pop(),b=idx.find(j=>j>i);if(a===undefined)return seq[b];if(b===undefined)return seq[a];const t=(i-a)/(b-a);return seq[a].map((p,k)=>[p[0]+(seq[b][k][0]-p[0])*t,p[1]+(seq[b][k][1]-p[1])*t])})}
+function motion(seq){const v=seq.filter(Boolean);if(v.length<2)return 0;let mx=0,my=0;v.forEach(h=>{mx+=h[0][0];my+=h[0][1]});mx/=v.length;my/=v.length;let s=0;v.forEach(h=>{s+=Math.hypot(h[0][0]-mx,h[0][1]-my)});return s/v.length+v.length/seq.length}
+function resample(F,T){const out=[];for(let i=0;i<T;i++){const p=i*(F.length-1)/(T-1),lo=Math.floor(p),hi=Math.min(lo+1,F.length-1),w=p-lo;out.push(F[lo].map((x,k)=>x*(1-w)+F[hi][k]*w))}return out}
+function toFeatures(frames){const Ls=frames.map(f=>f.L),Rs=frames.map(f=>f.R);let D=Ls,N=Rs,mir=false;if(motion(Rs)>motion(Ls)){D=Rs;N=Ls;mir=true}const flip=h=>h&&mir?h.map(p=>[-p[0],p[1]]):h;D=fillGaps(D.map(flip));if(!D)return null;const nUp=frames.filter((f,i)=>N[i]&&N[i][0][1]<f.hipY-0.3).length/frames.length;const nMove=motion(N)-N.filter(Boolean).length/N.length;const Nf=(nUp>0.4||nMove>0.12)?fillGaps(N.map(flip)):null;const F=D.map((h,i)=>{let f=[h[0][0]*POSW,h[0][1]*POSW,...shape(h)];if(Nf)f.push(Nf[i][0][0]*0.5*POSW,Nf[i][0][1]*0.5*POSW,...shape(Nf[i]).map(x=>x*0.3));else f.push(0,0.9*0.5*POSW,...new Array(40).fill(0));return f});return resample(F,24)}
+function dtw(a,b,band=6){const n=a.length,INF=1e18;const D=Array.from({length:n+1},()=>new Float64Array(n+1).fill(INF));D[0][0]=0;for(let i=1;i<=n;i++)for(let j=Math.max(1,i-band);j<=Math.min(n,i+band);j++){let s=0;const x=a[i-1],y=b[j-1];for(let k=0;k<x.length;k++){const d=x[k]-y[k];s+=d*d}D[i][j]=Math.sqrt(s)+Math.min(D[i-1][j],D[i][j-1],D[i-1][j-1])}return D[n][n]}
+/* Matching settings (23 Nov): hand position weighted 6x, warp band 3. Leave-one-signer-out on 15 CC0 signers, 732 clips of 7 customer signs, 45 examples each: 91% top-1. */
+const POSBOOST=6,BAND=3,_wcache=new WeakMap();
+function wpos(F){if(_wcache.has(F))return _wcache.get(F);const G=F.map(f=>{const g=f.slice();g[0]*=POSBOOST;g[1]*=POSBOOST;g[42]*=POSBOOST;g[43]*=POSBOOST;return g});_wcache.set(F,G);return G}
+/* One-hand signing (25 Nov): when the customer signs with one hand (e.g. holding the phone), a two-handed example is also compared
+   without its second hand, with a 10% penalty. Leave-one-signer-out: one-handed 73.5% -> 82.5% top-1, wrong slips 15.2% -> 8.2%;
+   normal two-handed signing unchanged (91.1% top-1, 95.5% with the ask step, 2.2% wrong slips). */
+const ONE_PEN=1.1,PH2=[0,0.9*0.5*POSW,...new Array(40).fill(0)],_scache=new WeakMap();
+const oneHanded=F=>F.every(f=>f[42]===0&&Math.abs(f[43]-PH2[1])<1e-3);
+function stripped(t){if(_scache.has(t))return _scache.get(t);const s=wpos(t.map(f=>[...f.slice(0,42),...PH2]));_scache.set(t,s);return s}
+/* Not-one-of-my-signs (25 Nov): 583 everyday signs that are NOT in Maak (fruits, animals, places, numbers, prayers… from two YouTube
+   teaching channels and our collected clips; hand-point numbers only, no video). If the closest of them beats the closest real sign,
+   the result is marked nonSign and the app asks «did you mean?» instead of guessing. Tested with each channel left out: unknown
+   signs guessed as a real word fell from about 46% to 26%; real signs: 95.4% end right (was 94.9%), 1.9% wrong slips (was 2.3%). */
+let NONSIGN=[];fetch('rejects.json').then(r=>r.ok?r.json():[]).then(j=>{NONSIGN=Array.isArray(j)?j:[]}).catch(()=>{});
+function classify(F){const best={};const Q=wpos(F),one=oneHanded(F);for(const [k,arr] of Object.entries(allTemplates()))for(const t of arr){let d=dtw(Q,wpos(t),BAND);if(one&&!oneHanded(t)){const ds=dtw(Q,stripped(t),BAND)*ONE_PEN;if(ds<d)d=ds}if(best[k]===undefined||d<best[k])best[k]=d}const out=Object.entries(best).sort((a,b)=>a[1]-b[1]);if(out.length&&NONSIGN.length){let dn=Infinity;for(const t of NONSIGN){const d=dtw(Q,wpos(t),BAND);if(d<dn)dn=d}out.nonSign=dn<out[0][1]}return out}
+
+/* camera + segmentation: a sign starts when a hand rises, ends when hands drop, stay still, or after 3.5 s */
+const CAM={stream:null,v:null,c:null,pill:null,perf:null,onSign:null,running:false,lastTs:-1};
+let buf=[],signing=false,startT=0,cool=0,prevW=null,upSince=0,downSince=0,stillSince=0,emitted=0,TS=0;
+const nextTs=t=>(TS=Math.max(TS+1,Math.floor(t)));
+const PERF={fps:0,ms:0,last:0};
+function attach(v,c,pill,perf,onSign){CAM.v=v;CAM.c=c;CAM.pill=pill;CAM.perf=perf;CAM.onSign=onSign;buf=[];signing=false;upSince=0;}
+async function startCam(){
+  await bootModel();
+  if(!CAM.stream) CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+  CAM.v.removeAttribute('src');CAM.v.srcObject=CAM.stream;CAM.v.style.transform='';CAM.c.style.transform='';CAM.v.loop=false;await CAM.v.play();CAM.startAt=performance.now();
+  if(!CAM.running){CAM.running=true;requestAnimationFrame(loop)}
+}
+async function useFile(file){
+  await bootModel();
+  if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}
+  const v=CAM.v,onSign=CAM.onSign;v.srcObject=null;v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.loop=false;v.style.transform='none';CAM.c.style.transform='none';
+  v.src=URL.createObjectURL(file);
+  await new Promise((res,rej)=>{if(v.readyState>=1)return res();v.onloadedmetadata=()=>res();v.onerror=()=>rej(new Error('bad video'))});
+  const dur=isFinite(v.duration)?v.duration:0;if(!dur)throw new Error('no duration');
+  /* iPhone Safari only shows frames of a video that has played once: play it silently for a moment, then pause */
+  try{await v.play()}catch(e){}v.pause();
+  /* copy each frame into a canvas and track that: reliable on Safari, same pixels everywhere */
+  /* track a small copy (long side 480 px, like the live camera): an iPhone video is 1080p+ and full size made each frame ~4x slower */
+  const sc=Math.min(1,480/Math.max(v.videoWidth,v.videoHeight)),W=Math.round(v.videoWidth*sc),H=Math.round(v.videoHeight*sc),fc=document.createElement('canvas');fc.width=W;fc.height=H;const fg=fc.getContext('2d');
+  const tc=document.createElement('canvas');tc.width=tc.height=16;const tg=tc.getContext('2d',{willReadFrequently:true});
+  buf=[];signing=false;upSince=0;cool=0;prevW=null;emitted=0;const all=[];const step=1/10;let n=0,blank=0;
+  for(let t=0;t<dur;t+=step){
+    if(CAM.onSign!==onSign)return;
+    await seekFrame(v,t);window.__t=t;
+    fg.drawImage(v,0,0,W,H);n++;
+    tg.drawImage(fc,0,0,16,16);const px=tg.getImageData(0,0,16,16).data;let mx=0;for(let k=0;k<px.length;k+=4)mx=Math.max(mx,px[k],px[k+1],px[k+2]);if(mx<12)blank++;
+    const r=holistic.detectForVideo(fc,nextTs(performance.now()));draw(r);
+    {const g=CAM.c.getContext('2d');g.globalCompositeOperation='destination-over';g.drawImage(fc,0,0,CAM.c.width,CAM.c.height);g.globalCompositeOperation='source-over'} /* show the frame being read, so the box is not black on iPhone */
+    const f=frameRaw(r,W,H);if(f){if(f.L||f.R)all.push(f);segment(f,t*1000)}
+    CAM.pill.textContent='بحلل الفيديو… '+arDigits(Math.min(100,Math.round(t/dur*100)))+'٪';
+  }
+  if(signing)endSign(dur*1000,'cap');
+  if(!emitted&&all.length>=4&&onSign){const F=toFeatures(all);if(F)onSign(F)}
+  else if(!emitted&&onSign)snack(n&&blank>n*0.8?'الموبايل ده مقدرش يقرا الفيديو. استخدم الكاميرا المباشرة.':'مش شايف إيد واضحة في الفيديو. صوّر تاني والإيد قدام الكاميرا.');
+  CAM.pill.classList.remove('rec');CAM.pill.textContent='خلص التحليل';
+}
+/* jump to time t and wait until that frame is actually on screen (requestVideoFrameCallback where available) */
+function seekFrame(v,t){return new Promise(res=>{let sk=false,fr=!v.requestVideoFrameCallback,done=false;
+  const fin=()=>{if(!done&&sk&&fr){done=true;res()}};
+  if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>{fr=true;fin()});
+  const h=()=>{v.removeEventListener('seeked',h);sk=true;fin();setTimeout(()=>{fr=true;fin()},40)};v.addEventListener('seeked',h);
+  setTimeout(()=>{v.removeEventListener('seeked',h);sk=fr=true;fin()},800);v.currentTime=t})}
+function stopCam(){if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}CAM.onSign=null}
+function raised(f){const up=h=>h&&h[0][1]<f.hipY-0.3;return up(f.L)||up(f.R)}
+function wrist(f){const h=f.R||f.L;return h?h[0]:null}
+function endSign(now,why){const cut=why==='down'?downSince:why==='still'?stillSince:Infinity;const frames=buf.filter(x=>x.now<cut).map(x=>x.f);
+  signing=false;upSince=0;downSince=0;stillSince=0;buf=[];cool=now+400;CAM.pill.classList.remove('rec');CAM.pill.textContent='ارفع إيدك وابدأ الإشارة';
+  if(frames.length>=3&&CAM.onSign){const F=toFeatures(frames);if(F){emitted++;CAM.onSign(F)}}}
+function segment(f,now){const up=raised(f),w=wrist(f);const sp=(w&&prevW)?Math.hypot(w[0]-prevW[0],w[1]-prevW[1]):0;prevW=w;
+  if(!signing){if(up&&now>cool){if(!upSince)upSince=now;buf.push({f,now});if(now-upSince>=150){signing=true;startT=upSince;downSince=0;stillSince=0;CAM.pill.textContent='بسجّل الإشارة…';CAM.pill.classList.add('rec')}}else{upSince=0;buf=[]}return}
+  buf.push({f,now});
+  if(!up){if(!downSince)downSince=now;if(now-downSince>=250)return endSign(now,'down')}else downSince=0;
+  if(sp<0.025){if(!stillSince)stillSince=now;if(now-startT>=600&&now-stillSince>=400)return endSign(now,'still')}else stillSince=0;
+  if(now-startT>3500)return endSign(now,'cap')}
+function draw(r){const c=CAM.c,v=CAM.v;c.width=v.videoWidth;c.height=v.videoHeight;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);const hs=[r.leftHandLandmarks&&r.leftHandLandmarks[0],r.rightHandLandmarks&&r.rightHandLandmarks[0]];g.fillStyle=signing?'#ff5a4e':'#adc3fe';hs.forEach(h=>h&&h.forEach(p=>{g.beginPath();g.arc(p.x*c.width,p.y*c.height,4,0,7);g.fill()}))}
+function loop(){
+  if(!CAM.running)return;
+  /* one bad frame (iPhone GPU hiccup, video switching) must never stop tracking for good: always schedule the next frame */
+  try{loopFrame();CAM.errs=0}catch(e){CAM.errs=(CAM.errs||0)+1;console.error('track',e);
+    if(CAM.errs===30&&!CAM.rebooting){CAM.rebooting=true;holistic=null;booting=null;CPU_ONLY=true;CAM.pill&&(CAM.pill.textContent='بيعيد تشغيل التتبّع…');bootModel().finally(()=>{CAM.rebooting=false;CAM.errs=0;CAM.pill&&(CAM.pill.textContent='ارفع إيدك وابدأ الإشارة')})}}
+  requestAnimationFrame(loop);
+}
+function loopFrame(){const v=CAM.v;
+  /* iPhone Safari can pause the camera preview (another video starting, a screen change): resume it */
+  if(v&&v.srcObject&&v.paused&&CAM.onSign&&!CAM.resuming){CAM.resuming=true;v.play().catch(()=>{}).finally(()=>{CAM.resuming=false})}
+  if(holistic&&v&&v.readyState>=2&&!v.paused&&CAM.onSign){const ts=performance.now();if(ts>CAM.lastTs){CAM.lastTs=ts;
+    const t0=performance.now();const r=holistic.detectForVideo(v,nextTs(ts));const dt=performance.now()-t0;PERF.ms=PERF.ms?PERF.ms*0.9+dt*0.1:dt;if(PERF.last){const f=1000/(ts-PERF.last);PERF.fps=PERF.fps?PERF.fps*0.9+f*0.1:f}PERF.last=ts;
+    if(CAM.perf){CAM.perf.hidden=!SET.perf;CAM.perf.textContent=PERF.fps.toFixed(0)+' fps · '+PERF.ms.toFixed(0)+' ms'}
+    if(PERF.fps&&PERF.fps<3&&CAM.startAt&&ts-CAM.startAt>4000&&!CAM.warned){CAM.warned=true;snack('الجهاز ده بطيء على الكاميرا المباشرة. صوّر الإشارة فيديو بزرار «أو صوّر فيديو» وهتشتغل.')}
+    draw(r);const f=frameRaw(r,v.videoWidth,v.videoHeight);if(f)segment(f,ts)}}
+}
+async function camButton(phEl,pill){
+  pill.textContent='بيحمّل النموذج…';
+  try{await startCam();phEl.hidden=true;pill.textContent='ارفع إيدك وابدأ الإشارة'}
+  catch(e){pill.textContent='الكاميرا مقفولة هنا';snack('الكاميرا مش متاحة في الصفحة دي. صوّر الإشارة فيديو بزرار «أو صوّر فيديو».')}
+}
+async function fileButton(input,phEl){const f=input.files[0];input.value='';if(!f)return;phEl.hidden=true;try{await useFile(f)}catch(e){CAM.pill.textContent='مقدرتش أقرا الفيديو';snack('مقدرتش أقرا الفيديو ده. صوّره تاني من الموبايل.')}}
+
+/* =========================================================
+   CUSTOMER APP
+   ========================================================= */
+function customer(){
+  document.documentElement.lang='ar';document.documentElement.dir='rtl';
+  $('#app').replaceChildren($('#customer').content.cloneNode(true));
+  const st={plan:store.get('maak_plan',{intent:'ashab',amount:2000}),words:[],alts:[],thread:[],room:null,code:null,ended:false};
+  const savePlan=()=>store.set('maak_plan',st.plan);
+  const hist=[];let cur=null;
+  const screens=[...document.querySelectorAll('.phone .screen')];
+  function go(id,push=true){
+    if(cur&&push&&cur!==id) hist.push(cur);
+    if(id!=='c8'&&id!=='c3')CAM.onSign=null;
+    screens.forEach(s=>s.hidden=s.id!==id);cur=id;
+    document.querySelectorAll(`#${id} video[data-clip]`).forEach(v=>{if(!v.src)v.src='clips/'+v.dataset.clip+'.mp4';v.play().catch(()=>{})});
+    (enter[id]||(()=>{}))();
+  }
+  const back=()=>{const p=hist.pop();if(p)go(p,false)};
+  window.__maakClick=e=>{
+    const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+    if(e.target.closest('[data-back]')){back();return}
+    if(e.target.closest('[data-help]')){const d=$('#help').content.cloneNode(true).firstElementChild;document.body.appendChild(d);d.querySelector('[data-close]').onclick=()=>d.remove();d.onclick=ev=>{if(ev.target===d)d.remove()};return}
+    if(e.target.closest('[data-voice]')){SET.voice=!SET.voice;saveSet();syncSwitches();snack(SET.voice?'الصوت اشتغل: الموظف هيسمع كلامك على جهازه':'الصوت اتقفل');return}
+    if(e.target.closest('[data-teller]')){location.hash='teller';return}
+    const sw=e.target.closest('.sw[data-setting]');if(sw){SET[sw.dataset.setting]=!SET[sw.dataset.setting];saveSet();syncSwitches();return}
+  };
+  function syncSwitches(){document.querySelectorAll('.sw[data-setting]').forEach(s=>s.setAttribute('aria-checked',!!SET[s.dataset.setting]));document.querySelectorAll('[data-voice] .ms').forEach(i=>i.textContent=SET.voice?'volume_up':'volume_off')}
+  syncSwitches();
+  // bottom nav
+  document.querySelectorAll('[data-nav]').forEach(n=>{const here=n.dataset.nav;n.innerHTML=[['c4','home','الرئيسية'],['c12','history','زياراتي'],['c13','front_hand','تمرين']].map(([id,ic,l])=>`<button data-go="${id}" aria-current="${id===here}"><span class="ind"><span class="ms ${id===here?'fill':''}">${ic}</span></span>${l}</button>`).join('')});
+  const trainedCount=()=>SIGNS.filter(s=>(TEMPL[s.k]||[]).length).length;
+
+  /* ---------- C3 teach signs ---------- */
+  const CORE=['flos','aywa','3waz','ashab','awda3','bta2a'];
+  const T={list:CORE,i:0,ret:'c4'};
+  const curSign=()=>SIGNS.find(x=>x.k===T.list[T.i]);
+  function showTeach(){
+    const s=curSign();$('#c3count').textContent=T.list.length>1?`إشارة ${arDigits(T.i+1)} من ${arDigits(T.list.length)}`:'تمرين';$('#c3word').textContent=s.ar;$('#c3word2').textContent=s.ar;
+    const r=$('#c3ref');if(s.clip){r.hidden=false;$('#c3noref').hidden=true;r.src='clips/'+s.clip+'.mp4';r.play().catch(()=>{})}else{r.hidden=true;r.removeAttribute('src');$('#c3noref').hidden=false}
+    {const yt=RECMODE&&REC_YT[s.k],yf=$('#c3yt');if(yt){r.hidden=true;$('#c3noref').hidden=true;ytShow(yf,yt);yf.hidden=false;$('#c3ytsrc').hidden=false;$('#c3ytsrc').textContent='شوف الإشارة · من يوتيوب: '+yt[3]}else{yf.hidden=true;{const pb=yf.parentElement.querySelector('.ytplay');if(pb)pb.style.display='none'}if(yf.getAttribute('src'))yf.removeAttribute('src');ytCur='';$('#c3ytsrc').hidden=true}}
+    if(RECMODE){const n=REC.reps[s.k]||0;$('#c3st').textContent=n?`اتسجلت ${arDigits(Math.min(n,REC_REPS))} من ${arDigits(REC_REPS)} ✔`:`اعمل الإشارة ${arDigits(REC_REPS)} مرات، ونزّل إيدك بين كل مرة`}else{const n=(TEMPL[s.k]||[]).length;$('#c3st').textContent=n?`اتسجلت ${arDigits(n)} مرة ✔ ${n<2?'— اعملها مرة كمان':''}`:'اعمل الإشارة مرتين، ونزّل إيدك بين كل مرة'}
+    $('#c3next').lastChild.textContent=T.i<T.list.length-1?'التالي':'خلّصت';
+    $('#c3skip').hidden=T.list.length===1&&!RECMODE;
+    if(RECMODE){const n=REC.reps[s.k]||0;$('#c3next').disabled=n<1;$('#c3skip').textContent='مش عارف الإشارة دي، اللي بعدها'}
+  }
+  /* reference videos from YouTube: start muted and loop the exact seconds of the sign */
+  let ytCur='',ytApi=null;
+  const loadYT=()=>ytApi||(ytApi=new Promise((ok,no)=>{if(window.YT&&YT.Player)return ok();window.onYouTubeIframeAPIReady=ok;const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=no;document.head.appendChild(sc);setTimeout(no,8000)}));
+  function ytShow(f,yt){
+    const [id,st,en]=yt;const s0=st||0;
+    /* minimal player: no controls or keyboard, our own play icon; YouTube's small logo stays (YouTube's terms) */
+    const u='https://www.youtube-nocookie.com/embed/'+id+'?rel=0&playsinline=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin='+encodeURIComponent(location.origin)+(st!=null?'&start='+st+'&end='+en:'');
+    let pb=f.parentElement.querySelector('.ytplay');
+    if(!pb){pb=document.createElement('button');pb.className='ytplay';pb.type='button';pb.setAttribute('aria-label','شغّل الإشارة');pb.innerHTML='<span class="ms">play_arrow</span>';
+      pb.style.cssText='position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer';
+      pb.querySelector('.ms').style.fontSize='40px';f.parentElement.appendChild(pb)}
+    pb.style.display='flex';
+    if(ytCur===u)return;ytCur=u;f.src=u;f.ytp=null;
+    pb.onclick=()=>{if(f.ytp&&f.ytp.playVideo){f.ytp.playVideo();pb.style.display='none'}};
+    loadYT().then(()=>{if(ytCur!==u)return;f.ytp=new YT.Player(f.id,{events:{onReady:e=>{e.target.mute()},onStateChange:e=>{if(ytCur!==u)return;if(e.data===1)pb.style.display='none';else if(e.data===2)pb.style.display='flex';if(e.data===0){e.target.seekTo(s0,true);e.target.playVideo()}}}})}).catch(()=>{});
+  }
+  const finishTeach=()=>{if(!RECMODE)store.set('maak_onboarded',true);hist.length=0;go(T.ret,false)};
+  function onTeach(F){if(RECMODE){recTeach(F);return}const s=curSign();(TEMPL[s.k]=TEMPL[s.k]||[]).push(F);if(TEMPL[s.k].length>4)TEMPL[s.k].shift();saveT();showTeach();if(TEMPL[s.k].length>=2)setTimeout(()=>{if(cur==='c3'&&T.i<T.list.length-1){T.i++;showTeach()}},900)}
+  $('#c3cam').onclick=()=>camButton($('#c3ph'),$('#c3pill'));
+  $('#c3file').onchange=()=>fileButton($('#c3file'),$('#c3ph'));
+  $('#c3next').onclick=()=>{if(T.i<T.list.length-1){T.i++;showTeach()}else finishTeach()};
+  $('#c3skip').onclick=()=>{if(!RECMODE){finishTeach();return}const s=curSign();(REC.skip=REC.skip||{})[s.k]=true;recSave();if(T.i<T.list.length-1){T.i++;showTeach()}else finishTeach()};
+  /* ---------- volunteer recorder (?rec): hand-point features only, sent to the Maak-only Supabase project ---------- */
+  const RECMODE=(()=>{try{return new URLSearchParams(location.search).has('rec')}catch(e){return false}})();
+  const REC_LIST=['ana','asam','3waz','bta2a','msh_shaghal','bdal_fa2ed','bdal_talef','raqam_serri','gedid','estelam','tawqee3','meeza','hesab','emta','tmam'],REC_REPS=3;
+  const REC_YT={asam:['OqW23uvL988',null,null,'رسالة مصر الجديدة'],meeza:['aC_eUBtx2tQ',0,20,'NBK Egypt'],msh_shaghal:['bkted-RRmcs',null,null,'رسالة مصر الجديدة'],bdal_fa2ed:['_dqib3zB-L8',null,null,'منصة إشارتي'],bdal_talef:['WqZYQBFQHFU',null,null,'منصة إشارتي'],raqam_serri:['TV8a1gLTr_0',null,null,'منصة إشارتي'],estelam:['sztPowyPYBs',180,188,'إشارتي هي لغتي – أيمن عباس'],tawqee3:['aC_eUBtx2tQ',311,325,'NBK Egypt'],tmam:['r7NQIIu3GQ8',null,null,'رسالة مصر الجديدة']};
+  const REC_URL='https://lkvdivexgzhavuijydsb.supabase.co/rest/v1/recordings',REC_KEY='sb_publishable_aB8IwodTbdxR_O2l6AWyXg_8QBCM1b0';
+  const REC=store.get('maak_rec',null)||{session:Math.random().toString(36).slice(2,8).toUpperCase(),meta:{},reps:{},sent:0};
+  const recSave=()=>store.set('maak_rec',REC);
+  async function recSend(it){try{const r=await fetch(REC_URL,{method:'POST',headers:{apikey:REC_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(it)});return r.ok}catch(e){return false}}
+  let recBusy=false;
+  async function recFlush(){if(recBusy)return store.get('maak_rec_q',[]).length;recBusy=true;const q=store.get('maak_rec_q',[]);const left=[];for(const it of q){if(await recSend(it))REC.sent++;else left.push(it)}store.set('maak_rec_q',left);recSave();recBusy=false;return left.length}
+  function recTeach(F){const s=curSign();const n=(REC.reps[s.k]||0)+1;REC.reps[s.k]=n;recSave();
+    const q=store.get('maak_rec_q',[]);q.push({session:REC.session,sign:s.k,rep:Math.min(n,10),features:F.map(r=>r.map(v=>Math.round(v*1e3)/1e3)),meta:REC.meta});store.set('maak_rec_q',q);recFlush();
+    showTeach();if(n>=REC_REPS)setTimeout(()=>{if(cur!=='c3')return;if(T.i<T.list.length-1){T.i++;showTeach()}else finishTeach()},900)}
+  const rvReady=()=>{const ok=REC.meta.hand&&REC.meta.rel&&document.querySelector('[data-rv="adult"]').getAttribute('aria-checked')==='true'&&document.querySelector('[data-rv="agree"]').getAttribute('aria-checked')==='true';$('#rvstart').disabled=!ok};
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>{b.setAttribute('aria-checked',b.getAttribute('aria-checked')!=='true');rvReady()});
+  document.querySelectorAll('[data-rvpick]').forEach(g=>g.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{g.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b));REC.meta[g.dataset.rvpick]=b.dataset.v;rvReady()}));
+  $('#rvstart').onclick=()=>{REC.meta.adult=true;REC.meta.consent=new Date().toISOString();REC.meta.v=1;recSave();T.list=REC_LIST;T.i=0;T.ret='rvdone';go('c3')};
+  $('#rvretry').onclick=async()=>{$('#rvretry').disabled=true;await recFlush();$('#rvretry').disabled=false;enter.rvdone()};
+  /* ---------- word picker (fallback when signing is not understood) ---------- */
+  function openPicker(){
+    const frag=$('#picker').content.cloneNode(true);const scrim=frag.querySelector('[data-scrim]'),sheet=frag.querySelector('.sheet');document.body.append(scrim,sheet);
+    const close=()=>{scrim.remove();sheet.remove()};scrim.onclick=close;sheet.querySelector('[data-close]').onclick=close;
+    const ws=sheet.querySelector('[data-words]');ws.innerHTML=SIGNS.map(x=>`<button class="word" data-k="${x.k}"><span class="ms">${x.clip?'sign_language':'text_fields'}</span>${x.ar}</button>`).join('');
+    ws.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{st.words.push(b.dataset.k);close();renderChips();if(cur!=='c8')go('c8',false)});
+    sheet.addEventListener('keydown',e=>{if(e.key==='Escape')close()});ws.querySelector('button').focus();
+  }
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=openPicker);
+  $('#c2ok').onclick=()=>{T.list=CORE;T.i=0;T.ret='c4';go('c3')};
+  /* ---------- C5 plan ---------- */
+  function renderPlan(){
+    $('#c5opts').innerHTML=INTENTS.map(i=>`<button class="li ${st.plan.intent===i.k?'sel':''}" data-intent="${i.k}" aria-pressed="${st.plan.intent===i.k}"><span class="ms lead">${i.icon}</span><span class="txt"><b>${i.ar}</b></span></button>`).join('');
+    $('#c5opts').querySelectorAll('[data-intent]').forEach(b=>b.onclick=()=>{st.plan.intent=b.dataset.intent;savePlan();renderPlan()});
+    const it=INTENTS.find(i=>i.k===st.plan.intent);const v=$('#c5vid');v.parentElement.hidden=!okClip(it.clip);if(okClip(it.clip)){const want='clips/'+it.clip+'.mp4';if(!v.src.endsWith(want)){v.src=want;v.play().catch(()=>{})}}else v.removeAttribute('src')
+    $('#c5amtrow').hidden=st.plan.intent==='card';$('#c5amt').textContent=money(st.plan.amount)+' جنيه';
+  }
+  $('#c5edit').onclick=()=>{$('#c5field').hidden=false;$('#c5in').value=arDigits(st.plan.amount);$('#c5in').focus()};
+  $('#c5ok').onclick=()=>{const n=parseInt(toLatin($('#c5in').value).replace(/\D/g,''),10);if(n>0){st.plan.amount=n;savePlan()}$('#c5field').hidden=true;renderPlan()};
+  const wantText=()=>{const it=INTENTS.find(i=>i.k===st.plan.intent);return it.want};
+  const visitInfo=()=>({want:wantText(),amount:st.plan.intent==='card'?null:st.plan.amount,intent:st.plan.intent});
+
+  /* ---------- C7 pairing ---------- */
+  async function pair(){
+    if(st.room) return;
+    st.code=st.code||String(Math.floor(100000+Math.random()*900000));
+    $('#c7code').innerHTML='<span>'+arDigits(st.code.slice(0,3))+'</span><span>'+arDigits(st.code.slice(3))+'</span>';
+    const q=$('#c7qr');q.innerHTML='';try{new QRCode(q,{text:'MAAK:'+st.code,width:200,height:200,colorDark:'#1a1b21',colorLight:'#ffffff'})}catch(e){q.textContent=st.code}
+    const room=await roomP;
+    if(!room){$('#c7st').textContent='التوصيل مش متاح هنا. كمّل على موبايلك بس.';$('#c7wait').querySelector('.spin').hidden=true;return}
+    try{
+      const r=await room.join('maak-'+st.code);st.room=r;
+      await r.presence({role:'customer'});
+      const sendVisit=()=>r.emit('visit',visitInfo()).catch(()=>{});
+      r.onPeers(ch=>{
+        const t=ch.joined.find(p=>p.presence?.role==='teller'&&!p.isMe)||ch.updated.find(p=>p.presence?.role==='teller'&&!p.isMe);
+        if(t){sendVisit();if(cur==='c7'){snack('الموظف اتوصل ✔');go('c8')}}
+      });
+      r.on('hello',m=>{if(!m.sameTab){sendVisit();if(cur==='c7'){snack('الموظف اتوصل ✔');go('c8')}}});
+      r.on('reply',m=>{if(m.sameTab)return;const d=m.data||{};st.thread.push({who:'t',text:String(d.t||'')});showTeller(d)});
+      r.on('end',m=>{if(m.sameTab)return;st.ended=true;st.summary=(m.data&&m.data.items)||null;$('#c8end').hidden=false;snack('الموظف خلّص الزيارة');saveVisit()});
+      if(r.peers().some(p=>p.presence?.role==='teller'&&!p.isMe)){sendVisit();go('c8')}
+    }catch(e){$('#c7st').textContent='مقدرتش أوصل. جرّب تاني أو كمّل على موبايلك بس.'}
+  }
+  function showTeller(d){
+    $('#c8ttext').textContent=d.t||'';$('#c8ttext').classList.remove('mute');
+    st.lastClips=(d.clips||[]).filter(c=>/^[a-z0-9_]+$/.test(c));
+    playClips($('#c8tv'),st.lastClips,$('#c8tph'));
+    const ws=(Array.isArray(d.words)?d.words:[]).filter(k=>AR[k]).slice(0,5);const wb=$('#c8twords');wb.hidden=!ws.length;
+    wb.innerHTML=ws.map(k=>`<button class="chip" data-k="${k}"><span class="ms">sign_language</span>${AR[k]}</button>`).join('');
+    wb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const c=CLIP[b.dataset.k];if(c)playClips($('#c8tv'),[c],$('#c8tph'))});
+    if(!st.lastClips.length){$('#c8tph').innerHTML=ws.length?'<span class="ms lg">sign_language</span>الكلمات الأساسية تحت':'<span class="ms lg">text_snippet</span>الرد ده لسه ملوش فيديو إشارة، اقراه تحت'}
+    if(cur!=='c8'&&cur!=='c9'&&cur!=='c10') go('c8');
+  }
+  $('#c8replay').onclick=()=>playClips($('#c8tv'),st.lastClips||[],$('#c8tph'));
+
+  /* ---------- C8 conversation ---------- */
+  function sentenceFor(ws){let best=null;for(const [keys,txt] of RULES){if(keys.every(k=>ws.includes(k))&&(!best||keys.length>best[0].length))best=[keys,txt]}
+    if(best&&best[0].length>=ws.filter(w=>!['salam','sabah','shokran','ana'].includes(w)).length-1){const pre=ws.filter(w=>['salam','sabah'].includes(w)).map(w=>AR[w]).join('، ');return (pre?pre+'، ':'')+best[1]}
+    return ws.map(w=>AR[w]).join(' ')}
+  async function composeAgent(){const key=st.words.join(',');if(!st.words.length)return;
+    const it=INTENTS.find(i=>i.k===st.plan.intent);
+    const r=await agent('compose',{signs:st.words.map(w=>AR[w]),goal:it?it.want:null,amount:st.plan.intent==='card'?null:String(st.plan.amount)});
+    if(r&&st.words.join(',')===key&&cur==='c9'){st.composed={key,text:r.text};$('#c9text').textContent=r.text}}
+  function renderChips(){
+    $('#c8chips').innerHTML=st.words.length?st.words.map((w,i)=>`<span class="chip">${AR[w]}<button aria-label="امسح ${AR[w]}" data-i="${i}"><span class="ms">close</span></button></span>`).join(''):'<span class="body-m">الإشارات اللي فهمتها هتظهر هنا</span>';
+    $('#c8chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{st.words.splice(+b.dataset.i,1);renderChips()});
+    $('#c8send').disabled=!st.words.length;
+  }
+  function onTalk(F){
+    const r=classify(F);
+    if(!r.length){snack('علّم معاك الإشارات الأول من «تمرين»');return}
+    /* unclear (too far) or too close to call: let the customer pick instead of guessing */
+    if(r.nonSign||r[0][1]>78||(r[1]&&r[1][1]/r[0][1]<1.08)){st.alts=r.slice(0,3).map(x=>x[0]);go('c10');return}
+    const k=r[0][0],now=Date.now();if(st.words[st.words.length-1]===k&&now-(st.lastAdd||0)<2500){st.lastAdd=now;return}
+    st.lastAdd=now;st.words.push(k);renderChips();
+  }
+  $('#c8cam').onclick=()=>camButton($('#c8ph'),$('#c8pill'));
+  $('#c8file').onchange=()=>fileButton($('#c8file'),$('#c8ph'));
+  $('#c8clear').onclick=()=>{st.words=[];renderChips()};
+  $('#c8send').onclick=()=>go('c9');
+  /* ---------- C9 check ---------- */
+  $('#c9yes').onclick=async()=>{
+    const key=st.words.join(',');const text=st.composed&&st.composed.key===key?st.composed.text:sentenceFor(st.words);st.composed=null;st.thread.push({who:'c',text});
+    if(st.room){try{await st.room.emit('say',{text,voice:!!SET.voice})}catch(e){snack('مقدرتش أبعت. اتأكد إن الموظف لسه متوصل.')}}
+    else snack('مش متوصل بالموظف، ورّيله الشاشة');
+    st.words=[];renderChips();hist.length=Math.max(0,hist.lastIndexOf('c8'));go('c8',false);
+    if(st.room) snack('اتبعت للموظف ✔');
+  };
+  $('#c9no').onclick=()=>{st.words=[];renderChips();go('c8',false)};
+  /* ---------- C10 not sure ---------- */
+  function renderAlts(){
+    $('#c10opts').innerHTML=st.alts.map((k,i)=>`<button class="li two" data-k="${k}"><span class="ms lead">play_circle</span><span class="txt"><b>${AR[k]}</b><small>إشارة ${arDigits(i+1)}</small></span></button>`).join('');
+    $('#c10opts').querySelectorAll('[data-k]').forEach(b=>{
+      b.onmouseenter=b.onfocus=()=>{const c=CLIP[b.dataset.k];if(c){$('#c10v').hidden=false;$('#c10ph').hidden=true;$('#c10v').src='clips/'+c+'.mp4';$('#c10v').play().catch(()=>{})}else{$('#c10v').hidden=true;$('#c10ph').hidden=false}};
+      b.onclick=()=>{st.words.push(b.dataset.k);renderChips();go('c8',false)};
+    });
+  }
+  /* ---------- visits ---------- */
+  function saveVisit(){
+    const v=store.get('maak_visits',[]);const d=new Date();
+    v.unshift({date:d.toISOString().slice(0,10),want:wantText(),amount:st.plan.intent==='card'?null:st.plan.amount,items:st.thread.slice(-12)});
+    store.set('maak_visits',v.slice(0,20));
+  }
+  const fmtDate=s=>{const m=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];const [y,mo,d]=s.split('-');return arDigits(+d)+' '+m[+mo-1]};
+  let viewVisit=0;
+  const enter={
+    c1(){},
+    c3(){showTeach();attach($('#c3v'),$('#c3c'),$('#c3pill'),$('#c3perf'),onTeach);if(CAM.stream){$('#c3ph').hidden=true;startCam()}},
+    c4(){stopCam();const v=store.get('maak_visits',[]);$('#c4last').hidden=!v.length;if(v.length){$('#c4lastn').textContent=v[0].want;viewVisit=0}
+      const n=trainedCount();$('#c4trained').textContent=n?`معاك اتعلم ${arDigits(n)} من ${arDigits(SIGNS.length)} إشارة`:'معاك لسه ما اتعلمش إشاراتك. افتح «تمرين».'},
+    c5(){renderPlan()},
+    c6(){$('#c6want').textContent=wantText();$('#c6amt').textContent=st.plan.intent==='card'?'':'المبلغ '+money(st.plan.amount)+' جنيه'},
+    c7(){pair()},
+    c8(){attach($('#c8v'),$('#c8c'),$('#c8pill'),$('#c8perf'),onTalk);renderChips();if(CAM.stream){$('#c8ph').hidden=true;startCam()}$('#c8end').hidden=!st.ended;$('#c8title').textContent=st.room?'عند الشباك · متوصل':'عند الشباك'},
+    c9(){$('#c9chips').innerHTML=st.words.map(w=>`<span class="chip">${AR[w]}</span>`).join('');$('#c9text').textContent=sentenceFor(st.words);composeAgent()},
+    c10(){renderAlts();$('#c10v').hidden=true;$('#c10ph').hidden=false},
+    c11(){stopCam();const v=store.get('maak_visits',[]);const it=st.ended?{want:wantText(),amount:st.plan.amount,items:st.thread,date:new Date().toISOString().slice(0,10)}:v[viewVisit];
+      if(!it){$('#c11list').innerHTML='<p class="body-m pad">مفيش زيارات لسه</p>';return}
+      const rows=[`<div class="li static two"><span class="ms lead">check_circle</span><span class="txt"><b>${esc(it.want)}${it.amount?' · '+money(it.amount)+' جنيه':''}</b><small>${fmtDate(it.date)}</small></span></div>`];
+      (it.items||[]).forEach(m=>rows.push(`<div class="li static two"><span class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'إنت قلت':'الموظف قال'}</small></span></div>`));
+      $('#c11list').innerHTML=rows.join('');
+      if(st.ended){st.ended=false;st.thread=[];if(st.room){st.room.leave().catch(()=>{});st.room=null;st.code=null}}},
+    c12(){stopCam();const v=store.get('maak_visits',[]);$('#c12list').innerHTML=v.length?v.map((x,i)=>`<button class="li two" data-visit="${i}"><span class="ms lead">account_balance</span><span class="txt"><b>بنك · ${esc(x.want)}${x.amount?' '+money(x.amount):''}</b><small>${fmtDate(x.date)}</small></span><span class="ms trail">chevron_left</span></button>`).join(''):'<p class="body-m pad" style="padding-top:16px">لسه مفيش زيارات. أول زيارة هتظهر هنا.</p>';
+      $('#c12list').querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{viewVisit=+b.dataset.visit;st.ended=false;go('c11')})},
+    c13(){stopCam();$('#c13list').innerHTML=SIGNS.map((s,i)=>{const n=(TEMPL[s.k]||[]).length;return `<button class="li two" data-t="${i}"><span class="ms lead">play_circle</span><span class="txt"><b>${s.ar}</b><small>${n?'اتعلمتها':'لسه'}</small></span>${n?'<span class="ms trail">check_circle</span>':''}</button>`}).join('');
+      $('#c13list').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{T.list=[SIGNS[+b.dataset.t].k];T.i=0;T.ret='c13';go('c3')})},
+    async rvdone(){stopCam();const done=REC_LIST.filter(k=>(REC.reps[k]||0)>=REC_REPS).length;$('#rvmsg').textContent=`سجّلت ${arDigits(done)} من ${arDigits(REC_LIST.length)} إشارة`;$('#rvcode').textContent=REC.session;const left=await recFlush();$('#rvpending').textContent=left?`فاضل ${arDigits(left)} تسجيل لسه ما اتبعتش. اتأكد من النت ودوس «ابعت الباقي».`:'كل التسجيلات اتبعتت ✔';$('#rvretry').hidden=!left},
+    c14(){stopCam();$('#c14n').textContent=`معاك اتعلم ${arDigits(trainedCount())} إشارة على الموبايل ده`},
+  };
+  $('#c14reset').onclick=()=>{TEMPL={};saveT();enter.c14();snack('اتمسحت الإشارات')};
+  if(RECMODE){const idx=REC_LIST.findIndex(k=>(REC.reps[k]||0)<REC_REPS&&!(REC.skip||{})[k]);if(!Object.keys(REC.reps).length)go('rv',false);else if(idx<0)go('rvdone',false);else{T.list=REC_LIST;T.i=idx;T.ret='rvdone';go('c3',false)}}
+  else go('c0',false);
+  $('#c0talk').onclick=()=>go(store.get('maak_onboarded',false)?'c4':'c1');
+  bootModel().catch(()=>{});
+}
+
+/* =========================================================
+   TELLER WEB APP
+   ========================================================= */
+function teller(){
+  document.documentElement.lang='ar';document.documentElement.dir='rtl';
+  $('#app').replaceChildren($('#teller').content.cloneNode(true));
+  const st={room:null,visit:null,items:[],voice:false,sel:null};
+  const show=id=>document.querySelectorAll('.web .screen').forEach(s=>s.hidden=s.id!==id);
+  document.querySelector('[data-customer]').onclick=()=>{location.hash='';};
+  const stem=w=>w.replace(/^(و|ف|ب)(?=..)/,'').replace(/^ال(?=..)/,'');
+  const sstem=w=>{w=w.replace(/^و(?=...)/,'').replace(/^ف(?=ال)/,'').replace(/^(بال|لل|ال)(?=..)/,'');return w.length>4?w.replace(/(كم|نا|ها|ك|ي)$/,''):w};
+  function signWordsIn(text){const tw=norm(text).split(/\s+/).map(sstem);const hits=[];for(const sg of SIGNS){const sw=norm(sg.ar).split(/\s+/).map(sstem);for(let i=0;i+sw.length<=tw.length;i++){if(sw.every((x,j)=>tw[i+j]===x)){hits.push([i,sg.k]);break}}}return hits.sort((a,b)=>a[0]-b[0]).map(h=>h[1]).filter((k,i,a)=>a.indexOf(k)===i).slice(0,5)}
+  function match(text){const words=norm(text).split(/\s+/).map(stem);let best=null,bs=0,second=0;
+    for(const p of TELLER){let s=0;for(const k of p.kw){const kw=norm(k).split(/\s+/).map(stem);for(let i=0;i+kw.length<=words.length;i++){if(kw.every((x,j)=>words[i+j]===x)){s=Math.max(s,kw.join('').length);break}}}if(s>bs){second=bs;bs=s;best=p}else if(s>second)second=s}
+    if(!best||second===bs)return null;return best}
+  // phrases
+  $('#t2phr').innerHTML=TELLER.map((p,i)=>`<button class="li" data-p="${i}"><span class="ms lead">sign_language</span><span class="txt"><b>${p.t}</b></span><span class="ms trail">${p.clips.length?'play_circle':'text_snippet'}</span></button>`).join('');
+  $('#t2phr').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=TELLER[+b.dataset.p];$('#t2in').value=p.t;st.sel=p;playClips($('#t2pv'),p.clips,$('#t2pph'));if(!p.clips.length)$('#t2pph').innerHTML='<span class="ms lg">text_snippet</span>الجملة دي لسه ملهاش فيديو، هتوصل للعميل كتابة'});
+  $('#t2in').oninput=()=>{st.sel=null};
+  // connect
+  const codeIn=$('#t1code');
+  const hashCode=(location.hash.match(/teller-(\d{6})/)||[])[1];if(hashCode)codeIn.value=hashCode;
+  if(hashCode)queueMicrotask(()=>$('#t1go').click());
+  codeIn.addEventListener('focus',()=>codeIn.select());codeIn.addEventListener('input',()=>{const d=toLatin(codeIn.value).replace(/\D/g,'');if(d.length>6)codeIn.value=d.slice(-6)});
+  $('#t1go').onclick=async()=>{
+    const code=toLatin(codeIn.value).replace(/\D/g,'');
+    if(code.length!==6){$('#t1st').className='status warn';$('#t1st').textContent='الرقم ٦ أرقام، زي اللي على موبايل العميل';return}
+    $('#t1st').className='status';$('#t1st').textContent='بيوصّل…';
+    const room=await roomP;
+    if(!room){$('#t1st').className='status warn';$('#t1st').textContent='التوصيل مش متاح في الصفحة دي';return}
+    try{
+      const r=await room.join('maak-'+code);st.room=r;await r.presence({role:'teller'});
+      r.on('visit',m=>{if(m.sameTab)return;const d=m.data||{};st.visit=d;$('#t2title').textContent='العميل · بنك · '+(d.want||'');
+        if(!st.items.length){addMsg('c',(d.want||'')+(d.amount?' · '+money(d.amount)+' جنيه · '+Number(d.amount).toLocaleString('en-US')+' EGP':''),'كارت الزيارة')}});
+      r.on('say',m=>{if(m.sameTab)return;const d=m.data||{};addMsg('c',String(d.text||''),'بالإشارة · العميل أكّد');if(st.voice||d.voice)speak(String(d.text||''))});
+      await r.emit('hello',{});
+      show('t2');
+    }catch(e){$('#t1st').className='status warn';$('#t1st').textContent='مقدرتش أوصل: '+(e.code||e.message||'')}
+  };
+  function addMsg(who,text,meta){
+    $('#t2wait').hidden=true;st.items.push({who,text});
+    const d=document.createElement('div');d.className='msg '+who;
+    d.innerHTML=`<span class="who">${who==='c'?'العميل':'إنت'}</span><span class="say"></span><span class="meta"><span class="ms">${who==='c'?'check_circle':'sign_language'}</span><span></span></span>`;
+    d.querySelector('.say').textContent=text;d.querySelector('.meta span:last-child').textContent=meta;
+    $('#t2thread').appendChild(d);d.scrollIntoView({block:'end',behavior:'smooth'});
+  }
+  // voice toggle (read customer aloud)
+  $('#t2voice').onclick=()=>{st.voice=!st.voice;$('#t2voice').setAttribute('aria-pressed',st.voice);$('#t2voice .ms').textContent=st.voice?'volume_up':'volume_off';if(st.voice)speak('الصوت اشتغل')};
+  // dictation
+  (async()=>{try{const d=await window.claude?.use?.('dictation');if(!d)return;const mic=$('#t2mic');mic.hidden=false;
+    d.onFinal(({text})=>{$('#t2in').value=($('#t2in').value+' '+text).trim();st.sel=null});
+    d.onPartial(({text})=>{$('#t2in').placeholder=text});
+    d.onState(({state})=>{mic.querySelector('.ms').textContent=state==='listening'?'stop_circle':'mic'});
+    mic.onclick=()=>{if(d.active()){d.stop().catch(()=>{})}else{d.start({language:'ar'}).catch(e=>{if(e&&e.code==='unavailable'){d.start().catch(()=>{})}})}};
+  }catch(e){}})();
+  // send → confirm
+  $('#t2send').onclick=async()=>{
+    const text=$('#t2in').value.trim();if(!text){$('#t2in').focus();return}
+    let p=st.sel&&st.sel.t===text?st.sel:match(text);
+    if(!p){const btn=$('#t2send');btn.disabled=true;const r=await agent('match',{text,phrases:TELLER.map(x=>x.t)});btn.disabled=false;if(r&&r.index>=0)p=TELLER[r.index]}
+    let words=[];
+    if(!p){const btn=$('#t2send');btn.disabled=true;const s=await agent('simplify',{text,vocab:SIGNS.map(x=>({k:x.k,ar:x.ar}))});btn.disabled=false;
+      p={t:(s&&s.text)||text,clips:[]};words=(s&&s.words&&s.words.length)?s.words:signWordsIn(text)}
+    const clips=p.clips.length?p.clips:words.map(k=>CLIP[k]).filter(Boolean);const shown=p.t;
+    const dlg=$('#confirm').content.cloneNode(true).firstElementChild;document.body.appendChild(dlg);
+    dlg.querySelector('[data-text]').textContent=shown;
+    dlg.querySelector('[data-title]').textContent=clips.length?'هيتبعت للعميل بالإشارة':words.length?'هيتبعت للعميل بالكلمات الأساسية':'هيتبعت للعميل كتابة';
+    if(words.length){const w=document.createElement('p');w.className='body-m';w.textContent='الكلمات: '+words.map(k=>AR[k]).join(' · ');dlg.querySelector('[data-text]').after(w)}
+    dlg.querySelector('[data-phtext]').textContent=clips.length?'معاينة الإشارة':'مفيش فيديو إشارة للجملة دي لسه';
+    playClips(dlg.querySelector('[data-v]'),clips,dlg.querySelector('[data-ph]'));
+    dlg.querySelector('[data-no]').onclick=()=>{dlg.remove();$('#t2in').focus()};
+    dlg.querySelector('[data-yes]').onclick=async()=>{
+      dlg.remove();
+      try{await st.room.emit('reply',{t:shown,clips,words})}catch(e){snack('مقدرتش أبعت، العميل ممكن يكون فصل');return}
+      addMsg('t',shown,clips.length?'اتبعت للعميل بالإشارة':'اتبعت للعميل كتابة');$('#t2in').value='';st.sel=null;
+    };
+    dlg.querySelector('[data-yes]').focus();
+  };
+  $('#t2in').addEventListener('keydown',e=>{if(e.key==='Enter')$('#t2send').click()});
+  // end
+  $('#t2end').onclick=async()=>{
+    try{await st.room?.emit('end',{items:st.items.slice(-12)})}catch(e){}
+    $('#t4list').innerHTML=st.items.map(m=>`<div class="li static two" style="padding-inline:0"><span class="ms lead">${m.who==='c'?'sign_language':'person'}</span><span class="txt"><b>${esc(m.text)}</b><small>${m.who==='c'?'العميل':'إنت'}</small></span></div>`).join('')||'<p class="body-m">مفيش رسايل في الزيارة دي</p>';
+    show('t4');
+  };
+  $('#t4new').onclick=async()=>{try{await st.room?.leave()}catch(e){}st.room=null;st.items=[];st.visit=null;$('#t2thread').querySelectorAll('.msg').forEach(m=>m.remove());$('#t2wait').hidden=false;codeIn.value='';$('#t1st').textContent='';show('t1')};
+  show('t1');
+}
+
+/* ---------- route: #teller opens the teller page ---------- */
+document.addEventListener('click',e=>{if(window.__maakClick&&!/^#teller/.test(location.hash))window.__maakClick(e)});
+function route(){if(/^#teller/.test(location.hash))teller();else customer()}
+window.addEventListener('hashchange',()=>{stopCam();route()});
+route();
+
+window.__maak={attach,useFile,classify,BUILTIN:()=>BUILTIN};
+</script>
+</body></html>
