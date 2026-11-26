@@ -225,7 +225,7 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
       max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
-      system: PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
+      system: (en ? "ANSWER IN ENGLISH. " : "") + PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
       tools: [{ name: "answer", description: "Return the answer.", input_schema: SCHEMAS[task] }],
       tool_choice: agent ? { type: "auto" } : { type: "tool", name: "answer" },
       messages: [{ role: "user", content }],
@@ -275,6 +275,7 @@ function buildInput(task: string, p: any): unknown {
     vocabulary: (p.vocab || []).map((v: any) => `${v.k}: ${v.ar}`),
     icons: ICONS,
   };
+  if (p.lang === "en") base.answer_language = "English: every text field must be in plain English, even if the goal or conversation is in Arabic";
   if (task === "next" || task === "summary" || task === "letter") Object.assign(base, { steps: p.steps || [], conversation: p.turns || [], facts_so_far: p.facts || [] });
   if (task === "summary") base.today = p.today;
   if (task === "letter" && p.want) base.paper_wanted = p.want;
