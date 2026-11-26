@@ -211,6 +211,14 @@ const SCHEMAS: Record<string, any> = {
   },
 };
 
+// English mode: the same prompt with its Arabic wording and examples switched to English.
+function toEnglish(s: string): string {
+  return s.replace(/polite Egyptian Arabic/g, "polite plain English").replace(/Egyptian Arabic/g, "plain English")
+    .replace(/simple Modern Standard Arabic/g, "simple plain English").replace(/very simple Egyptian words/g, "very simple English words")
+    .replace(/\u00ab\u0647\u0627\u062a \u0627\u0644\u0628\u0637\u0627\u0642\u0629\u00bb, \u00ab\u062a\u0639\u0627\u0644\u0649 \u0628\u0643\u0631\u0629\u00bb, \u00ab\u0634\u0628\u0627\u0643 \u0663\u00bb/g, '"Bring your ID", "Come tomorrow", "Window 3"')
+    .replace(/no formal Arabic/g, "no jargon");
+}
+
 // Forced tool call: the model can only answer with the fields in SCHEMAS[task].
 async function ask(key: string, task: string, content: unknown, signal: AbortSignal, strict = false, en = false) {
   // strict = the fast model with a forced tool call (always returns the full schema); used as the
@@ -225,7 +233,7 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
       max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
-      system: (en ? "ANSWER IN ENGLISH. " : "") + PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
+      system: (en ? "ANSWER IN ENGLISH. " + toEnglish(PROMPTS[task]) : PROMPTS[task]) + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
       tools: [{ name: "answer", description: "Return the answer.", input_schema: SCHEMAS[task] }],
       tool_choice: agent ? { type: "auto" } : { type: "tool", name: "answer" },
       messages: [{ role: "user", content }],
