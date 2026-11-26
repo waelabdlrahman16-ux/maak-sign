@@ -1,6 +1,6 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
-// Agent tasks (v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
 // v20: compose may not add requests the signs do not contain (prompt + server guard).
 // v19: letter — the paper the customer hands to the staff (request or police statement).
 // Only text and, for "read", one photo reach this function; the photo is used once and never stored.
@@ -35,7 +35,7 @@ const PROMPTS: Record<string, string> = {
   plan:
     "You are Maak, an agent that helps a deaf Egyptian person get a task done at a service counter (bank, civil registry, social unit, hospital). Given the goal and the place, plan the visit: 2 to 5 short steps in order (each at most 6 words), and for each step the exact polite question Maak will show the staff on the customer's behalf (at most 18 words, Egyptian Arabic, addressed to the staff), or an empty string if no question is needed. List what to bring (each at most 5 words), and the fee: if a KNOWLEDGE fact gives the fee for this goal, put it (e.g. \"100 جنيه\") with that fact id, else empty text. In words, pick the sign keys that carry the goal (e.g. card, lost, new). For every step, item and the fee, set from to the id of the KNOWLEDGE fact it comes from (e.g. \"f1\"), or an empty string if it comes from no fact. Items with no fact are fine but must not contain numbers. If a step can only be done by phone and the customer is deaf, say Maak will ask the staff to do it. Prefer official facts over news facts. If an official fact offers a way to do the goal from home or online without the counter, the warning must say so (e.g. «ممكن تطلبها من البيت على موقع مصر الرقمية»). Otherwise add one warning only if it really matters (at most 12 words), else empty. " + STYLE,
   next:
-    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
+    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); up to 3 picture cards that show what the staff said without reading (cards): one card per idea, in the order the staff said them; each card has an icon (badge = bring national ID, credit_card = bank card, payments = pay money, event = a day or date, schedule = a time, storefront = go to a window or counter, hourglass_top = wait, description = a paper or form, edit_document = sign or fill a paper, photo_camera = photo, check_circle = done or approved, cancel = refused or not possible, location_on = another place), a text of at most 3 very simple Egyptian words (for example «هات البطاقة», «تعالى بكرة», «شباك ٣»; any number must be one the staff said), and word = the one vocabulary sign key that best shows the card, or empty; and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
   read:
     "You are Maak. A deaf Egyptian person photographed a paper or a phone screen at a service counter. Say what it is (kind), a short title (at most 8 words), up to 5 key facts copied EXACTLY as printed (amounts, dates, reference numbers, names of places or documents) with a short label each, and the one next step the person should take (at most 14 words). If the photo is blurry, cut off or unreadable, set unclear=true and say so in next instead of guessing. Do not read out or repeat full card numbers, national ID numbers or account numbers: show only the last 4 digits. " + STYLE,
   letter:
@@ -171,9 +171,10 @@ const SCHEMAS: Record<string, any> = {
       tell_customer: { type: "string" },
       words: keys,
       replies: { type: "array", items: { type: "string" }, maxItems: 3 },
+      cards: { type: "array", maxItems: 3, items: { type: "object", properties: { icon, text: { type: "string" }, word: { type: "string" } }, required: ["icon", "text", "word"] } },
       finished: { type: "boolean" },
     },
-    required: ["progress", "facts", "ask_staff", "tell_customer", "words", "replies", "finished"],
+    required: ["progress", "facts", "ask_staff", "tell_customer", "words", "replies", "cards", "finished"],
   },
   read: {
     type: "object",
@@ -325,6 +326,9 @@ function shape(task: string, out: any, p: any): any | null {
       tell_customer: supported(tell, kText + " " + evidence) ? tell : "",
       words: signKeys(out.words, p.vocab),
       replies: (Array.isArray(out.replies) ? out.replies : []).map((r: unknown) => clip(r, 30)).filter(Boolean).slice(0, 3),
+      cards: (Array.isArray(out.cards) ? out.cards : []).slice(0, 3)
+        .map((c: any) => ({ icon: okIcon(c.icon), text: clip(c.text, 24), word: signKeys([c.word], p.vocab)[0] || "" }))
+        .filter((c: any) => c.text && supported(c.text, evidence)),
       finished: out.finished === true,
     };
   }
