@@ -1,6 +1,7 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v21: English mode — payload.lang "en" makes every customer/staff text English (demo and judges).
 // v20: compose may not add requests the signs do not contain (prompt + server guard).
 // v19: letter — the paper the customer hands to the staff (request or police statement).
 // Only text and, for "read", one photo reach this function; the photo is used once and never stored.
@@ -211,7 +212,7 @@ const SCHEMAS: Record<string, any> = {
 };
 
 // Forced tool call: the model can only answer with the fields in SCHEMAS[task].
-async function ask(key: string, task: string, content: unknown, signal: AbortSignal, strict = false) {
+async function ask(key: string, task: string, content: unknown, signal: AbortSignal, strict = false, en = false) {
   // strict = the fast model with a forced tool call (always returns the full schema); used as the
   // agent tasks' backup when the smart model's answer comes back incomplete.
   const agent = SMART_TASKS.includes(task) && !strict;
@@ -224,7 +225,7 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
       max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
-      system: PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : ""),
+      system: PROMPTS[task] + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
       tools: [{ name: "answer", description: "Return the answer.", input_schema: SCHEMAS[task] }],
       tool_choice: agent ? { type: "auto" } : { type: "tool", name: "answer" },
       messages: [{ role: "user", content }],
@@ -392,14 +393,15 @@ Deno.serve(async (req) => {
   if (!key) return json({ fallback: true, reason: "no_key" }, 200, h);
 
   const p = body.payload;
+  const EN = p?.lang === "en";
   const content = buildInput(task, p);
   const agent = AGENT_TASKS.includes(task);
 
   try {
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), agent ? 25000 : 9000);
-    let res = await ask(key, task, content, ctl.signal);
-    if (res.status === 200 && !res.out) res = await ask(key, task, content, ctl.signal); // one retry on unparsable output
+    let res = await ask(key, task, content, ctl.signal, false, EN);
+    if (res.status === 200 && !res.out) res = await ask(key, task, content, ctl.signal, false, EN); // one retry on unparsable output
     clearTimeout(timer);
     if (res.status !== 200) return json({ fallback: true, reason: "upstream_" + res.status, detail: res.stop }, 200, h);
     const out = res.out;
@@ -414,7 +416,7 @@ Deno.serve(async (req) => {
       if (!shaped) {
         const ctl2 = new AbortController();
         const t2 = setTimeout(() => ctl2.abort(), 15000);
-        const res2 = await ask(key, task, content, ctl2.signal, true);
+        const res2 = await ask(key, task, content, ctl2.signal, true, EN);
         clearTimeout(t2);
         if (res2.status === 200 && res2.out) shaped = shape(task, res2.out, p);
         if (shaped) return json({ ...shaped, backup: true }, 200, h);
