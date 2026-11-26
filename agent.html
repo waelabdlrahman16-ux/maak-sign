@@ -150,7 +150,7 @@ h2{font-size:30px;line-height:1.25;font-weight:700}
 #banks .tile .bmark .ms{background:none;padding:0;width:auto;height:auto}
 #banks .tile[data-p=bank_misr]{background:#8c1d2f}#banks .tile[data-p=bank_misr] .bmark{border-radius:14px}#banks .tile[data-p=bank_misr] .ms{color:#8c1d2f}
 #banks .tile[data-p=nbe]{background:#0b6b3a}#banks .tile[data-p=nbe] .bmark{border-radius:28px}#banks .tile[data-p=nbe] .ms{color:#0b6b3a}
-.pstrip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(100px,1fr);gap:10px;overflow-x:auto}
+.pstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .pst{background:#f4f6fc;border-radius:20px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 .pst .pi{width:60px;height:60px;border-radius:18px;background:#d6e4ff;display:grid;place-items:center}.pst .pi .ms{font-size:34px;color:#2f4c8f}
 .pst .n{font-size:26px;line-height:1}.pst .t{font-size:13px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
@@ -353,6 +353,8 @@ const HAND_OK=new Set(['shokran','fein','mo7tag','mosa3da','asef','kwayes','3ame
 const canSign=k=>!!(CLIP[k]||HAND_OK.has(k));
 
 const PLACES={bank_misr:{ar:'بنك مصر',icon:'account_balance'},nbe:{ar:'البنك الأهلي',icon:'account_balance'},civil_registry:{ar:'السجل المدني',icon:'badge'},social_solidarity:{ar:'الوحدة الاجتماعية',icon:'family_restroom'},hospital:{ar:'المستشفى',icon:'local_hospital'}};
+/* Banque Misr debit card fees, from banquemisr.com (VISA and MasterCard debit cards page), checked 24 Nov 2026. */
+const OFFICIAL_FEES={bank_misr:{replace:100,pin:15}};
 const IMG='https://lkvdivexgzhavuijydsb.supabase.co/storage/v1/object/public/maak-public/goals/';
 const GOALS=[
  {icon:'credit_card_off',img:'lost_card',sign:['bta2a','bdal_fa2ed'],ar:'بطاقة البنك ضاعت',goal:'بطاقة البنك ضاعت وعايز أوقفها وآخد بدل فاقد',place:'bank'},
@@ -444,11 +446,13 @@ render.sPlan=()=>{
   const p=S.plan;if(!p)return go('sGoal',false);
   $('#planHead').innerHTML=`<span class="chip"><span aria-hidden="true" class="ms">${PLACES[S.place]?.icon||'help'}</span>${esc(PLACES[S.place]?.ar||'')}</span><span class="chip" style="background:var(--pc);color:var(--on-pc);border:0">${esc(p.title)}</span>`;
   const sure=x=>x.sure!==false;
+  // If the model left out a fee that the bank's own page states, show it (same official source as the server facts).
+  if(!p.fee.text){const g=S.goal||'',f=(OFFICIAL_FEES[S.place]||{});const k=/الرقم السري/.test(g)?'pin':/بطاقة البنك/.test(g)&&/ضاع|باظ/.test(g)?'replace':'';if(k&&f[k])p.fee={text:window.MAAK_LANG==='en'?f[k]+' EGP':f[k]+' جنيه',sure:true}}
   $('#planFee').hidden=!(p.fee.text&&p.fee.sure);$('#planFeeTx').textContent=p.fee.text;
   $('#planFeeTag').innerHTML='';
   const st=p.steps.filter(sure).length?p.steps.filter(sure):p.steps;
   $('#planSteps').innerHTML='<div class="pstrip">'+st.map((x,i)=>`<div class="pst" role="group" aria-label="${ar(i+1)}: ${esc(x.text)}"><span class="pi"><span aria-hidden="true" class="ms">${esc(x.icon||'help')}</span></span><b class="n">${ar(i+1)}</b><span class="t">${esc(x.text)}</span></div>`).join('')+'</div>';
-  const br=p.bring.filter(sure);
+  const br=p.bring;
   $('#planBring').hidden=!br.length;
   $('#planBringList').innerHTML=br.map(b=>`<span class="bring"><span aria-hidden="true" class="ms">${esc(b.icon)}</span>${esc(b.text)}</span>`).join('');
   $('#planWarn').hidden=!p.warn;$('#planWarn span:last-child').textContent=p.warn;
