@@ -383,7 +383,7 @@ function cardsHtml(el,cards){
   el.querySelectorAll('.pcP').forEach(b=>b.onclick=()=>playSign(b.dataset.k));
 }
 function wordChips(el,words){
-  el.innerHTML=(words||[]).filter(k=>AR[k]).map(k=>`<button class="chip" data-k="${k}"><span aria-hidden="true" class="ms">sign_language</span>${esc(AR[k])}</button>`).join('');
+  el.innerHTML=(words||[]).filter(k=>AR[k]&&canSign(k)).map(k=>`<button class="chip" data-k="${k}"><span aria-hidden="true" class="ms">sign_language</span>${esc(AR[k])}</button>`).join('');
   el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>playSign(b.dataset.k));
 }
 const factHtml=f=>`<div class="fact"><span aria-hidden="true" class="ms">${esc(f.icon||'info')}</span><div><span>${esc(f.label)}</span><b>${esc(f.value)}</b></div></div>`;
