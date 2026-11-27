@@ -543,7 +543,7 @@ $('#smCal').onclick=()=>{
 
 /* ---------- signing (recog.js) ---------- */
 const arDigits=ar;const SET={perf:false};
-const RAR={'3waz':'عايز',ashab:'أسحب',awda3:'أودع',flos:'فلوس',bta2a:'البطاقة',gedid:'جديدة',msh_shaghal:'مش شغالة',kam:'كام',hesab:'الحساب',emta:'إمتى',aywa:'أيوه',la:'لأ',tmam:'تمام',tany:'تاني',shokran:'شكراً',salam:'السلام عليكم',sabah:'صباح الخير',ana:'أنا',mo7tag:'محتاج',mosa3da:'مساعدة',fein:'فين',asef:'آسف',kwayes:'كويس','3amel_eh':'عامل إيه',bdal_fa2ed:'بدل فاقد',bdal_talef:'بدل تالف',raqam_serri:'الرقم السري',bank:'البنك',tawqee3:'توقيع',telefon:'تليفون',asam:'أصم',estelam:'استلام',meeza:'بطاقة ميزة',sora:'صورة',besor3a:'بسرعة',ba3d:'بعدين',akid:'أكيد','7ader':'حاضر',ahlan:'أهلاً'};
+const RAR={n0:'٠',n1:'١',n2:'٢',n3:'٣',n4:'٤',n5:'٥',n6:'٦',n7:'٧',n8:'٨',n9:'٩',n10:'١٠','3waz':'عايز',ashab:'أسحب',awda3:'أودع',flos:'فلوس',bta2a:'البطاقة',gedid:'جديدة',msh_shaghal:'مش شغالة',kam:'كام',hesab:'الحساب',emta:'إمتى',aywa:'أيوه',la:'لأ',tmam:'تمام',tany:'تاني',shokran:'شكراً',salam:'السلام عليكم',sabah:'صباح الخير',ana:'أنا',mo7tag:'محتاج',mosa3da:'مساعدة',fein:'فين',asef:'آسف',kwayes:'كويس','3amel_eh':'عامل إيه',bdal_fa2ed:'بدل فاقد',bdal_talef:'بدل تالف',raqam_serri:'الرقم السري',bank:'البنك',tawqee3:'توقيع',telefon:'تليفون',asam:'أصم',estelam:'استلام',meeza:'بطاقة ميزة',sora:'صورة',besor3a:'بسرعة',ba3d:'بعدين',akid:'أكيد','7ader':'حاضر',ahlan:'أهلاً'};
 let SG=[];
 function sgShow(){
   $('#sgWords').innerHTML=SG.length?SG.map(k=>`<span class="chip sign-chip">${esc(RAR[k]||k)}</span>`).join(''):'<span class="slot"></span><span class="slot"></span><span class="slot"></span>';
