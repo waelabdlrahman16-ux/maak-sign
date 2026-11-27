@@ -63,5 +63,5 @@ export const ICONS = [
   "credit_card", "credit_card_off", "block", "payments", "event", "schedule", "badge", "description",
   "local_police", "photo_camera", "call", "location_on", "receipt_long", "medication", "local_hospital",
   "account_balance", "family_restroom", "task_alt", "help", "edit_document", "person", "home", "school",
-  "password", "inventory_2", "warning", "storefront", "hourglass_top", "cancel", "check_circle",
+  "password", "inventory_2", "warning", "storefront", "hourglass_top", "cancel", "check_circle", "sign_language", "id_card", "support_agent",
 ];

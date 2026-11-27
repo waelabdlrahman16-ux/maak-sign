@@ -1,6 +1,9 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v24: counter picture cards show only the staff's newest message (walkthrough 28 Nov: cards kept the first reply and lost the pickup time).
+// v23: letter also returns up to 3 picture cards for a customer who can't read (cards in the app language; the letter itself stays Arabic).
+// v22: every answer carries _u = the model calls it made and their token counts (for measuring cost per task). No user content is logged.
 // v21: English mode — payload.lang "en" makes every customer/staff text English (demo and judges).
 // v20: compose may not add requests the signs do not contain (prompt + server guard).
 // v19: letter — the paper the customer hands to the staff (request or police statement).
@@ -36,11 +39,11 @@ const PROMPTS: Record<string, string> = {
   plan:
     "You are Maak, an agent that helps a deaf Egyptian person get a task done at a service counter (bank, civil registry, social unit, hospital). Given the goal and the place, plan the visit: 2 to 5 short steps in order (each at most 6 words), and for each step the exact polite question Maak will show the staff on the customer's behalf (at most 18 words, Egyptian Arabic, addressed to the staff), or an empty string if no question is needed. List what to bring (each at most 5 words), and the fee: if a KNOWLEDGE fact gives the fee for this goal, put it (e.g. \"100 جنيه\") with that fact id, else empty text. In words, pick the sign keys that carry the goal (e.g. card, lost, new). For every step, item and the fee, set from to the id of the KNOWLEDGE fact it comes from (e.g. \"f1\"), or an empty string if it comes from no fact. Items with no fact are fine but must not contain numbers. If a step can only be done by phone and the customer is deaf, say Maak will ask the staff to do it. Prefer official facts over news facts. If an official fact offers a way to do the goal from home or online without the counter, the warning must say so (e.g. «ممكن تطلبها من البيت على موقع مصر الرقمية»). Otherwise add one warning only if it really matters (at most 12 words), else empty. " + STYLE,
   next:
-    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); up to 3 picture cards that show what the staff said without reading (cards): one card per idea, in the order the staff said them; each card has an icon (badge = bring national ID, credit_card = bank card, payments = pay money, event = a day or date, schedule = a time, storefront = go to a window or counter, hourglass_top = wait, description = a paper or form, edit_document = sign or fill a paper, photo_camera = photo, check_circle = done or approved, cancel = refused or not possible, location_on = another place), a text of at most 3 very simple Egyptian words (for example «هات البطاقة», «تعالى بكرة», «شباك ٣»; any number must be one the staff said), and word = the one vocabulary sign key that best shows the card, or empty; and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
+    "You are Maak, running a visit at a service counter for a deaf Egyptian customer. You get the goal, the planned steps with their status, and the conversation so far (staff = what the staff said or typed, customer = what the customer signed or tapped, maak = what Maak already asked). Decide: for EVERY planned step, its state in progress: \"done\" only if the staff did it now or said it is done, or (for a step that is asking something) the staff answered it; \"customer_todo\" if the staff says the customer still has to do it (file, bring, pay, come back); \"open\" otherwise; any new concrete facts the staff stated (fee, date, time, number, place, document) copied exactly; the single most useful next question Maak should show the staff (at most 20 words, polite Egyptian Arabic to the staff; empty if nothing is missing or the staff just needs to act); what to tell the customer now (at most 14 words, very simple); up to 3 one-tap replies the customer may want (each at most 4 words, first person); up to 3 picture cards that show, without reading, what is in last_staff_message ONLY (the staff's newest message; earlier staff turns were already shown, so never repeat anything that is not in last_staff_message) (cards): one card per idea of that last message, in the order the staff said them, most important first if there are more than 3 (a date, time or window to come back beats politeness); each card has an icon (badge = bring national ID, credit_card = bank card, payments = pay money, event = a day or date, schedule = a time, storefront = go to a window or counter, hourglass_top = wait, description = a paper or form, edit_document = sign or fill a paper, photo_camera = photo, check_circle = done or approved, cancel = refused or not possible, location_on = another place), a text of at most 3 very simple Egyptian words (for example «هات البطاقة», «تعالى بكرة», «شباك ٣»; any number must be one the staff said), and word = the one vocabulary sign key that best shows the card, or empty; and finished=true only when every step is done or the staff said there is nothing more. Never ask about anything the staff already answered in the conversation, and never repeat a question Maak already asked unless the staff did not answer it; ask only about what is still unknown and matters for the goal. " + STYLE,
   read:
     "You are Maak. A deaf Egyptian person photographed a paper or a phone screen at a service counter. Say what it is (kind), a short title (at most 8 words), up to 5 key facts copied EXACTLY as printed (amounts, dates, reference numbers, names of places or documents) with a short label each, and the one next step the person should take (at most 14 words). If the photo is blurry, cut off or unreadable, set unclear=true and say so in next instead of guessing. Do not read out or repeat full card numbers, national ID numbers or account numbers: show only the last 4 digits. " + STYLE,
   letter:
-    "You are Maak. Write the short paper a deaf Egyptian customer will hand to the staff, in the customer's own voice (first person). If paper_wanted is given, use that kind; otherwise pick \"police_statement\" only when the goal is reporting a lost or stolen national ID or document to the police, else \"request\". A police_statement is addressed to the police station (\"السيد مأمور قسم الشرطة\") and states what was lost, roughly when and where only if the customer or staff said so, and asks for a police report (محضر فقد) to be written. to = who it is addressed to (e.g. \"السيد مدير فرع بنك مصر\", \"السيد رئيس الوحدة الاجتماعية\", \"السيد مأمور القسم\"), at most 8 words. subject = at most 8 words. lines = 3 to 6 short sentences in clear, polite, simple Modern Standard Arabic that any clerk understands: first say the customer is deaf and communicates in Egyptian Sign Language and asks for written replies; then state exactly what happened and what they request, using only the goal, the conversation and the facts. Never invent dates, amounts, names, numbers, places or events; never write a card, account or national ID number (the customer fills those by hand). Never say that anything was paid, done, received or stopped unless the staff said exactly that; a fee the staff mentioned is only a fee to pay. Do not promise anything on behalf of the staff. Numbers as digits. A fact marked level \"news\" is not confirmed: do not state it as a rule.",
+    "You are Maak. Write the short paper a deaf Egyptian customer will hand to the staff, in the customer's own voice (first person). If paper_wanted is given, use that kind; otherwise pick \"police_statement\" only when the goal is reporting a lost or stolen national ID or document to the police, else \"request\". A police_statement is addressed to the police station (\"السيد مأمور قسم الشرطة\") and states what was lost, roughly when and where only if the customer or staff said so, and asks for a police report (محضر فقد) to be written. to = who it is addressed to (e.g. \"السيد مدير فرع بنك مصر\", \"السيد رئيس الوحدة الاجتماعية\", \"السيد مأمور القسم\"), at most 8 words. subject = at most 8 words. lines = 3 to 6 short sentences in clear, polite, simple Modern Standard Arabic that any clerk understands: first say the customer is deaf and communicates in Egyptian Sign Language and asks for written replies; then state exactly what happened and what they request, using only the goal, the conversation and the facts. Never invent dates, amounts, names, numbers, places or events; never write a card, account or national ID number (the customer fills those by hand). Never say that anything was paid, done, received or stopped unless the staff said exactly that; a fee the staff mentioned is only a fee to pay. Do not promise anything on behalf of the staff. Numbers as digits. A fact marked level \"news\" is not confirmed: do not state it as a rule. Also give cards: up to 3 picture cards that show a customer who cannot read what this paper says, in order: first that they are deaf and ask for writing (icon sign_language, e.g. «أنا أصم، اكتب لي»), then what they request (one card), then the place or office if useful (one card). Each card: an icon from the icon list, text of at most 3 very simple words, and word = the one vocabulary sign key that best shows it, or empty. A number may appear in a card only if it is in the facts or what the staff said.",
   summary:
     "You are Maak. Summarise a finished visit for a deaf Egyptian customer: a title (at most 5 words), up to 5 lines (each at most 8 words) covering what was done, the fee paid, and what happens next, using only what the staff said and the facts collected during the visit; never claim something was paid or done unless the staff said so. If the staff gave a pickup or follow-up date, set remind.date as YYYY-MM-DD (today's date is given; resolve phrases like \"after 3 days\") and remind.text (at most 8 words); otherwise leave remind.date empty. " + STYLE,
 };
@@ -196,8 +199,9 @@ const SCHEMAS: Record<string, any> = {
       to: { type: "string" },
       subject: { type: "string" },
       lines: { type: "array", minItems: 2, maxItems: 6, items: { type: "string" } },
+      cards: { type: "array", maxItems: 3, items: { type: "object", properties: { icon, text: { type: "string" }, word: { type: "string" } }, required: ["icon", "text", "word"] } },
     },
-    required: ["kind", "to", "subject", "lines"],
+    required: ["kind", "to", "subject", "lines", "cards"],
   },
   summary: {
     type: "object",
@@ -224,16 +228,17 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
   // strict = the fast model with a forced tool call (always returns the full schema); used as the
   // agent tasks' backup when the smart model's answer comes back incomplete.
   const agent = SMART_TASKS.includes(task) && !strict;
+  const model = agent ? SMART : FAST;
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     signal,
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
-      model: agent ? SMART : FAST,
+      model,
       max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
-      system: (en ? "ANSWER IN ENGLISH. " + toEnglish(PROMPTS[task]) : PROMPTS[task]) + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
+      system: (en && task === "letter" ? PROMPTS[task] + " ENGLISH MODE: the paper itself (to, subject, lines) stays in simple Modern Standard Arabic for the Egyptian staff; only the cards are in short plain English (e.g. \"I'm deaf, write please\", \"New bank card\")." : en ? "ANSWER IN ENGLISH. " + toEnglish(PROMPTS[task]) : PROMPTS[task]) + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en && task !== "letter" ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
       tools: [{ name: "answer", description: "Return the answer.", input_schema: SCHEMAS[task] }],
       tool_choice: agent ? { type: "auto" } : { type: "tool", name: "answer" },
       messages: [{ role: "user", content }],
@@ -242,13 +247,14 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
   if (!r.ok) {
     let msg = "";
     try { msg = String((await r.json())?.error?.message || "").slice(0, 200); } catch { /* no body */ }
-    return { status: r.status, out: null, stop: msg };
+    return { status: r.status, out: null, stop: msg, usage: null };
   }
   const data = await r.json();
   const blocks: any[] = data?.content || [];
   const tool = blocks.find((c) => c?.type === "tool_use" && c?.input && typeof c.input === "object");
   const out = tool ? tool.input : firstObject(blocks.map((c) => c?.type === "text" ? c.text || "" : "").join(""));
-  return { status: 200, out, stop: String(data?.stop_reason || "") };
+  const usage = { m: model, i: Number(data?.usage?.input_tokens) || 0, o: Number(data?.usage?.output_tokens) || 0 };
+  return { status: 200, out, stop: String(data?.stop_reason || ""), usage };
 }
 
 // ---------- honesty guard: every number the agent states must exist in its evidence ----------
@@ -283,8 +289,10 @@ function buildInput(task: string, p: any): unknown {
     vocabulary: (p.vocab || []).map((v: any) => `${v.k}: ${v.ar}`),
     icons: ICONS,
   };
-  if (p.lang === "en") base.answer_language = "English: every text field must be in plain English, even if the goal or conversation is in Arabic";
+  if (p.lang === "en" && task === "letter") base.answer_language = "cards in short plain English; to, subject and lines in simple Modern Standard Arabic";
+  else if (p.lang === "en") base.answer_language = "English: every text field must be in plain English, even if the goal or conversation is in Arabic";
   if (task === "next" || task === "summary" || task === "letter") Object.assign(base, { steps: p.steps || [], conversation: p.turns || [], facts_so_far: p.facts || [] });
+  if (task === "next") base.last_staff_message = [...(p.turns || [])].reverse().find((t: any) => t.who === "staff")?.text || "";
   if (task === "summary") base.today = p.today;
   if (task === "letter" && p.want) base.paper_wanted = p.want;
   if (task !== "read") return JSON.stringify(base);
@@ -323,6 +331,8 @@ function shape(task: string, out: any, p: any): any | null {
 
   if (task === "next") {
     const ids = new Set(p.steps.map((s: any) => s.id));
+    // picture cards: only the staff's newest message (its numbers must be in it)
+    const lastStaff = [...(p.turns || [])].reverse().find((t: any) => t.who === "staff")?.text || "";
     const evidence = staff + " " + factsSoFar;
     const facts = (Array.isArray(out.facts) ? out.facts : []).slice(0, 4)
       .map((f: any) => ({ icon: okIcon(f.icon), label: clip(f.label, 30), value: clip(f.value, 60) }))
@@ -338,7 +348,7 @@ function shape(task: string, out: any, p: any): any | null {
       replies: (Array.isArray(out.replies) ? out.replies : []).map((r: unknown) => clip(r, 30)).filter(Boolean).slice(0, 3),
       cards: (Array.isArray(out.cards) ? out.cards : []).slice(0, 3)
         .map((c: any) => ({ icon: okIcon(c.icon), text: clip(c.text, 24), word: signKeys([c.word], p.vocab)[0] || "" }))
-        .filter((c: any) => c.text && supported(c.text, evidence)),
+        .filter((c: any) => c.text && supported(c.text, lastStaff)),
       finished: out.finished === true,
     };
   }
@@ -366,7 +376,11 @@ function shape(task: string, out: any, p: any): any | null {
     const lines = (Array.isArray(out.lines) ? out.lines : []).slice(0, 6)
       .map((l: unknown) => clip(l, 220)).filter((l: string) => l && supported(l, evidence) && noLong(l));
     if (lines.length < 2) return null;
+    const cards = (Array.isArray(out.cards) ? out.cards : []).slice(0, 3)
+      .map((c: any) => ({ icon: okIcon(c.icon), text: clip(c.text, 30), word: signKeys([c.word], p.vocab)[0] || "" }))
+      .filter((c: any) => c.text && supported(c.text, evidence));
     return {
+      cards,
       kind: p.want || (out.kind === "police_statement" ? "police_statement" : "request"),
       to: supported(clip(out.to, 80), evidence) ? clip(out.to, 80) : "",
       subject: supported(clip(out.subject, 80), evidence) ? clip(out.subject, 80) : "",
@@ -405,16 +419,20 @@ Deno.serve(async (req) => {
   const EN = p?.lang === "en";
   const content = buildInput(task, p);
   const agent = AGENT_TASKS.includes(task);
+  // model calls made for this request and their token counts (cost per task); no user content
+  const U: any[] = [];
+  const reply = (b: any) => json({ ...b, _u: U }, 200, h);
 
   try {
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), agent ? 25000 : 9000);
     let res = await ask(key, task, content, ctl.signal, false, EN);
-    if (res.status === 200 && !res.out) res = await ask(key, task, content, ctl.signal, false, EN); // one retry on unparsable output
+    if (res.usage) U.push(res.usage);
+    if (res.status === 200 && !res.out) { res = await ask(key, task, content, ctl.signal, false, EN); if (res.usage) U.push(res.usage); } // one retry on unparsable output
     clearTimeout(timer);
-    if (res.status !== 200) return json({ fallback: true, reason: "upstream_" + res.status, detail: res.stop }, 200, h);
+    if (res.status !== 200) return reply({ fallback: true, reason: "upstream_" + res.status, detail: res.stop });
     const out = res.out;
-    if (!out) return json({ fallback: true, reason: "parse", stop: res.stop }, 200, h);
+    if (!out) return reply({ fallback: true, reason: "parse", stop: res.stop });
 
     if (agent) {
       // some replies carry nested arrays/objects as JSON strings; parse them back
@@ -426,33 +444,34 @@ Deno.serve(async (req) => {
         const ctl2 = new AbortController();
         const t2 = setTimeout(() => ctl2.abort(), 15000);
         const res2 = await ask(key, task, content, ctl2.signal, true, EN);
+        if (res2.usage) U.push(res2.usage);
         clearTimeout(t2);
         if (res2.status === 200 && res2.out) shaped = shape(task, res2.out, p);
-        if (shaped) return json({ ...shaped, backup: true }, 200, h);
+        if (shaped) return reply({ ...shaped, backup: true });
       }
-      if (shaped) return json(shaped, 200, h);
-      return json({ fallback: true, reason: "shape", ...(p.debug === true ? { raw: out } : {}) }, 200, h);
+      if (shaped) return reply(shaped);
+      return reply({ fallback: true, reason: "shape", ...(p.debug === true ? { raw: out } : {}) });
     }
     if (task === "compose") {
-      if (typeof out.text !== "string" || !out.text.trim() || out.text.length > 160) return json({ fallback: true, reason: "shape" }, 200, h);
+      if (typeof out.text !== "string" || !out.text.trim() || out.text.length > 160) return reply({ fallback: true, reason: "shape" });
       // guard: the sentence may not say more than the signs. Identity/greeting signs are returned as signed;
       // a sentence far longer than the signs falls back to the signs themselves.
       const signs = (p.signs as string[]).map((x) => x.trim()).filter(Boolean);
       const plain = signs.join(" ") + ".";
-      if (signs.every((x) => COMPOSE_PLAIN.includes(x))) return json({ text: plain, guarded: true }, 200, h);
+      if (signs.every((x) => COMPOSE_PLAIN.includes(x))) return reply({ text: plain, guarded: true });
       const t = out.text.trim();
-      if (t.split(/\s+/).length > signs.length * 5 + 6) return json({ text: plain, guarded: true }, 200, h);
-      return json({ text: t }, 200, h);
+      if (t.split(/\s+/).length > signs.length * 5 + 6) return reply({ text: plain, guarded: true });
+      return reply({ text: t });
     }
     if (task === "simplify") {
       const t = typeof out.text === "string" ? out.text.trim() : "";
-      if (!t || t.length > 120) return json({ fallback: true, reason: "shape" }, 200, h);
-      return json({ text: t, words: signKeys(out.words, p.vocab) }, 200, h);
+      if (!t || t.length > 120) return reply({ fallback: true, reason: "shape" });
+      return reply({ text: t, words: signKeys(out.words, p.vocab) });
     }
     const i = Number(out.index);
-    if (!Number.isInteger(i) || i < -1 || i >= p.phrases.length) return json({ fallback: true, reason: "shape" }, 200, h);
-    return json({ index: i }, 200, h);
+    if (!Number.isInteger(i) || i < -1 || i >= p.phrases.length) return reply({ fallback: true, reason: "shape" });
+    return reply({ index: i });
   } catch (_e) {
-    return json({ fallback: true, reason: "error" }, 200, h);
+    return reply({ fallback: true, reason: "error" });
   }
 });
