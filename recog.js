@@ -50,7 +50,7 @@ const CAM={stream:null,v:null,c:null,pill:null,perf:null,onSign:null,running:fal
 let buf=[],signing=false,startT=0,cool=0,prevW=null,upSince=0,downSince=0,stillSince=0,emitted=0,TS=0;
 const nextTs=t=>(TS=Math.max(TS+1,Math.floor(t)));
 const PERF={fps:0,ms:0,last:0};
-function attach(v,c,pill,perf,onSign){CAM.v=v;CAM.c=c;CAM.pill=pill;CAM.perf=perf;CAM.onSign=onSign;buf=[];signing=false;upSince=0;}
+function attach(v,c,pill,perf,onSign){hideWarn();CAM.v=v;CAM.c=c;CAM.pill=pill;CAM.perf=perf;CAM.onSign=onSign;buf=[];signing=false;upSince=0;}
 async function startCam(){
   await bootModel();
   if(!CAM.stream) CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
@@ -90,7 +90,7 @@ function seekFrame(v,t){return new Promise(res=>{let sk=false,fr=!v.requestVideo
   if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>{fr=true;fin()});
   const h=()=>{v.removeEventListener('seeked',h);sk=true;fin();setTimeout(()=>{fr=true;fin()},120)};v.addEventListener('seeked',h);
   setTimeout(()=>{v.removeEventListener('seeked',h);sk=fr=true;fin()},1500);v.currentTime=t})}
-function stopCam(){if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}CAM.onSign=null}
+function stopCam(){if(CAM.stream){CAM.stream.getTracks().forEach(t=>t.stop());CAM.stream=null}CAM.onSign=null;hideWarn()}
 function raised(f){const up=h=>h&&h[0][1]<f.hipY-0.3;return up(f.L)||up(f.R)}
 function wrist(f){const h=f.R||f.L;return h?h[0]:null}
 function endSign(now,why){const cut=why==='down'?downSince:why==='still'?stillSince:Infinity;const frames=buf.filter(x=>x.now<cut).map(x=>x.f);
@@ -102,7 +102,19 @@ function segment(f,now){const up=raised(f),w=wrist(f);const sp=(w&&prevW)?Math.h
   if(!up){if(!downSince)downSince=now;if(now-downSince>=250)return endSign(now,'down')}else downSince=0;
   if(sp<0.025){if(!stillSince)stillSince=now;if(now-startT>=600&&now-stillSince>=400)return endSign(now,'still')}else stillSince=0;
   if(now-startT>3500)return endSign(now,'cap')}
-function draw(r){const c=CAM.c,v=CAM.v;c.width=v.videoWidth;c.height=v.videoHeight;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);const hs=[r.leftHandLandmarks&&r.leftHandLandmarks[0],r.rightHandLandmarks&&r.rightHandLandmarks[0]];g.fillStyle=signing?'#ff5a4e':'#adc3fe';hs.forEach(h=>h&&h.forEach(p=>{g.beginPath();g.arc(p.x*c.width,p.y*c.height,4,0,7);g.fill()}))}
+/* Camera overlay (27 Nov, Wael's choice "Google style, light face"): each hand its own colour with bright points and dim lines (both turn red while a sign is recording), shoulders and arms faint, face only a faint outline and lips so the staff still see it. Display only: recognition reads the same points either way. A banner shows when a raised hand isn't being tracked. */
+const HC=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]],OVAL=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109],LIPS=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185],HCOL=['#2FD3A3','#FF8A5C'],WARN={el:null,since:0,on:false};
+function hideWarn(){WARN.since=0;WARN.on=false;if(WARN.el)WARN.el.style.display='none';const c=CAM.c;if(c&&c.width)c.getContext('2d').clearRect(0,0,c.width,c.height)}
+function drawWarn(show){const m=CAM.c&&CAM.c.parentElement;if(!m)return;if(!WARN.el||WARN.el.parentElement!==m){WARN.el=document.createElement('div');WARN.el.setAttribute('role','status');WARN.el.style.cssText='position:absolute;inset-inline:12px;bottom:56px;margin:auto;width:max-content;max-width:calc(100% - 24px);background:#FAEEDA;color:#633806;border-radius:14px;padding:6px 12px;font-size:14px;display:none;align-items:center;gap:6px;z-index:2';WARN.el.innerHTML='<span aria-hidden="true" class="ms" style="font-size:20px">front_hand</span><span>'+(window.MAAK_LANG==='en'?'Hand not seen — step back or face the light':'إيدك مش باينة — ابعد شوية أو قرّب للنور')+'</span>';m.appendChild(WARN.el)}const now=performance.now();if(show){if(!WARN.since)WARN.since=now}else WARN.since=0;const on=!!WARN.since&&now-WARN.since>800;if(on!==WARN.on){WARN.on=on;WARN.el.style.display=on?'flex':'none'}}
+function draw(r){const c=CAM.c,v=CAM.v;c.width=v.videoWidth;c.height=v.videoHeight;const g=c.getContext('2d'),W=c.width,H=c.height,s=Math.max(1,Math.min(W,H)/360);g.clearRect(0,0,W,H);g.lineCap='round';g.lineJoin='round';
+ const P=r.poseLandmarks&&r.poseLandmarks[0],F=r.faceLandmarks&&r.faceLandmarks[0],X=p=>[p.x*W,p.y*H];
+ const line=(a,b,col,w)=>{g.strokeStyle=col;g.lineWidth=w*s;g.beginPath();g.moveTo(...X(a));g.lineTo(...X(b));g.stroke()},dot=(p,col,rr)=>{g.fillStyle=col;g.beginPath();g.arc(...X(p),rr*s,0,7);g.fill()},loop=(pts,idx,col,w)=>{g.strokeStyle=col;g.lineWidth=w*s;g.beginPath();idx.forEach((i,k)=>{const q=X(pts[i]);k?g.lineTo(...q):g.moveTo(...q)});g.closePath();g.stroke()};
+ if(F){loop(F,OVAL,'rgba(0,0,0,.25)',2.5);loop(F,OVAL,'rgba(206,203,246,.7)',1);loop(F,LIPS,'rgba(0,0,0,.25)',2.5);loop(F,LIPS,'rgba(206,203,246,.85)',1)}
+ if(P){[['rgba(0,0,0,.3)',3.5],['rgba(255,255,255,.6)',1.8]].forEach(([col,w])=>[[11,12],[11,13],[13,15],[12,14],[14,16]].forEach(([a,b])=>{if(P[a]&&P[b])line(P[a],P[b],col,w)}));[11,12,13,14].forEach(i=>P[i]&&dot(P[i],'rgba(255,255,255,.8)',3))}
+ const hs=[r.leftHandLandmarks&&r.leftHandLandmarks[0],r.rightHandLandmarks&&r.rightHandLandmarks[0]];
+ hs.forEach((h,k)=>{if(!h)return;const col=signing?'#FF4D4D':HCOL[k];g.globalAlpha=.5;HC.forEach(([a,b])=>line(h[a],h[b],col,2.5));g.globalAlpha=1;h.forEach((p,i)=>{dot(p,'rgba(0,0,0,.35)',(i?3.2:4.5)+1.2);dot(p,col,i?3.2:4.5)})});
+ /* warn only before a sign starts (short dropouts mid-sign are normal, e.g. a hand in front of the face, and are filled in), when for 0.8 s no hand is tracked while a wrist is clearly raised (less than one shoulder-width below the shoulders) — tested 27 Nov on 48 CC0 clips */
+ let lost=false;if(!signing&&P&&P[11]&&P[12]&&!hs[0]&&!hs[1]){const my=(P[11].y+P[12].y)/2,sw=Math.hypot((P[11].x-P[12].x)*W/H,P[11].y-P[12].y)||1;[15,16].forEach(w=>{const q=P[w];if(q&&(q.visibility===undefined||q.visibility>0.6)&&(q.y-my)/sw<1.0)lost=true})}drawWarn(lost)}
 function loop(){
   if(!CAM.running)return;const v=CAM.v;
   if(holistic&&v&&v.readyState>=2&&!v.paused&&CAM.onSign){const ts=performance.now();if(ts>CAM.lastTs){CAM.lastTs=ts;
