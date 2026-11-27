@@ -1,6 +1,7 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v25: summary also returns up to 5 picture cards (big number + 3 words) for customers who can't read.
 // v24: counter picture cards show only the staff's newest message (walkthrough 28 Nov: cards kept the first reply and lost the pickup time).
 // v23: letter also returns up to 3 picture cards for a customer who can't read (cards in the app language; the letter itself stays Arabic).
 // v22: every answer carries _u = the model calls it made and their token counts (for measuring cost per task). No user content is logged.
@@ -45,7 +46,7 @@ const PROMPTS: Record<string, string> = {
   letter:
     "You are Maak. Write the short paper a deaf Egyptian customer will hand to the staff, in the customer's own voice (first person). If paper_wanted is given, use that kind; otherwise pick \"police_statement\" only when the goal is reporting a lost or stolen national ID or document to the police, else \"request\". A police_statement is addressed to the police station (\"السيد مأمور قسم الشرطة\") and states what was lost, roughly when and where only if the customer or staff said so, and asks for a police report (محضر فقد) to be written. to = who it is addressed to (e.g. \"السيد مدير فرع بنك مصر\", \"السيد رئيس الوحدة الاجتماعية\", \"السيد مأمور القسم\"), at most 8 words. subject = at most 8 words. lines = 3 to 6 short sentences in clear, polite, simple Modern Standard Arabic that any clerk understands: first say the customer is deaf and communicates in Egyptian Sign Language and asks for written replies; then state exactly what happened and what they request, using only the goal, the conversation and the facts. Never invent dates, amounts, names, numbers, places or events; never write a card, account or national ID number (the customer fills those by hand). Never say that anything was paid, done, received or stopped unless the staff said exactly that; a fee the staff mentioned is only a fee to pay. Do not promise anything on behalf of the staff. Numbers as digits. A fact marked level \"news\" is not confirmed: do not state it as a rule. Also give cards: up to 3 picture cards that show a customer who cannot read what this paper says, in order: first that they are deaf and ask for writing (icon sign_language, e.g. «أنا أصم، اكتب لي»), then what they request (one card), then the place or office if useful (one card). Each card: an icon from the icon list, text of at most 3 very simple words, and word = the one vocabulary sign key that best shows it, or empty. A number may appear in a card only if it is in the facts or what the staff said.",
   summary:
-    "You are Maak. Summarise a finished visit for a deaf Egyptian customer: a title (at most 5 words), up to 5 lines (each at most 8 words) covering what was done, the fee paid, and what happens next, using only what the staff said and the facts collected during the visit; never claim something was paid or done unless the staff said so. If the staff gave a pickup or follow-up date, set remind.date as YYYY-MM-DD (today's date is given; resolve phrases like \"after 3 days\") and remind.text (at most 8 words); otherwise leave remind.date empty. " + STYLE,
+    "You are Maak. Summarise a finished visit for a deaf Egyptian customer: a title (at most 5 words), up to 5 lines (each at most 8 words) covering what was done, the fee paid, and what happens next, using only what the staff said and the facts collected during the visit; never claim something was paid or done unless the staff said so. If the staff gave a pickup or follow-up date, set remind.date as YYYY-MM-DD (today's date is given; resolve phrases like \"after 3 days\") and remind.text (at most 8 words); otherwise leave remind.date empty. Also give up to 5 picture cards for a customer who cannot read, most important first (a time or counter window to come back to beats what was done; then what to bring, the fee paid, what was stopped or done). Never put the reminder date in a card (the app draws it). big is one short number shown large (a time like \"10\", a window like \"5\", an amount like \"100\") or empty; text is at most 3 words naming it (e.g. «الساعة», «شباك», «جنيه», «هات البطاقة», «الكارت اتوقف»). Cards use only what the staff said. " + STYLE,
 };
 
 function cors(origin: string | null) {
@@ -210,8 +211,9 @@ const SCHEMAS: Record<string, any> = {
       lines: { type: "array", maxItems: 5, items: { type: "object", properties: { icon, text: { type: "string" } }, required: ["icon", "text"] } },
       remind: { type: "object", properties: { date: { type: "string" }, text: { type: "string" } }, required: ["date", "text"] },
       words: keys,
+      cards: { type: "array", maxItems: 5, items: { type: "object", properties: { icon, big: { type: "string" }, text: { type: "string" } }, required: ["icon", "big", "text"] } },
     },
-    required: ["title", "lines", "remind", "words"],
+    required: ["title", "lines", "remind", "words", "cards"],
   },
 };
 
@@ -394,7 +396,11 @@ function shape(task: string, out: any, p: any): any | null {
       .map((l: any) => ({ icon: okIcon(l.icon), text: clip(l.text, 70) }))
       .filter((l: any) => l.text && supported(l.text, evidence));
     const date = /^\d{4}-\d{2}-\d{2}$/.test(String(out.remind?.date || "")) && staff ? String(out.remind.date) : "";
-    return { title: clip(out.title, 40), lines, remind: { date, text: date ? clip(out.remind?.text, 60) : "" }, words: signKeys(out.words, p.vocab) };
+    // picture cards for a customer who can't read: one short number + up to 3 words, every number said by the staff
+    const cards = (Array.isArray(out.cards) ? out.cards : []).slice(0, 5)
+      .map((c: any) => ({ icon: okIcon(c.icon), big: /^[0-9\u0660-\u0669:.]{1,6}$/.test(clip(c.big, 6)) ? clip(c.big, 6) : "", text: clip(c.text, 30) }))
+      .filter((c: any) => c.text && c.icon !== "help" && supported(c.big + " " + c.text, evidence));
+    return { title: clip(out.title, 40), lines, remind: { date, text: date ? clip(out.remind?.text, 60) : "" }, words: signKeys(out.words, p.vocab), cards };
   }
   return null;
 }
