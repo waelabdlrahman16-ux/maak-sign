@@ -1,6 +1,7 @@
 // Maak Sign agent brain.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
+// v26: plan max_tokens 1800 (10 live runs 28 Nov: 2/10 hit 1200, one needed the backup call); _u also carries the stop reason (s).
 // v25: summary also returns up to 5 picture cards (big number + 3 words) for customers who can't read.
 // v24: counter picture cards show only the staff's newest message (walkthrough 28 Nov: cards kept the first reply and lost the pickup time).
 // v23: letter also returns up to 3 picture cards for a customer who can't read (cards in the app language; the letter itself stays Arabic).
@@ -237,7 +238,7 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
       model,
-      max_tokens: AGENT_TASKS.includes(task) ? 1200 : 400,
+      max_tokens: task === "plan" ? 1800 : AGENT_TASKS.includes(task) ? 1200 : 400,
       // The agent model does not accept a forced tool choice, so it is told to call the tool and
       // a plain-JSON reply is still parsed by firstObject.
       system: (en && task === "letter" ? PROMPTS[task] + " ENGLISH MODE: the paper itself (to, subject, lines) stays in simple Modern Standard Arabic for the Egyptian staff; only the cards are in short plain English (e.g. \"I'm deaf, write please\", \"New bank card\")." : en ? "ANSWER IN ENGLISH. " + toEnglish(PROMPTS[task]) : PROMPTS[task]) + (AGENT_TASKS.includes(task) ? " Always reply only by calling the answer tool, once, filling every field." : "") + (en && task !== "letter" ? " LANGUAGE OVERRIDE: the app is in English mode. Every text a person will read must be in short, plain English, never Arabic: sentences, the plan title, steps, questions to the staff, what to bring, the fee text (e.g. \"100 EGP\"), picture cards (at most 3 English words, e.g. \"Bring your ID\", \"Come tomorrow\", \"Window 3\"), replies, facts, letters and summaries. Keep every fact id (from) and every number exactly as the rules say. Sign keys stay as given." : ""),
@@ -255,7 +256,7 @@ async function ask(key: string, task: string, content: unknown, signal: AbortSig
   const blocks: any[] = data?.content || [];
   const tool = blocks.find((c) => c?.type === "tool_use" && c?.input && typeof c.input === "object");
   const out = tool ? tool.input : firstObject(blocks.map((c) => c?.type === "text" ? c.text || "" : "").join(""));
-  const usage = { m: model, i: Number(data?.usage?.input_tokens) || 0, o: Number(data?.usage?.output_tokens) || 0 };
+  const usage = { m: model, i: Number(data?.usage?.input_tokens) || 0, o: Number(data?.usage?.output_tokens) || 0, s: String(data?.stop_reason || "") };
   return { status: 200, out, stop: String(data?.stop_reason || ""), usage };
 }
 
