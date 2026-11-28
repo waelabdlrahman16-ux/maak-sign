@@ -1,4 +1,6 @@
 // Maak Sign agent brain.
+// v27: only the Maak website may call (a call with no Origin is refused), and daily limits per caller and in total
+//      (Cairo day) cap Anthropic spend; over the limit the app gets {fallback:true, reason:"limit"} and uses its built-in rules.
 // Translator tasks (v7): compose, match, simplify.
 // Agent tasks (v10: counter loop also returns picture cards for the staff reply; v9: plan prefers official facts and names an official from-home option): plan a visit, run the counter loop (next), read a paper (read), and summarise (summary).
 // v26: plan max_tokens 1800 (10 live runs 28 Nov: 2/10 hit 1200, one needed the backup call); _u also carries the stop reason (s).
@@ -16,6 +18,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { ICONS, KNOWLEDGE } from "./knowledge.ts";
 
 const ALLOWED = ["https://maaksign.com", "https://www.maaksign.com", "https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
+// Daily model-call limits (Cairo day): per caller, and for everyone together.
+const LIMIT_PER_CALLER = 200;
+const LIMIT_TOTAL = 2000;
 const FAST = "claude-haiku-5-5";
 const SMART = "claude-sonnet-5-5";
 const AGENT_TASKS = ["plan", "next", "read", "summary", "letter"];
@@ -62,6 +67,27 @@ function cors(origin: string | null) {
 
 function json(body: unknown, status: number, h: Record<string, string>) {
   return new Response(JSON.stringify(body), { status, headers: { ...h, "Content-Type": "application/json" } });
+}
+
+// Daily limits. The caller's address is hashed with a server secret; the raw address is never stored.
+// Counters live in public.rate_hits (service role only) and are pruned after 3 days.
+async function underLimit(req: Request, bucket: string, perCaller: number, total: number): Promise<boolean> {
+  const url = Deno.env.get("SUPABASE_URL"), sk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !sk) return false;
+  const ip = (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown").trim();
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(sk.slice(-24) + "|" + ip));
+  const who = btoa(String.fromCharCode(...new Uint8Array(d))).replace(/[^A-Za-z0-9]/g, "").slice(0, 22);
+  const hit = async (key: string, limit: number) => {
+    try {
+      const r = await fetch(url + "/rest/v1/rpc/rate_hit", {
+        method: "POST",
+        headers: { apikey: sk, Authorization: "Bearer " + sk, "Content-Type": "application/json" },
+        body: JSON.stringify({ p_key: key, p_limit: limit }),
+      });
+      return r.ok && (await r.json()) === true;
+    } catch { return false; }
+  };
+  return (await hit(bucket + ":" + who, perCaller)) && (await hit(bucket + ":all", total));
 }
 
 const str = (v: unknown, max: number, min = 0) => typeof v === "string" && v.length >= min && v.length <= max;
@@ -411,7 +437,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
   if (req.method !== "POST") return json({ error: "method" }, 405, h);
   const origin = req.headers.get("origin");
-  if (origin && !ALLOWED.includes(origin)) return json({ error: "origin" }, 403, h);
+  if (!origin || !ALLOWED.includes(origin)) return json({ error: "origin" }, 403, h);
 
   let body: any;
   try { body = await req.json(); } catch { return json({ error: "json" }, 400, h); }
@@ -421,6 +447,7 @@ Deno.serve(async (req) => {
 
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return json({ fallback: true, reason: "no_key" }, 200, h);
+  if (!(await underLimit(req, "agent", LIMIT_PER_CALLER, LIMIT_TOTAL))) return json({ fallback: true, reason: "limit" }, 200, h);
 
   const p = body.payload;
   const EN = p?.lang === "en";

@@ -2,8 +2,13 @@
 // the date, a random case id and a short generic text (no names, no numbers, no bank details).
 // A daily database job calls op "send"; the function sends what is due and forgets sent jobs after 7 days.
 // The signing key pair is made here on first use and kept in the database (no person handles it).
+// v3: only the Maak website may call (no Origin = refused, except the daily "send" job, which has its own secret);
+//     new reminders are capped per caller and in total per Cairo day.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 import webpush from "npm:web-push@3.6.7";
+
+const ADD_PER_CALLER = 30;
+const ADD_TOTAL = 1000;
 
 const ALLOWED = ["https://maaksign.com", "https://www.maaksign.com", "https://waelabdlrahman16-ux.github.io", "http://localhost:8790"];
 const cors = (o: string | null) => ({
@@ -22,6 +27,17 @@ async function keys() {
   await db.from("push_keys").insert({ id: 1, public_key: k.publicKey, private_key: k.privateKey });
   const { data: d2 } = await db.from("push_keys").select("public_key,private_key,cron_secret").eq("id", 1).single();
   return d2!;
+}
+// Daily limits. The caller's address is hashed with a server secret; the raw address is never stored.
+async function underLimit(req: Request, bucket: string, perCaller: number, total: number): Promise<boolean> {
+  const ip = (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown").trim();
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!.slice(-24) + "|" + ip));
+  const who = btoa(String.fromCharCode(...new Uint8Array(d))).replace(/[^A-Za-z0-9]/g, "").slice(0, 22);
+  const hit = async (key: string, limit: number) => {
+    const { data, error } = await db.rpc("rate_hit", { p_key: key, p_limit: limit });
+    return !error && data === true;
+  };
+  return (await hit(bucket + ":" + who, perCaller)) && (await hit(bucket + ":all", total));
 }
 const cairoToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo" }).format(new Date());
 const okEndpoint = (u: string) => {
@@ -56,7 +72,7 @@ Deno.serve(async (req) => {
     return json({ today, due: (jobs || []).length, sent, gone, failed }, 200, h);
   }
 
-  if (origin && !ALLOWED.includes(origin)) return json({ error: "origin" }, 403, h);
+  if (!origin || !ALLOWED.includes(origin)) return json({ error: "origin" }, 403, h);
   if (b?.op === "key") return json({ key: (await keys()).public_key }, 200, h);
   if (b?.op === "add") {
     const s = b.sub || {}, endpoint = String(s.endpoint || ""), p256dh = String(s.keys?.p256dh || ""), auth = String(s.keys?.auth || "");
@@ -64,6 +80,7 @@ Deno.serve(async (req) => {
     if (!okEndpoint(endpoint) || !/^[A-Za-z0-9_-]{80,100}$/.test(p256dh) || !/^[A-Za-z0-9_-]{16,24}$/.test(auth)) return json({ error: "sub" }, 400, h);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(due) || due < cairoToday()) return json({ error: "date" }, 400, h);
     if (!/^[a-z0-9]{8,24}$/.test(caseRef) || !body || /\d{5,}/.test(body)) return json({ error: "case" }, 400, h);
+    if (!(await underLimit(req, "push_add", ADD_PER_CALLER, ADD_TOTAL))) return json({ error: "limit" }, 429, h);
     await db.from("push_jobs").delete().eq("endpoint", endpoint).eq("case_ref", caseRef);
     const { error } = await db.from("push_jobs").insert({ endpoint, p256dh, auth, due_date: due, case_ref: caseRef, body });
     if (error) return json({ error: "store" }, 500, h);
